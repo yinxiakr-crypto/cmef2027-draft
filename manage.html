@@ -2,74 +2,266 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>메뉴 관리</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>전시회 관리</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <style>
+    :root {
+      --ink: #1c1a17;
+      --muted: #8a817a;
+      --line: #e4ddd2;
+      --paper: #faf7f2;
+      --red: #9b1b30;
+      --deep: #141210;
+    }
     * { box-sizing: border-box; }
-    body { margin: 0; background: #f4f6f6; color: #243033; font-family: Pretendard, "Malgun Gothic", sans-serif; }
-    header { background: #004448; color: #fff; padding: 22px 0; }
-    .wrap { width: min(980px, calc(100% - 40px)); margin: 0 auto; }
-    a { color: inherit; }
-    h1 { margin: 0; font-size: 28px; letter-spacing: -0.03em; }
-    .who { margin: 8px 0 0; font-size: 14px; opacity: 0.85; }
-    .back { display: inline-block; margin-top: 14px; color: #fff; font-size: 13px; }
-    main { padding: 28px 0 64px; }
-    article { background: #fff; border: 1px solid #e3e8e8; padding: 20px 22px; margin-top: 12px; }
-    h2 { margin: 0; font-size: 18px; }
-    p { margin: 8px 0 0; color: #5c6b70; font-size: 14px; line-height: 1.5; }
-    label { display: block; margin-top: 14px; font-size: 13px; font-weight: 650; }
-    input, textarea { width: 100%; margin-top: 6px; padding: 10px 12px; border: 1px solid #d5dddd; font: inherit; background: #fff; }
-    .grid { display: grid; grid-template-columns: 120px 1fr 1fr; gap: 8px; margin-top: 12px; }
-    .cell { min-height: 72px; border: 1px solid #d5dddd; background: #fafbfb; padding: 8px; font-size: 13px; }
-    .cell b { display: block; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Pretendard, "Malgun Gothic", sans-serif;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .wrap { width: min(920px, calc(100% - 32px)); margin: 0 auto; }
+    header { padding: 28px 0 4px; }
+    h1 { margin: 0; font-size: clamp(28px, 5vw, 36px); letter-spacing: -0.04em; font-weight: 680; }
+    .who { margin: 10px 0 0; color: var(--muted); font-size: 14px; line-height: 1.6; }
+    .bar {
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      background: rgba(250, 247, 242, 0.94);
+      border-bottom: 1px solid var(--line);
+      margin-top: 18px;
+    }
+    nav { display: flex; gap: 8px; overflow-x: auto; padding: 12px 0; }
+    nav a {
+      flex: 0 0 auto;
+      color: var(--ink);
+      text-decoration: none;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 14px;
+    }
+    main { padding-bottom: 48px; }
+    article {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 20px;
+      margin-top: 14px;
+    }
+    .see { margin: 0 0 8px; font-size: 12px; color: var(--red); font-weight: 680; letter-spacing: 0.04em; }
+    .see a { color: inherit; }
+    h2 { margin: 0; font-size: 22px; letter-spacing: -0.03em; }
+    .tag {
+      display: inline-block;
+      margin-left: 8px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--deep);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 680;
+      vertical-align: 3px;
+    }
+    p { margin: 8px 0 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
+    label { display: block; margin-top: 14px; font-size: 13px; font-weight: 680; }
+    input, textarea, select {
+      width: 100%;
+      margin-top: 6px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      font: inherit;
+      background: var(--paper);
+    }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .booths { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; }
+    button.save, button.add {
+      margin-top: 16px;
+      min-height: 48px;
+      border: 0;
+      border-radius: 12px;
+      background: var(--deep);
+      color: #fff;
+      font: inherit;
+      font-weight: 680;
+      padding: 0 18px;
+      cursor: pointer;
+    }
+    button.add { background: #fff; color: var(--ink); border: 1px solid var(--line); }
+    .list { margin: 14px 0 0; padding: 0; list-style: none; }
+    .list li { padding: 12px 0; border-top: 1px solid var(--line); font-size: 14px; }
+    .status { margin: 18px 0 0; font-size: 14px; }
+    @media (max-width: 720px) {
+      .row, .booths { grid-template-columns: 1fr 1fr; }
+      h1 { font-size: 28px; }
+    }
   </style>
 </head>
 <body>
   <header>
     <div class="wrap">
-      <h1>메뉴 관리</h1>
-      <p class="who">사용자가 보는 화면이 아닙니다. 시노서울이 각 메뉴를 고치는 화면입니다.</p>
-      <a class="back" href="index.html">사용자 첫 화면으로</a>
+      <h1>전시회 관리</h1>
+      <p class="who">방문자 메뉴와 같은 순서입니다. 이 주소는 방문자 화면에 없습니다. 저장은 이 브라우저의 시안에만 반영되고, 시노서울 서버에는 쓰이지 않습니다.</p>
     </div>
   </header>
+  <div class="bar">
+    <div class="wrap">
+      <nav>
+        <a href="#intro">전시 소개</a>
+        <a href="#map">전시 도면</a>
+        <a href="#apply">참가 신청</a>
+        <a href="#match">바이어 매칭</a>
+        <a href="#notice">공지</a>
+        <a href="cmef.html">방문자 화면</a>
+      </nav>
+    </div>
+  </div>
   <main class="wrap">
-    <article>
+    <article id="intro">
+      <p class="see">방문자 화면 · <a href="cmef.html#intro">전시 소개</a></p>
       <h2>전시 소개</h2>
-      <p>브로셔가 바뀌면 규모 수치와 Post Show Report를 여기서 고칩니다.</p>
-      <label>전시면적<input value="320,000+"></label>
+      <p>규모 숫자는 브로셔를 확인해서 방문자 화면에 이미 들어가 있습니다. 여기서는 브로셔 파일 이름만 적어 둡니다. 파일을 올린다고 숫자가 바뀌지는 않습니다.</p>
+      <label>브로셔 파일 이름<input id="brochure" placeholder="95th CMEF Brochure"></label>
     </article>
-    <article>
-      <h2>전시 도면</h2>
-      <p>그림 파일을 올리지 않습니다. 3×3 칸에 부스 번호와 업체 이름을 넣습니다.</p>
-      <div class="grid">
-        <div class="cell"><b>3×3</b>번호</div>
-        <div class="cell"><b>3×3</b>번호</div>
-        <div class="cell"><b>3×3</b>번호</div>
-      </div>
+
+    <article id="map">
+      <p class="see">방문자 화면 · <a href="cmef.html#map">전시 도면</a></p>
+      <h2>전시 도면 <span class="tag">CMEF</span></h2>
+      <p>1. 전시관 도면에서 한국관이 있는 곳을 누르면 2. 한국관 도면이 열립니다. 베트남 전시에는 이 단계를 두지 않습니다. 칸은 3×3이고, 번호는 여기서 정합니다.</p>
+      <div class="booths" id="boothInputs"></div>
     </article>
-    <article>
+
+    <article id="apply">
+      <p class="see">방문자 화면 · <a href="cmef.html#map">한국관 아래 목록</a></p>
       <h2>참가 신청</h2>
-      <p>신청서에서 기업명, 전시 제품, 인허가 여부를 받습니다. 한국관 목록에 그대로 표시됩니다.</p>
-      <label>기업명<input placeholder="기업명"></label>
-      <label>전시 제품<textarea rows="2" placeholder="공개할 제품"></textarea></label>
-      <label>인허가<input placeholder="취득 또는 미취득"></label>
+      <p>기업명, 제품 분류, 전시 제품, 인허가를 받습니다. 제품 분류와 인허가는 시판허가 쪽과 이어집니다. 소개 방식은 다음 설명에서 넣습니다.</p>
+      <label>주최사 신청 링크<input id="applyLink" placeholder="주최사 신청 주소"></label>
+      <div class="row">
+        <label>부스 번호<input id="appBooth" placeholder="번호"></label>
+        <label>기업명<input id="appCompany" placeholder="기업명"></label>
+      </div>
+      <div class="row">
+        <label>제품 분류<input id="appCategory" placeholder="제품 분류"></label>
+        <label>인허가<input id="appAuth" placeholder="취득 또는 미취득"></label>
+      </div>
+      <label>전시 제품<textarea id="appProduct" rows="2" placeholder="공개할 제품"></textarea></label>
+      <button class="add" type="button" id="addApp">이 신청을 목록에 넣기</button>
+      <ul class="list" id="appList"></ul>
     </article>
-    <article>
+
+    <article id="match">
+      <p class="see">방문자 화면 · <a href="cmef.html#match">바이어 매칭</a></p>
       <h2>바이어 매칭</h2>
       <p>인허가 여부에 따라 바이어 소개가 달라집니다. 소개 방식은 다음 설명에서 넣습니다.</p>
     </article>
-    <article>
-      <h2>공지</h2>
-      <label>제목<input placeholder="공지 제목"></label>
-      <label>내용<textarea rows="3"></textarea></label>
-    </article>
-    <article>
+
+    <article id="shows">
+      <p class="see">방문자 화면 · <a href="cmef.html">동기간 전시</a></p>
       <h2>동기간 전시</h2>
-      <p>담당하는 섹터만 아래에 내용을 추가합니다. 나머지 카드는 로고와 이름만 둡니다.</p>
-      <label>담당 섹터<input placeholder="예: Animal Health"></label>
-      <label>넣을 내용<textarea rows="3" placeholder="나중에 채울 안내"></textarea></label>
+      <p>담당하는 섹터만 내용을 넣습니다. 나머지 카드는 로고와 이름만 둡니다.</p>
+      <label>섹터
+        <select id="sector">
+          <option value="">선택</option>
+          <option value="icmd">Component &amp; Design</option>
+          <option value="crs">Rehabilitation</option>
+          <option value="cecn">Elderly Care</option>
+          <option value="homecare">Home Care</option>
+          <option value="intelligent">Intelligent Health</option>
+          <option value="ahc">Animal Health</option>
+          <option value="emergency">Emergency Rescue</option>
+          <option value="lifestyle">Healthy Lifestyle</option>
+        </select>
+      </label>
+      <label>넣을 내용<textarea id="sectorNote" rows="3" placeholder="나중에 채울 안내"></textarea></label>
     </article>
+
+    <article id="notice">
+      <p class="see">방문자 화면 · <a href="cmef.html#notice">공지</a></p>
+      <h2>공지</h2>
+      <label>제목<input id="noticeTitle" placeholder="공지 제목"></label>
+      <label>내용<textarea id="noticeBody" rows="3"></textarea></label>
+    </article>
+
+    <button class="save" type="button" id="save">이 브라우저 시안에 반영</button>
+    <p class="status" id="status"></p>
   </main>
+  <script>
+    var key = "cmef2027-draft";
+    var data = { brochure: "", booths: ["", "", "", "", "", "", "", ""], applyLink: "", apps: [], sector: "", sectorNote: "", noticeTitle: "", noticeBody: "" };
+    try {
+      var stored = JSON.parse(localStorage.getItem(key) || "null");
+      if (stored) data = Object.assign(data, stored);
+    } catch (error) {}
+
+    var boothBox = document.getElementById("boothInputs");
+    data.booths.forEach(function (value, index) {
+      var label = document.createElement("label");
+      label.textContent = "3×3";
+      var input = document.createElement("input");
+      input.value = value || "";
+      input.placeholder = "번호";
+      input.addEventListener("input", function () { data.booths[index] = input.value; });
+      label.appendChild(input);
+      boothBox.appendChild(label);
+    });
+
+    function fill(id, field) {
+      var node = document.getElementById(id);
+      node.value = data[field] || "";
+      node.addEventListener("input", function () { data[field] = node.value; });
+    }
+    fill("brochure", "brochure");
+    fill("applyLink", "applyLink");
+    fill("sector", "sector");
+    fill("sectorNote", "sectorNote");
+    fill("noticeTitle", "noticeTitle");
+    fill("noticeBody", "noticeBody");
+
+    var list = document.getElementById("appList");
+    function drawApps() {
+      list.innerHTML = "";
+      data.apps.forEach(function (item, index) {
+        var li = document.createElement("li");
+        li.textContent = [item.booth, item.company, item.category, item.auth].filter(Boolean).join(" · ");
+        var remove = document.createElement("button");
+        remove.type = "button";
+        remove.textContent = "빼기";
+        remove.style.marginLeft = "10px";
+        remove.addEventListener("click", function () {
+          data.apps.splice(index, 1);
+          drawApps();
+        });
+        li.appendChild(remove);
+        list.appendChild(li);
+      });
+    }
+    drawApps();
+
+    document.getElementById("addApp").addEventListener("click", function () {
+      var item = {
+        booth: document.getElementById("appBooth").value.trim(),
+        company: document.getElementById("appCompany").value.trim(),
+        category: document.getElementById("appCategory").value.trim(),
+        product: document.getElementById("appProduct").value.trim(),
+        auth: document.getElementById("appAuth").value.trim()
+      };
+      if (!item.company) return;
+      data.apps.push(item);
+      ["appBooth", "appCompany", "appCategory", "appProduct", "appAuth"].forEach(function (id) {
+        document.getElementById(id).value = "";
+      });
+      drawApps();
+    });
+
+    document.getElementById("save").addEventListener("click", function () {
+      localStorage.setItem(key, JSON.stringify(data));
+      document.getElementById("status").textContent = "이 브라우저의 방문자 화면에 반영했습니다. 시노서울 서버는 그대로입니다.";
+    });
+  </script>
 </body>
 </html>

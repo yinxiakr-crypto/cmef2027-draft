@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>SINOSEOUL</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <style>
@@ -24,7 +24,8 @@
     .sub { margin: 10px 0 0; font-size: 20px; font-weight: 500; }
     .pills { display: flex; gap: 16px; margin-top: 36px; flex-wrap: wrap; justify-content: center; }
     .pills a {
-      min-width: 220px;
+      min-width: min(220px, 100%);
+      min-height: 48px;
       padding: 12px 22px;
       border: 1px solid rgba(255, 255, 255, 0.85);
       border-radius: 28px;
@@ -35,6 +36,11 @@
     }
     .pills a:hover { background: rgba(255, 255, 255, 0.2); }
     .depth { margin: 28px 0 0; font-size: 13px; opacity: 0.85; }
+    @media (max-width: 640px) {
+      .stage { padding: 32px 20px; }
+      .pills { width: min(320px, 100%); }
+      .pills a { width: 100%; }
+    }
   </style>
 </head>
 <body>

@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>제95회 CMEF 시안</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <style>
@@ -262,12 +262,28 @@
     .roster th { color: var(--muted); font-size: 12px; font-weight: 650; letter-spacing: 0.04em; }
     footer { padding: 36px 0 56px; color: var(--muted); font-size: 12px; }
 
+    @media (max-width: 1100px) {
+      .shows { grid-template-columns: 1fr 1fr; }
+      .fields { grid-template-columns: 1fr 1fr; }
+    }
     @media (max-width: 860px) {
-      .stats, .fields, .shows, .steps { grid-template-columns: 1fr 1fr; }
+      .stats, .steps { grid-template-columns: 1fr 1fr; }
       .nav-row { align-items: flex-start; flex-direction: column; padding: 14px 0; }
-      .hall { grid-template-columns: 1fr; grid-template-rows: 200px 80px 80px; }
-      .zone.korea { grid-row: auto; }
-      .split { grid-template-columns: 1fr; gap: 36px; }
+      .nav-links a { padding: 8px 2px; }
+      .hall { grid-template-columns: 1fr; grid-template-rows: 220px 72px 72px; }
+      .zone.korea { grid-row: auto; min-height: 180px; }
+      .split { grid-template-columns: 1fr; gap: 28px; }
+      .booths { grid-template-columns: 1fr 1fr; }
+      .roster { overflow-x: auto; }
+      .reason b { font-size: 32px; }
+      .fold-btn .en { font-size: 22px; }
+    }
+    @media (max-width: 520px) {
+      .wrap { width: min(1080px, calc(100% - 28px)); }
+      .stats { grid-template-columns: 1fr 1fr; }
+      .stat { padding: 18px 8px 14px 0; }
+      .shows, .fields, .steps { grid-template-columns: 1fr; }
+      header { padding-top: 28px; }
     }
   </style>
 </head>
@@ -374,14 +390,14 @@
       </button>
       <div class="panel" id="showBody">
       <div class="shows">
-        <article class="show"><img src="logos/icmd.png" alt="ICMD"><p class="en">Component &amp; Design</p><p class="ko">부품·설계</p><div class="slot"></div></article>
-        <article class="show"><img src="logos/crs.png" alt="CRS"><p class="en">Rehabilitation</p><p class="ko">재활·개인 건강</p><div class="slot"></div></article>
-        <article class="show"><img src="logos/cecn.png" alt="CECN"><p class="en">Elderly Care</p><p class="ko">노인 요양</p><div class="slot"></div></article>
-        <article class="show"><img src="logos/homecare.png" alt="Home Care"><p class="en">Home Care</p><p class="ko">가정용 의료</p><div class="slot"></div></article>
-        <article class="show"><img src="logos/intelligent.png" alt="Intelligent Health"><p class="en">Intelligent Health</p><p class="ko">지능형 건강</p><div class="slot"></div></article>
-        <article class="show"><img src="logos/ahc.png" alt="AHC"><p class="en">Animal Health</p><p class="ko">동물 건강</p><div class="slot"></div></article>
-        <article class="show"><img src="logos/emergency.png" alt="Emergency Rescue"><p class="en">Emergency Rescue</p><p class="ko">응급·구조</p><div class="slot"></div></article>
-        <article class="show"><svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="16" fill="none" stroke="#1a1a1a" stroke-width="1.6"/><path d="M16 26c2-6 4-8 8-8s6 2 8 8" fill="none" stroke="#1a1a1a" stroke-width="1.6" stroke-linecap="round"/></svg><p class="en">Healthy Lifestyle</p><p class="ko">건강 생활</p><div class="slot"></div></article>
+        <article class="show" data-show="icmd"><img src="logos/icmd.png" alt="ICMD"><p class="en">Component &amp; Design</p><p class="ko">부품·설계</p><div class="slot"></div></article>
+        <article class="show" data-show="crs"><img src="logos/crs.png" alt="CRS"><p class="en">Rehabilitation</p><p class="ko">재활·개인 건강</p><div class="slot"></div></article>
+        <article class="show" data-show="cecn"><img src="logos/cecn.png" alt="CECN"><p class="en">Elderly Care</p><p class="ko">노인 요양</p><div class="slot"></div></article>
+        <article class="show" data-show="homecare"><img src="logos/homecare.png" alt="Home Care"><p class="en">Home Care</p><p class="ko">가정용 의료</p><div class="slot"></div></article>
+        <article class="show" data-show="intelligent"><img src="logos/intelligent.png" alt="Intelligent Health"><p class="en">Intelligent Health</p><p class="ko">지능형 건강</p><div class="slot"></div></article>
+        <article class="show" data-show="ahc"><img src="logos/ahc.png" alt="AHC"><p class="en">Animal Health</p><p class="ko">동물 건강</p><div class="slot"></div></article>
+        <article class="show" data-show="emergency"><img src="logos/emergency.png" alt="Emergency Rescue"><p class="en">Emergency Rescue</p><p class="ko">응급·구조</p><div class="slot"></div></article>
+        <article class="show" data-show="lifestyle"><svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="16" fill="none" stroke="#1a1a1a" stroke-width="1.6"/><path d="M16 26c2-6 4-8 8-8s6 2 8 8" fill="none" stroke="#1a1a1a" stroke-width="1.6" stroke-linecap="round"/></svg><p class="en">Healthy Lifestyle</p><p class="ko">건강 생활</p><div class="slot"></div></article>
       </div>
       </div>
     </section>
@@ -401,7 +417,7 @@
       </div>
       <div id="koreaMap" hidden>
         <button type="button" class="back" id="backHall">전체 도면</button>
-        <div class="booths" aria-label="한국관 부스">
+        <div class="booths" id="booths" aria-label="한국관 부스">
           <div class="booth"><b>번호</b><span>3×3</span></div>
           <div class="booth"><b>번호</b><span>3×3</span></div>
           <div class="booth"><b>번호</b><span>3×3</span></div>
@@ -418,7 +434,7 @@
             <thead>
               <tr><th>부스 번호</th><th>기업명</th><th>전시 제품</th><th>인허가</th></tr>
             </thead>
-            <tbody>
+            <tbody id="rosterBody">
               <tr><td colspan="4">아직 표시할 신청이 없습니다.</td></tr>
             </tbody>
           </table>
@@ -431,8 +447,8 @@
       <h2>참가 신청</h2>
       <p class="lead">로그인 없이 볼 수 있습니다. 기본 정보는 이 사이트에서 받고, 신청서 작성은 주최 측 온라인 신청으로 이어집니다.</p>
       <div class="steps">
-        <article class="plain-card"><b>1. 기본 정보</b><span>참가 기업이 이 사이트에서 입력합니다.</span></article>
-        <article class="plain-card"><b>2. 참가 신청서</b><span>주최 측 신청 화면으로 연결됩니다.</span></article>
+        <article class="plain-card"><b>1. 기본 정보</b><span>기업명, 제품 분류, 전시 제품, 인허가를 받습니다. 인허가와 제품 분류는 시판허가 쪽과 이어집니다.</span></article>
+        <article class="plain-card"><b>2. 참가 신청서</b><span id="applyNext">주최 측 신청 화면으로 연결됩니다.</span></article>
       </div>
     </section>
 
@@ -448,9 +464,9 @@
     <section class="block" id="notice">
       <p class="kicker">NOTICE</p>
       <h2>공지</h2>
-      <div class="plain-card">
-        <b>등록된 공지가 없습니다</b>
-        <span>일정과 안내는 이 칸에 올라갑니다.</span>
+      <div class="plain-card" id="noticeCard">
+        <b id="noticeTitle">등록된 공지가 없습니다</b>
+        <span id="noticeBody">일정과 안내는 이 칸에 올라갑니다.</span>
       </div>
     </section>
   </div>
@@ -571,6 +587,38 @@
       koreaMap.hidden = true;
       hallMap.hidden = false;
     });
+
+    try {
+      var saved = JSON.parse(localStorage.getItem("cmef2027-draft") || "null");
+      if (saved) {
+        if (saved.noticeTitle) document.getElementById("noticeTitle").textContent = saved.noticeTitle;
+        if (saved.noticeBody) document.getElementById("noticeBody").textContent = saved.noticeBody;
+        if (saved.applyLink) document.getElementById("applyNext").textContent = "주최 측 신청: " + saved.applyLink;
+        if (saved.booths) {
+          document.querySelectorAll("#booths .booth b").forEach(function (node, index) {
+            if (saved.booths[index]) node.textContent = saved.booths[index];
+          });
+        }
+        if (saved.apps && saved.apps.length) {
+          var body = document.getElementById("rosterBody");
+          body.innerHTML = "";
+          saved.apps.forEach(function (item) {
+            var row = document.createElement("tr");
+            [item.booth, item.company, item.product, item.auth].forEach(function (value) {
+              var cell = document.createElement("td");
+              cell.textContent = value || "";
+              row.appendChild(cell);
+            });
+            body.appendChild(row);
+          });
+        }
+        var shows = ["icmd", "crs", "cecn", "homecare", "intelligent", "ahc", "emergency", "lifestyle"];
+        if (shows.indexOf(saved.sector) >= 0 && saved.sectorNote) {
+          var card = document.querySelector('.show[data-show="' + saved.sector + '"] .slot');
+          if (card) card.textContent = saved.sectorNote;
+        }
+      }
+    } catch (error) {}
 
     document.querySelectorAll(".fold-btn").forEach(function (button) {
       if (button.id === "psrBtn") return;

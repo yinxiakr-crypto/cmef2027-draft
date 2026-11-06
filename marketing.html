@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>SINOSEOUL MARKETING</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <style>
@@ -24,6 +24,7 @@
     .china { position: relative; margin-top: 36px; max-width: 280px; }
     .china > button {
       width: 100%;
+      min-height: 64px;
       padding: 16px 18px;
       border: 1px solid rgba(255, 255, 255, 0.4);
       border-radius: 12px;
@@ -52,7 +53,12 @@
     .drop span { display: block; margin-top: 2px; color: #777; font-size: 12px; }
     .depth { margin: 28px 0 0; font-size: 13px; opacity: 0.8; }
     .depth a { color: #fff; }
-    @media (max-width: 800px) { .split { grid-template-columns: 1fr; } .photo { min-height: 240px; } }
+    @media (max-width: 800px) {
+      .split { grid-template-columns: 1fr; }
+      .photo { min-height: 220px; order: -1; }
+      .info { padding: 36px 24px 48px; }
+      .china { max-width: none; }
+    }
   </style>
 </head>
 <body>
