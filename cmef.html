@@ -189,6 +189,10 @@
     .mark { width: 42px; height: 42px; }
     .show .en { margin: 14px 0 0; font-size: 16px; font-weight: 700; line-height: 1.3; }
     .show .ko { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+    .show .slot:empty { display: none; }
+    .show .slot { margin-top: 12px; width: 100%; font-size: 13px; line-height: 1.45; color: var(--ink); }
+    .crumb { margin: 0; padding: 10px 0 0; color: var(--muted); font-size: 13px; }
+    .crumb a { color: inherit; text-decoration: none; }
 
     .site-nav {
       position: sticky;
@@ -280,6 +284,7 @@
         <a href="#notice">공지</a>
       </div>
     </div>
+    <div class="wrap"><p class="crumb"><a href="index.html">1. 플랫폼</a> · <a href="marketing.html">2. 마케팅</a> · 3. 중국 · 4. CMEF</p></div>
   </nav>
   <header id="intro">
     <div class="wrap">
@@ -369,14 +374,14 @@
       </button>
       <div class="panel" id="showBody">
       <div class="shows">
-        <article class="show"><img src="logos/icmd.png" alt="ICMD"><p class="en">Component &amp; Design</p><p class="ko">부품·설계</p></article>
-        <article class="show"><img src="logos/crs.png" alt="CRS"><p class="en">Rehabilitation</p><p class="ko">재활·개인 건강</p></article>
-        <article class="show"><img src="logos/cecn.png" alt="CECN"><p class="en">Elderly Care</p><p class="ko">노인 요양</p></article>
-        <article class="show"><img src="logos/homecare.png" alt="Home Care"><p class="en">Home Care</p><p class="ko">가정용 의료</p></article>
-        <article class="show"><img src="logos/intelligent.png" alt="Intelligent Health"><p class="en">Intelligent Health</p><p class="ko">지능형 건강</p></article>
-        <article class="show"><img src="logos/ahc.png" alt="AHC"><p class="en">Animal Health</p><p class="ko">동물 건강</p></article>
-        <article class="show"><img src="logos/emergency.png" alt="Emergency Rescue"><p class="en">Emergency Rescue</p><p class="ko">응급·구조</p></article>
-        <article class="show"><svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="16" fill="none" stroke="#1a1a1a" stroke-width="1.6"/><path d="M16 26c2-6 4-8 8-8s6 2 8 8" fill="none" stroke="#1a1a1a" stroke-width="1.6" stroke-linecap="round"/></svg><p class="en">Healthy Lifestyle</p><p class="ko">건강 생활</p></article>
+        <article class="show"><img src="logos/icmd.png" alt="ICMD"><p class="en">Component &amp; Design</p><p class="ko">부품·설계</p><div class="slot"></div></article>
+        <article class="show"><img src="logos/crs.png" alt="CRS"><p class="en">Rehabilitation</p><p class="ko">재활·개인 건강</p><div class="slot"></div></article>
+        <article class="show"><img src="logos/cecn.png" alt="CECN"><p class="en">Elderly Care</p><p class="ko">노인 요양</p><div class="slot"></div></article>
+        <article class="show"><img src="logos/homecare.png" alt="Home Care"><p class="en">Home Care</p><p class="ko">가정용 의료</p><div class="slot"></div></article>
+        <article class="show"><img src="logos/intelligent.png" alt="Intelligent Health"><p class="en">Intelligent Health</p><p class="ko">지능형 건강</p><div class="slot"></div></article>
+        <article class="show"><img src="logos/ahc.png" alt="AHC"><p class="en">Animal Health</p><p class="ko">동물 건강</p><div class="slot"></div></article>
+        <article class="show"><img src="logos/emergency.png" alt="Emergency Rescue"><p class="en">Emergency Rescue</p><p class="ko">응급·구조</p><div class="slot"></div></article>
+        <article class="show"><svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="16" fill="none" stroke="#1a1a1a" stroke-width="1.6"/><path d="M16 26c2-6 4-8 8-8s6 2 8 8" fill="none" stroke="#1a1a1a" stroke-width="1.6" stroke-linecap="round"/></svg><p class="en">Healthy Lifestyle</p><p class="ko">건강 생활</p><div class="slot"></div></article>
       </div>
       </div>
     </section>
@@ -581,6 +586,4 @@
 
   <footer>
     <div class="wrap">수치는 주최사 브로셔와 Post Show Report에 적힌 것입니다. 이 화면은 시안이며, 아직 시노서울 사이트에는 올리지 않았습니다.</div>
-  </footer>
-</body>
-</html>
+  </foo

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>메뉴 관리</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f4f6f6; color: #243033; font-family: Pretendard, "Malgun Gothic", sans-serif; }
+    header { background: #004448; color: #fff; padding: 22px 0; }
+    .wrap { width: min(980px, calc(100% - 40px)); margin: 0 auto; }
+    a { color: inherit; }
+    h1 { margin: 0; font-size: 28px; letter-spacing: -0.03em; }
+    .who { margin: 8px 0 0; font-size: 14px; opacity: 0.85; }
+    .back { display: inline-block; margin-top: 14px; color: #fff; font-size: 13px; }
+    main { padding: 28px 0 64px; }
+    article { background: #fff; border: 1px solid #e3e8e8; padding: 20px 22px; margin-top: 12px; }
+    h2 { margin: 0; font-size: 18px; }
+    p { margin: 8px 0 0; color: #5c6b70; font-size: 14px; line-height: 1.5; }
+    label { display: block; margin-top: 14px; font-size: 13px; font-weight: 650; }
+    input, textarea { width: 100%; margin-top: 6px; padding: 10px 12px; border: 1px solid #d5dddd; font: inherit; background: #fff; }
+    .grid { display: grid; grid-template-columns: 120px 1fr 1fr; gap: 8px; margin-top: 12px; }
+    .cell { min-height: 72px; border: 1px solid #d5dddd; background: #fafbfb; padding: 8px; font-size: 13px; }
+    .cell b { display: block; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>메뉴 관리</h1>
+      <p class="who">사용자가 보는 화면이 아닙니다. 시노서울이 각 메뉴를 고치는 화면입니다.</p>
+      <a class="back" href="index.html">사용자 첫 화면으로</a>
+    </div>
+  </header>
+  <main class="wrap">
+    <article>
+      <h2>전시 소개</h2>
+      <p>브로셔가 바뀌면 규모 수치와 Post Show Report를 여기서 고칩니다.</p>
+      <label>전시면적<input value="320,000+"></label>
+    </article>
+    <article>
+      <h2>전시 도면</h2>
+      <p>그림 파일을 올리지 않습니다. 3×3 칸에 부스 번호와 업체 이름을 넣습니다.</p>
+      <div class="grid">
+        <div class="cell"><b>3×3</b>번호</div>
+        <div class="cell"><b>3×3</b>번호</div>
+        <div class="cell"><b>3×3</b>번호</div>
+      </div>
+    </article>
+    <article>
+      <h2>참가 신청</h2>
+      <p>신청서에서 기업명, 전시 제품, 인허가 여부를 받습니다. 한국관 목록에 그대로 표시됩니다.</p>
+      <label>기업명<input placeholder="기업명"></label>
+      <label>전시 제품<textarea rows="2" placeholder="공개할 제품"></textarea></label>
+      <label>인허가<input placeholder="취득 또는 미취득"></label>
+    </article>
+    <article>
+      <h2>바이어 매칭</h2>
+      <p>인허가 여부에 따라 바이어 소개가 달라집니다. 소개 방식은 다음 설명에서 넣습니다.</p>
+    </article>
+    <article>
+      <h2>공지</h2>
+      <label>제목<input placeholder="공지 제목"></label>
+      <label>내용<textarea rows="3"></textarea></label>
+    </article>
+    <article>
+      <h2>동기간 전시</h2>
+      <p>담당하는 섹터만 아래에 내용을 추가합니다. 나머지 카드는 로고와 이름만 둡니다.</p>
+      <label>담당 섹터<input placeholder="예: Animal Health"></label>
+      <label>넣을 내용<textarea rows="3" placeholder="나중에 채울 안내"></textarea></label>
+    </article>
+  </main>
+</body>
+</html>

@@ -3,100 +3,52 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>시노서울 마케팅 시안</title>
+  <title>SINOSEOUL</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <style>
-    :root {
-      --ink: #1c1a17;
-      --muted: #8a817a;
-      --line: #e4ddd2;
-      --paper: #faf7f2;
-      --red: #9b1b30;
-      --deep: #141210;
-    }
     * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      color: var(--ink);
-      background: var(--paper);
-      font-family: Pretendard, "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
-      letter-spacing: -0.02em;
-    }
-    .draft { margin: 0; padding: 10px 16px; background: var(--deep); color: #faf7f2; text-align: center; font-size: 13px; }
-    .wrap { width: min(760px, calc(100% - 48px)); margin: 0 auto; padding: 88px 0 96px; }
-    .kicker { margin: 0 0 22px; color: var(--red); font-size: 12px; font-weight: 650; letter-spacing: 0.22em; }
-    h1 { margin: 0; font-size: clamp(64px, 10vw, 112px); font-weight: 720; letter-spacing: -0.06em; line-height: 0.92; }
-    .lead { margin: 18px 0 0; color: #3c3834; font-size: 18px; }
-    .china { position: relative; margin-top: 36px; }
-    .china > button {
-      width: 100%;
+    body { margin: 0; font-family: Pretendard, "Malgun Gothic", sans-serif; }
+    .stage {
+      min-height: 100vh;
       display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      padding: 26px 28px;
-      border: 0;
-      border-top: 3px solid var(--red);
-      background: var(--deep);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
       color: #fff;
-      font: inherit;
-      cursor: pointer;
-      text-align: left;
+      background:
+        linear-gradient(rgba(40, 40, 40, 0.45), rgba(40, 40, 40, 0.45)),
+        url("https://sinoseoul.co.kr/public/images/intro/intro_img_1.jpg") center/cover no-repeat;
     }
-    .china > button .en { font-size: 32px; font-weight: 720; letter-spacing: -0.04em; }
-    .china > button .ko { font-size: 14px; opacity: 0.85; }
-    .drop {
-      position: absolute;
-      z-index: 2;
-      left: 0;
-      right: 0;
-      margin-top: 8px;
-      background: #fff;
-      border: 1px solid var(--line);
-    }
-    .drop[hidden] { display: none; }
-    .drop a {
-      display: block;
-      padding: 16px 22px;
-      border-bottom: 1px solid var(--line);
-      color: inherit;
+    h1 { margin: 0; font-size: clamp(42px, 6vw, 64px); font-weight: 750; letter-spacing: 0.04em; }
+    .sub { margin: 10px 0 0; font-size: 20px; font-weight: 500; }
+    .pills { display: flex; gap: 16px; margin-top: 36px; flex-wrap: wrap; justify-content: center; }
+    .pills a {
+      min-width: 220px;
+      padding: 12px 22px;
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      border-radius: 28px;
+      color: #fff;
       text-decoration: none;
+      font-size: 16px;
+      background: rgba(255, 255, 255, 0.08);
     }
-    .drop a:hover { background: var(--paper); }
-    .drop b { display: block; font-size: 22px; letter-spacing: -0.03em; }
-    .drop span { display: block; margin-top: 3px; color: var(--muted); font-size: 13px; }
+    .pills a:hover { background: rgba(255, 255, 255, 0.2); }
+    .depth { margin: 28px 0 0; font-size: 13px; opacity: 0.85; }
+    .staff { margin-top: 18px; font-size: 13px; }
+    .staff a { color: #fff; opacity: 0.8; }
   </style>
 </head>
 <body>
-  <p class="draft">검토용 시안입니다. 전시 도면만 로그인 후 열립니다. 올리는 위치는 나중에 정합니다.</p>
-  <main class="wrap">
-    <p class="kicker">SINOSEOUL MARKETING</p>
-    <h1>중국</h1>
-    <p class="lead">담당 전시회를 고르면 전시 소개가 열립니다.</p>
-    <div class="china">
-      <button type="button" id="chinaBtn" aria-expanded="false" aria-controls="chinaMenu">
-        <span class="en">중국</span>
-        <span class="ko">CMEF · CDS · CHCC</span>
-      </button>
-      <div class="drop" id="chinaMenu" hidden>
-        <a href="cmef.html"><b>CMEF</b><span>China International Medical Equipment Fair</span></a>
-        <a href="cds.html"><b>CDS</b><span>China Dental Show</span></a>
-        <a href="chcc.html"><b>CHCC</b><span>China Hospital Construction Conference</span></a>
-      </div>
+  <main class="stage">
+    <h1>SINOSEOUL</h1>
+    <p class="sub">Business Working Platform</p>
+    <div class="pills">
+      <a href="https://sinoseoul.co.kr/main/intro">Market Authorization</a>
+      <a href="marketing.html">Marketing</a>
     </div>
+    <p class="depth">1. 플랫폼</p>
+    <p class="staff"><a href="manage.html">메뉴 관리 화면</a></p>
   </main>
-  <script>
-    var btn = document.getElementById("chinaBtn");
-    var menu = document.getElementById("chinaMenu");
-    btn.addEventListener("click", function (event) {
-      event.stopPropagation();
-      var open = btn.getAttribute("aria-expanded") === "true";
-      menu.hidden = open;
-      btn.setAttribute("aria-expanded", open ? "false" : "true");
-    });
-    document.addEventListener("click", function () {
-      menu.hidden = true;
-      btn.setAttribute("aria-expanded", "false");
-    });
-  </script>
 </body>
 </html>
