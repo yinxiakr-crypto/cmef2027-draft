@@ -191,6 +191,22 @@
     .show .ko { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
     .show .slot:empty { display: none; }
     .show .slot { margin-top: 12px; width: 100%; font-size: 13px; line-height: 1.45; color: var(--ink); }
+    .basics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 28px; }
+    .basics div { background: #fff; border: 1px solid var(--line); padding: 16px 18px; }
+    .basics .ko { display: block; color: var(--muted); font-size: 12px; }
+    .basics b { display: block; margin-top: 6px; font-size: 16px; font-weight: 680; }
+    .booth-types { margin-top: 36px; }
+    .booth-types h2 { margin: 0; font-size: clamp(28px, 4vw, 40px); font-weight: 720; letter-spacing: -0.04em; }
+    .type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+    .type-grid article { background: #fff; border: 1px solid var(--line); padding: 18px; }
+    .type-grid b { display: block; font-size: 20px; font-weight: 720; }
+    .type-grid span { display: block; margin-top: 6px; color: var(--muted); font-size: 13px; }
+    .type-grid strong { display: block; margin-top: 14px; font-size: 28px; font-weight: 680; letter-spacing: -0.04em; }
+    .fee-title { margin: 22px 0 0; font-size: 13px; font-weight: 680; letter-spacing: 0.08em; }
+    .fee { display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; margin-top: 8px; }
+    .fee div { display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+    .fee span { font-size: 14px; }
+    .fee b { font-size: 18px; font-weight: 680; }
     .crumb { margin: 0; padding: 10px 0 0; color: var(--muted); font-size: 13px; }
     .crumb a { color: inherit; text-decoration: none; }
 
@@ -282,7 +298,7 @@
       .wrap { width: min(1080px, calc(100% - 28px)); }
       .stats { grid-template-columns: 1fr 1fr; }
       .stat { padding: 18px 8px 14px 0; }
-      .shows, .fields, .steps { grid-template-columns: 1fr; }
+      .shows, .fields, .steps, .type-grid, .fee, .basics { grid-template-columns: 1fr; }
       header { padding-top: 28px; }
     }
   </style>
@@ -317,6 +333,36 @@
         <div class="stat"><b>300,000+</b><span class="en">Visits</span><span class="ko">전문 참관</span></div>
         <div class="stat"><b>13,000+</b><span class="en">Buyers</span><span class="ko">해외 바이어</span></div>
         <div class="stat"><b>100+</b><span class="en">Conferences</span><span class="ko">컨퍼런스</span></div>
+      </div>
+
+      <div class="basics" id="basics">
+        <div><span class="ko">주최</span><b id="hostName">Reed Sinopharm Exhibitions</b></div>
+        <div><span class="ko">장소</span><b>NECC Shanghai</b></div>
+        <div><span class="ko">신청 기간</span><b id="applyPeriod">아직 없습니다</b></div>
+      </div>
+
+      <div class="booth-types" id="boothTypes">
+        <p class="kicker">BOOTH</p>
+        <h2>부스</h2>
+        <div class="type-grid">
+          <article>
+            <b id="boothName0">면적만 제공</b>
+            <span id="boothArea0">3m × 3m</span>
+            <strong id="boothPrice0">2,000,000</strong>
+          </article>
+          <article>
+            <b id="boothName1">기본 부스</b>
+            <span id="boothArea1">3m × 3m × 높이 3.5m · 일반 방문 간판</span>
+            <strong id="boothPrice1">2,800,000</strong>
+          </article>
+        </div>
+        <p class="fee-title">USD · 9㎡</p>
+        <div class="fee" id="feeBox">
+          <div><span>Standard Shell Scheme</span><b>4,770</b></div>
+          <div><span>Raw Space · minimum 18㎡</span><b>4,230</b></div>
+          <div><span>Catalogue Entry</span><b>61</b></div>
+          <div><span>Buyer's Guide</span><b>600</b></div>
+        </div>
       </div>
     </div>
   </header>
@@ -591,6 +637,13 @@
     try {
       var saved = JSON.parse(localStorage.getItem("cmef2027-draft") || "null");
       if (saved) {
+        if (saved.hostName) document.getElementById("hostName").textContent = saved.hostName;
+        if (saved.applyPeriod) document.getElementById("applyPeriod").textContent = saved.applyPeriod;
+        ["0", "1"].forEach(function (n) {
+          if (saved["boothName" + n]) document.getElementById("boothName" + n).textContent = saved["boothName" + n];
+          if (saved["boothArea" + n]) document.getElementById("boothArea" + n).textContent = saved["boothArea" + n];
+          if (saved["boothPrice" + n]) document.getElementById("boothPrice" + n).textContent = saved["boothPrice" + n];
+        });
         if (saved.noticeTitle) document.getElementById("noticeTitle").textContent = saved.noticeTitle;
         if (saved.noticeBody) document.getElementById("noticeBody").textContent = saved.noticeBody;
         if (saved.applyLink) document.getElementById("applyNext").textContent = "주최 측 신청: " + saved.applyLink;

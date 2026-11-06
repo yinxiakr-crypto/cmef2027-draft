@@ -125,8 +125,24 @@
     <article id="intro">
       <p class="see">방문자 화면 · <a href="cmef.html#intro">전시 소개</a></p>
       <h2>전시 소개</h2>
-      <p>규모 숫자는 브로셔를 확인해서 방문자 화면에 이미 들어가 있습니다. 여기서는 브로셔 파일 이름만 적어 둡니다. 파일을 올린다고 숫자가 바뀌지는 않습니다.</p>
+      <p>기본 정보와 부스 종류는 여기 있습니다. 규모 숫자는 브로셔를 확인해서 넣고, 파일만 올린다고 숫자가 바뀌지는 않습니다.</p>
+      <div class="row">
+        <label>주최<input id="hostName" placeholder="주최"></label>
+        <label>신청 기간<input id="applyPeriod" placeholder="신청 기간"></label>
+      </div>
       <label>브로셔 파일 이름<input id="brochure" placeholder="95th CMEF Brochure"></label>
+      <h2 style="margin-top:22px">부스 <span class="tag">금액 · 종류</span></h2>
+      <p>면적만 제공하는 칸과 기본 부스를 여기서 고칩니다. 아래 금액은 지금 95회 부스 관리에 들어 있는 값입니다.</p>
+      <div class="row">
+        <label>1. 종류<input id="boothName0"></label>
+        <label>크기<input id="boothArea0"></label>
+      </div>
+      <label>금액<input id="boothPrice0"></label>
+      <div class="row">
+        <label>2. 종류<input id="boothName1"></label>
+        <label>크기<input id="boothArea1"></label>
+      </div>
+      <label>금액<input id="boothPrice1"></label>
     </article>
 
     <article id="map">
@@ -192,7 +208,24 @@
   </main>
   <script>
     var key = "cmef2027-draft";
-    var data = { brochure: "", booths: ["", "", "", "", "", "", "", ""], applyLink: "", apps: [], sector: "", sectorNote: "", noticeTitle: "", noticeBody: "" };
+    var data = {
+      brochure: "",
+      hostName: "Reed Sinopharm Exhibitions",
+      applyPeriod: "",
+      boothName0: "면적만 제공",
+      boothArea0: "3m × 3m",
+      boothPrice0: "2,000,000",
+      boothName1: "기본 부스",
+      boothArea1: "3m × 3m × 높이 3.5m · 일반 방문 간판",
+      boothPrice1: "2,800,000",
+      booths: ["", "", "", "", "", "", "", ""],
+      applyLink: "",
+      apps: [],
+      sector: "",
+      sectorNote: "",
+      noticeTitle: "",
+      noticeBody: ""
+    };
     try {
       var stored = JSON.parse(localStorage.getItem(key) || "null");
       if (stored) data = Object.assign(data, stored);
@@ -216,6 +249,14 @@
       node.addEventListener("input", function () { data[field] = node.value; });
     }
     fill("brochure", "brochure");
+    fill("hostName", "hostName");
+    fill("applyPeriod", "applyPeriod");
+    fill("boothName0", "boothName0");
+    fill("boothArea0", "boothArea0");
+    fill("boothPrice0", "boothPrice0");
+    fill("boothName1", "boothName1");
+    fill("boothArea1", "boothArea1");
+    fill("boothPrice1", "boothPrice1");
     fill("applyLink", "applyLink");
     fill("sector", "sector");
     fill("sectorNote", "sectorNote");
