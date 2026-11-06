@@ -199,6 +199,7 @@
     .booth-types h2 { margin: 0; font-size: clamp(28px, 4vw, 40px); font-weight: 720; letter-spacing: -0.04em; }
     .type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
     .type-grid article { background: #fff; border: 1px solid var(--line); padding: 18px; }
+    .type-grid img { width: 100%; height: 160px; object-fit: cover; background: #efece6; margin-bottom: 12px; }
     .type-grid b { display: block; font-size: 20px; font-weight: 720; }
     .type-grid span { display: block; margin-top: 6px; color: var(--muted); font-size: 13px; }
     .type-grid strong { display: block; margin-top: 14px; font-size: 28px; font-weight: 680; letter-spacing: -0.04em; }
@@ -229,24 +230,48 @@
     .lock-card b, .plain-card b { display: block; font-size: 22px; font-weight: 720; }
     .lock-card span, .plain-card span { display: block; margin-top: 6px; color: var(--muted); font-size: 14px; line-height: 1.5; }
     .steps { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; }
-    .hall { display: grid; grid-template-columns: 1.3fr 0.7fr; gap: 10px; min-height: 360px; margin-top: 18px; }
-    .zone { background: #efece6; border: 1px solid var(--line); }
-    .zone.korea {
-      grid-row: 1 / span 2;
+    .hall {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr 1fr;
+      grid-template-rows: 120px 160px 110px;
+      gap: 8px;
+      margin-top: 18px;
+    }
+    .zone {
+      position: relative;
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
       align-items: flex-start;
-      padding: 24px;
-      border: 0;
-      background: var(--red);
-      color: #fff;
+      padding: 14px;
+      border: 1px solid var(--line);
+      background: #efece6;
+      color: var(--ink);
       font: inherit;
       text-align: left;
       cursor: pointer;
     }
-    .zone.korea b { font-size: 36px; font-weight: 720; letter-spacing: -0.04em; }
-    .zone.korea span { margin-top: 4px; font-size: 14px; opacity: 0.85; }
+    .zone b { font-size: 18px; font-weight: 720; }
+    .zone .go {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      font-size: 18px;
+      opacity: 0;
+    }
+    .zone:hover, .zone:focus-visible {
+      background: #fff;
+      outline: 2px solid var(--deep);
+      outline-offset: -2px;
+    }
+    .zone:hover .go, .zone:focus-visible .go { opacity: 1; }
+    .zone.s1 { grid-column: 1; grid-row: 1; }
+    .zone.s2 { grid-column: 2 / span 2; grid-row: 1; }
+    .zone.korea { grid-column: 1; grid-row: 2 / span 2; background: var(--red); color: #fff; border: 0; }
+    .zone.s3 { grid-column: 2 / span 2; grid-row: 2; }
+    .zone.s4 { grid-column: 2 / span 2; grid-row: 3; }
+    .zone.korea:hover, .zone.korea:focus-visible { background: #7a1526; outline-color: #fff; }
+    .hall-hint { margin: 10px 0 0; color: var(--muted); font-size: 13px; }
     .booths { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 16px; }
     .booth {
       min-height: 92px;
@@ -286,8 +311,9 @@
       .stats, .steps { grid-template-columns: 1fr 1fr; }
       .nav-row { align-items: flex-start; flex-direction: column; padding: 14px 0; }
       .nav-links a { padding: 8px 2px; }
-      .hall { grid-template-columns: 1fr; grid-template-rows: 220px 72px 72px; }
-      .zone.korea { grid-row: auto; min-height: 180px; }
+      .hall { grid-template-columns: 1fr 1fr; grid-template-rows: 100px 140px 90px; }
+      .zone.s2, .zone.s3, .zone.s4 { grid-column: 2; }
+      .zone.korea { grid-row: 2 / span 2; }
       .split { grid-template-columns: 1fr; gap: 28px; }
       .booths { grid-template-columns: 1fr 1fr; }
       .roster { overflow-x: auto; }
@@ -344,13 +370,16 @@
       <div class="booth-types" id="boothTypes">
         <p class="kicker">BOOTH</p>
         <h2>부스</h2>
+        <p id="introNoteView" hidden></p>
         <div class="type-grid">
           <article>
+            <img id="boothPic0" alt="" hidden>
             <b id="boothName0">면적만 제공</b>
             <span id="boothArea0">3m × 3m</span>
             <strong id="boothPrice0">2,000,000</strong>
           </article>
           <article>
+            <img id="boothPic1" alt="" hidden>
             <b id="boothName1">기본 부스</b>
             <span id="boothArea1">3m × 3m × 높이 3.5m · 일반 방문 간판</span>
             <strong id="boothPrice1">2,800,000</strong>
@@ -453,13 +482,21 @@
     <section class="block" id="map">
       <p class="kicker">FLOOR PLAN</p>
       <h2>전시 도면</h2>
+      <p class="lead">부스는 한 줄로 놓이지 않고, 섹션 번호도 서로 다릅니다. 전시관 전체에서 섹션에 마우스를 올리고 누르면 그 위치로 들어갑니다.</p>
       <div id="hallMap" class="hall">
-        <button type="button" class="zone korea" id="openKorea">
-          <b>한국관</b>
-          <span>국제관</span>
-        </button>
-        <div class="zone"></div>
-        <div class="zone"></div>
+        <button type="button" class="zone s1" data-section="1관"><span class="go" aria-hidden="true">→</span><b>1관</b></button>
+        <button type="button" class="zone s2" data-section="2관"><span class="go" aria-hidden="true">→</span><b>2관</b></button>
+        <button type="button" class="zone korea" data-section="한국관"><span class="go" aria-hidden="true">→</span><b>한국관</b></button>
+        <button type="button" class="zone s3" data-section="3관"><span class="go" aria-hidden="true">→</span><b>3관</b></button>
+        <button type="button" class="zone s4" data-section="4관"><span class="go" aria-hidden="true">→</span><b>4관</b></button>
+      </div>
+      <p class="hall-hint" id="hallHint">섹션 위에 화살표가 생기면 눌러 들어갑니다.</p>
+      <div id="sectionMap" hidden>
+        <button type="button" class="back" id="backSection">전체 도면</button>
+        <div class="plain-card">
+          <b id="sectionTitle">섹션</b>
+          <span>이 섹션의 위치입니다. 번호는 섹션마다 다릅니다.</span>
+        </div>
       </div>
       <div id="koreaMap" hidden>
         <button type="button" class="back" id="backHall">전체 도면</button>
@@ -625,14 +662,35 @@
 
     var hallMap = document.getElementById("hallMap");
     var koreaMap = document.getElementById("koreaMap");
-    document.getElementById("openKorea").addEventListener("click", function () {
-      hallMap.hidden = true;
-      koreaMap.hidden = false;
-    });
-    document.getElementById("backHall").addEventListener("click", function () {
-      koreaMap.hidden = true;
+    var sectionMap = document.getElementById("sectionMap");
+    var hallHint = document.getElementById("hallHint");
+    function showHall() {
       hallMap.hidden = false;
+      koreaMap.hidden = true;
+      sectionMap.hidden = true;
+      hallHint.textContent = "섹션 위에 화살표가 생기면 눌러 들어갑니다.";
+    }
+    document.querySelectorAll("#hallMap .zone").forEach(function (zone) {
+      zone.addEventListener("mouseenter", function () {
+        hallHint.textContent = zone.getAttribute("data-section") + " · 누르면 이 위치로 들어갑니다.";
+      });
+      zone.addEventListener("focus", function () {
+        hallHint.textContent = zone.getAttribute("data-section") + " · 누르면 이 위치로 들어갑니다.";
+      });
+      zone.addEventListener("click", function () {
+        hallMap.hidden = true;
+        if (zone.getAttribute("data-section") === "한국관") {
+          sectionMap.hidden = true;
+          koreaMap.hidden = false;
+        } else {
+          koreaMap.hidden = true;
+          sectionMap.hidden = false;
+          document.getElementById("sectionTitle").textContent = zone.getAttribute("data-section");
+        }
+      });
     });
+    document.getElementById("backHall").addEventListener("click", showHall);
+    document.getElementById("backSection").addEventListener("click", showHall);
 
     try {
       var saved = JSON.parse(localStorage.getItem("cmef2027-draft") || "null");
@@ -643,7 +701,17 @@
           if (saved["boothName" + n]) document.getElementById("boothName" + n).textContent = saved["boothName" + n];
           if (saved["boothArea" + n]) document.getElementById("boothArea" + n).textContent = saved["boothArea" + n];
           if (saved["boothPrice" + n]) document.getElementById("boothPrice" + n).textContent = saved["boothPrice" + n];
+          if (saved["boothPic" + n]) {
+            var pic = document.getElementById("boothPic" + n);
+            pic.hidden = false;
+            pic.src = saved["boothPic" + n];
+          }
         });
+        if (saved.introNote) {
+          var note = document.getElementById("introNoteView");
+          note.hidden = false;
+          note.textContent = saved.introNote;
+        }
         if (saved.noticeTitle) document.getElementById("noticeTitle").textContent = saved.noticeTitle;
         if (saved.noticeBody) document.getElementById("noticeBody").textContent = saved.noticeBody;
         if (saved.applyLink) document.getElementById("applyNext").textContent = "주최 측 신청: " + saved.applyLink;

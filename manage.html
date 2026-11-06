@@ -92,7 +92,29 @@
       padding: 0 18px;
       cursor: pointer;
     }
-    button.add { background: #fff; color: var(--ink); border: 1px solid var(--line); }
+    .frame {
+      display: grid;
+      place-items: center;
+      min-height: 140px;
+      margin-top: 8px;
+      border: 1px dashed var(--line);
+      border-radius: 12px;
+      background: var(--paper);
+      color: var(--muted);
+      font-size: 13px;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    .frame img { width: 100%; height: 140px; object-fit: cover; }
+    .editor {
+      min-height: 88px;
+      margin-top: 6px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      line-height: 1.5;
+    }
     .list { margin: 14px 0 0; padding: 0; list-style: none; }
     .list li { padding: 12px 0; border-top: 1px solid var(--line); font-size: 14px; }
     .status { margin: 18px 0 0; font-size: 14px; }
@@ -131,24 +153,35 @@
         <label>신청 기간<input id="applyPeriod" placeholder="신청 기간"></label>
       </div>
       <label>브로셔 파일 이름<input id="brochure" placeholder="95th CMEF Brochure"></label>
+      <label>소개 글
+        <div id="introNote" class="editor" contenteditable="true"></div>
+      </label>
       <h2 style="margin-top:22px">부스 <span class="tag">금액 · 종류</span></h2>
-      <p>면적만 제공하는 칸과 기본 부스를 여기서 고칩니다. 아래 금액은 지금 95회 부스 관리에 들어 있는 값입니다.</p>
+      <p>종류마다 그림 한 장을 올립니다. 이 그림은 회차가 바뀌어도 그대로 씁니다. 전시관 섹션은 그림 파일을 올리지 않습니다.</p>
       <div class="row">
         <label>1. 종류<input id="boothName0"></label>
         <label>크기<input id="boothArea0"></label>
       </div>
       <label>금액<input id="boothPrice0"></label>
+      <label class="pic">그림
+        <input id="pic0" type="file" accept="image/*" hidden>
+        <span class="frame" id="frame0">그림을 올리세요</span>
+      </label>
       <div class="row">
         <label>2. 종류<input id="boothName1"></label>
         <label>크기<input id="boothArea1"></label>
       </div>
       <label>금액<input id="boothPrice1"></label>
+      <label class="pic">그림
+        <input id="pic1" type="file" accept="image/*" hidden>
+        <span class="frame" id="frame1">그림을 올리세요</span>
+      </label>
     </article>
 
     <article id="map">
       <p class="see">방문자 화면 · <a href="cmef.html#map">전시 도면</a></p>
       <h2>전시 도면 <span class="tag">CMEF</span></h2>
-      <p>1. 전시관 도면에서 한국관이 있는 곳을 누르면 2. 한국관 도면이 열립니다. 베트남 전시에는 이 단계를 두지 않습니다. 칸은 3×3이고, 번호는 여기서 정합니다.</p>
+      <p>부스는 한 줄이 아닙니다. 전시관 전체에서 섹션에 마우스를 올리고 누르면 그 위치로 들어갑니다. 한국관 칸은 3×3이고, 번호는 여기서 정합니다. 베트남 전시에는 이 단계를 두지 않습니다.</p>
       <div class="booths" id="boothInputs"></div>
     </article>
 
@@ -218,6 +251,9 @@
       boothName1: "기본 부스",
       boothArea1: "3m × 3m × 높이 3.5m · 일반 방문 간판",
       boothPrice1: "2,800,000",
+      boothPic0: "",
+      boothPic1: "",
+      introNote: "",
       booths: ["", "", "", "", "", "", "", ""],
       applyLink: "",
       apps: [],
@@ -257,6 +293,42 @@
     fill("boothName1", "boothName1");
     fill("boothArea1", "boothArea1");
     fill("boothPrice1", "boothPrice1");
+    var editor = document.getElementById("introNote");
+    editor.textContent = data.introNote || "";
+    editor.addEventListener("input", function () { data.introNote = editor.textContent; });
+    function bindPic(inputId, frameId, field) {
+      var input = document.getElementById(inputId);
+      var frame = document.getElementById(frameId);
+      function show(src) {
+        frame.textContent = "";
+        var img = document.createElement("img");
+        img.src = src;
+        img.alt = "";
+        frame.appendChild(img);
+      }
+      if (data[field]) show(data[field]);
+      input.addEventListener("change", function () {
+        var file = input.files && input.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function () {
+          var image = new Image();
+          image.onload = function () {
+            var canvas = document.createElement("canvas");
+            var scale = Math.min(1, 640 / image.width);
+            canvas.width = Math.max(1, Math.round(image.width * scale));
+            canvas.height = Math.max(1, Math.round(image.height * scale));
+            canvas.getContext("2d").drawImage(image, 0, 0, canvas.width, canvas.height);
+            data[field] = canvas.toDataURL("image/jpeg", 0.8);
+            show(data[field]);
+          };
+          image.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+    bindPic("pic0", "frame0", "boothPic0");
+    bindPic("pic1", "frame1", "boothPic1");
     fill("applyLink", "applyLink");
     fill("sector", "sector");
     fill("sectorNote", "sectorNote");
