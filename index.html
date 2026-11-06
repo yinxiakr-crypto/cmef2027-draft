@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>제95회 CMEF 시안</title>
+  <title>시노서울 마케팅 시안</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <style>
     :root {
@@ -21,404 +21,71 @@
       font-family: Pretendard, "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
       letter-spacing: -0.02em;
     }
-    .draft {
-      margin: 0;
-      padding: 10px 16px;
-      background: #1a1a1a;
-      color: #fff;
-      text-align: center;
-      font-size: 13px;
-    }
+    .draft { margin: 0; padding: 10px 16px; background: #1a1a1a; color: #fff; text-align: center; font-size: 13px; }
     .wrap { width: min(1080px, calc(100% - 48px)); margin: 0 auto; }
-    header { padding: 40px 0 8px; }
-    .kicker {
-      margin: 0 0 18px;
-      color: var(--red);
-      font-size: 13px;
-      font-weight: 650;
-      letter-spacing: 0.16em;
-    }
-    h1 {
-      margin: 0;
-      font-size: clamp(36px, 5vw, 58px);
-      font-weight: 720;
-      line-height: 1.18;
-      letter-spacing: -0.045em;
-    }
-    .en-title { margin: 12px 0 0; font-size: 18px; font-weight: 500; color: #3c3c3c; }
-    .when { margin: 22px 0 0; font-size: 16px; color: var(--muted); }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      margin-top: 28px;
-      border-top: 1px solid var(--ink);
-    }
-    .stat { padding: 26px 8px 22px 0; }
-    .stat b {
+    header { padding: 48px 0 12px; }
+    .kicker { margin: 0 0 16px; color: var(--red); font-size: 13px; font-weight: 650; letter-spacing: 0.16em; }
+    h1 { margin: 0; font-size: clamp(36px, 5vw, 58px); font-weight: 720; line-height: 1.18; letter-spacing: -0.045em; }
+    .lead { margin: 18px 0 0; max-width: 640px; font-size: 17px; line-height: 1.6; }
+    .markets { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; padding: 36px 0 64px; }
+    .market h2 { margin: 0 0 14px; font-size: 13px; font-weight: 650; letter-spacing: 0.16em; }
+    .card {
       display: block;
-      font-size: clamp(34px, 3.4vw, 46px);
-      font-weight: 680;
-      letter-spacing: -0.05em;
-      line-height: 1;
-      font-variant-numeric: tabular-nums;
-    }
-    .stat .en { display: block; margin-top: 10px; font-size: 16px; font-weight: 680; }
-    .stat .ko { display: block; margin-top: 2px; color: var(--muted); font-size: 12px; }
-
-    .folds { display: grid; gap: 12px; padding: 28px 0 8px; }
-    .fold { border: 0; padding: 0; background: transparent; }
-    .fold-btn {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      text-align: left;
-      color: #fff;
-      background: var(--red);
-      border: 0;
-      cursor: pointer;
-      padding: 18px 22px;
-      font: inherit;
-    }
-    .fold-btn .en { display: block; font-size: 26px; font-weight: 720; letter-spacing: -0.04em; line-height: 1.1; }
-    .fold-btn .ko { display: block; margin-top: 4px; font-size: 13px; font-weight: 450; opacity: 0.85; }
-    .fold-btn .chev { font-size: 28px; font-weight: 400; line-height: 1; }
-    .fold-btn[aria-expanded="true"] { background: #a30d11; }
-    .panel { display: none; padding: 22px 4px 8px; }
-    .panel.open { display: block; }
-
-    .psr { position: relative; }
-    .psr-menu {
-      position: absolute;
-      z-index: 4;
-      left: 0;
-      right: 0;
-      margin-top: 8px;
       background: #fff;
       border: 1px solid var(--line);
-      box-shadow: 0 12px 28px rgba(26, 26, 26, 0.12);
-      max-height: 280px;
-      overflow: auto;
+      padding: 22px 22px 20px;
+      margin-top: 12px;
+      text-decoration: none;
+      color: inherit;
     }
-    .psr-menu[hidden] { display: none; }
-    .psr-menu button {
-      width: 100%;
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 16px;
-      border: 0;
-      border-bottom: 1px solid var(--line);
-      background: #fff;
-      font: inherit;
-      text-align: left;
-      padding: 12px 16px;
-      cursor: pointer;
-    }
-    .psr-menu button:hover,
-    .psr-menu button.on { background: #f6f4ef; }
-    .psr-menu .en { font-size: 16px; font-weight: 720; }
-    .psr-menu .ko { font-size: 12px; color: var(--muted); }
-    .brief {
-      margin-top: 14px;
-      padding: 22px 22px 18px;
-      background: #fff;
-      border: 1px solid var(--line);
-    }
-    .brief .en { margin: 0; font-size: 28px; font-weight: 720; letter-spacing: -0.04em; }
-    .brief .ko { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
-    .brief ul { margin: 16px 0 0; padding: 0; list-style: none; }
-    .brief li { padding: 8px 0; border-top: 1px solid var(--line); font-size: 16px; }
-    .brief li span { display: block; margin-top: 2px; color: var(--muted); font-size: 12px; }
-    .brief .stats { margin-top: 8px; border-top: 1px solid var(--line); }
-    .brief .stat { padding: 18px 8px 14px 0; }
-    .brief .stat b { font-size: clamp(26px, 2.6vw, 34px); }
-
-    .split { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 56px; }
-    .row {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 8px 16px;
-      align-items: center;
-      padding: 11px 0;
-      border-bottom: 1px solid var(--line);
-    }
-    .row .name { display: block; font-size: 18px; font-weight: 700; }
-    .row .ko { display: block; margin-top: 2px; color: var(--muted); font-weight: 450; font-size: 12px; }
-    .row strong { font-variant-numeric: tabular-nums; font-weight: 650; }
-    .track { grid-column: 1 / -1; height: 3px; background: #ece8e1; }
-    .track i { display: block; height: 100%; background: var(--red); }
-
-    .side-title { margin: 0 0 8px; font-size: 18px; font-weight: 700; }
-    .reasons { display: grid; gap: 0; }
-    .reason { padding: 18px 0; border-bottom: 1px solid var(--line); }
-    .reason b {
-      font-size: 42px;
-      font-weight: 680;
-      letter-spacing: -0.05em;
-      line-height: 1;
-    }
-    .reason .en { display: block; margin-top: 6px; font-size: 18px; font-weight: 700; }
-
-    .fields {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0 28px;
-      margin-top: 8px;
-    }
-    .fields div { padding: 14px 0; border-top: 1px solid var(--line); }
-    .fields strong { display: block; font-size: 18px; font-weight: 700; }
-    .fields em { display: block; margin-top: 2px; color: var(--muted); font-style: normal; font-size: 12px; }
-
-    .shows { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 8px; }
-    .show {
-      background: #fff;
-      min-height: 168px;
-      padding: 22px 16px 18px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
-      text-align: center;
-      border: 1px solid var(--line);
-    }
-    .show img { height: 42px; width: auto; max-width: 150px; object-fit: contain; }
-    .mark { width: 42px; height: 42px; }
-    .show .en { margin: 14px 0 0; font-size: 16px; font-weight: 700; line-height: 1.3; }
-    .show .ko { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
-    footer { padding: 36px 0 56px; color: var(--muted); font-size: 12px; }
-
-    @media (max-width: 860px) {
-      .stats, .fields, .shows { grid-template-columns: 1fr 1fr; }
-      .split { grid-template-columns: 1fr; gap: 36px; }
-    }
+    a.card:hover { border-color: var(--ink); }
+    .card b { display: block; font-size: 28px; font-weight: 720; letter-spacing: -0.04em; }
+    .card em { display: block; margin-top: 6px; color: var(--muted); font-style: normal; font-size: 14px; line-height: 1.45; }
+    .card .go { display: block; margin-top: 14px; color: var(--red); font-size: 13px; font-weight: 700; }
+    footer { padding: 0 0 48px; color: var(--muted); font-size: 12px; }
+    @media (max-width: 800px) { .markets { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
-  <p class="draft">검토용 시안입니다. 올리는 위치는 나중에 정합니다.</p>
+  <p class="draft">검토용 시안입니다. 전시 도면만 로그인 후 열립니다. 올리는 위치는 나중에 정합니다.</p>
   <header>
     <div class="wrap">
-      <p class="kicker">CMEF SHANGHAI 2027</p>
-      <h1>제95회 중국 국제 의료기기 전시회</h1>
-      <p class="en-title">China International Medical Equipment Fair</p>
-      <p class="when">2027.4.7 – 10 · NECC Shanghai</p>
-
-      <div class="stats" aria-label="전시 규모">
-        <div class="stat"><b>320,000+</b><span class="en">sqm</span><span class="ko">전시면적</span></div>
-        <div class="stat"><b>4,700+</b><span class="en">Exhibitors</span><span class="ko">참가업체</span></div>
-        <div class="stat"><b>150+</b><span class="en">Countries</span><span class="ko">국가·지역</span></div>
-        <div class="stat"><b>1,000+</b><span class="en">Innovations</span><span class="ko">신제품</span></div>
-        <div class="stat"><b>300,000+</b><span class="en">Visits</span><span class="ko">전문 참관</span></div>
-        <div class="stat"><b>13,000+</b><span class="en">Buyers</span><span class="ko">해외 바이어</span></div>
-        <div class="stat"><b>100+</b><span class="en">Conferences</span><span class="ko">컨퍼런스</span></div>
-      </div>
+      <p class="kicker">SINOSEOUL MARKETING</p>
+      <h1>중국·베트남 의료기기 전시</h1>
+      <p class="lead">시노서울은 중국과 베트남 의료기기 전시회의 한국 에이전트입니다. 참가 기업 모집, 한국관, 참가 신청, 바이어 매칭을 안내합니다.</p>
     </div>
   </header>
-
-  <div class="wrap folds">
-    <section class="fold psr">
-      <button type="button" class="fold-btn" id="psrBtn" aria-expanded="false" aria-controls="psrMenu">
-        <span><span class="en">PSR</span><span class="ko">Post Show Report</span></span>
-        <span class="chev" aria-hidden="true">+</span>
-      </button>
-      <div class="psr-menu" id="psrMenu" hidden></div>
-      <div class="brief" id="historyBrief" hidden></div>
+  <main class="wrap markets">
+    <section class="market">
+      <h2>CHINA · 중국</h2>
+      <a class="card" href="cmef.html">
+        <b>CMEF</b>
+        <em>China International Medical Equipment Fair</em>
+        <span class="go">제95회 시안 열기</span>
+      </a>
+      <article class="card">
+        <b>CDS</b>
+        <em>China Dental Show</em>
+      </article>
+      <article class="card">
+        <b>CHCC</b>
+        <em>China Hospital Construction Conference</em>
+      </article>
     </section>
-
-    <section class="fold">
-      <button type="button" class="fold-btn" aria-expanded="false" aria-controls="visitorBody">
-        <span><span class="en">Visitor Profile</span><span class="ko">참관객</span></span>
-        <span class="chev" aria-hidden="true">+</span>
-      </button>
-      <div class="panel" id="visitorBody">
-      <div class="split">
-      <div>
-        <div class="row"><div><span class="name">Distributors &amp; Agents</span><span class="ko">유통·대리점</span></div><strong>34%</strong><div class="track"><i style="width:34%"></i></div></div>
-        <div class="row"><div><span class="name">Manufacturers</span><span class="ko">제조사</span></div><strong>24%</strong><div class="track"><i style="width:24%"></i></div></div>
-        <div class="row"><div><span class="name">Medical Institutions</span><span class="ko">의료기관</span></div><strong>23%</strong><div class="track"><i style="width:23%"></i></div></div>
-        <div class="row"><div><span class="name">Others</span><span class="ko">기타</span></div><strong>6%</strong><div class="track"><i style="width:6%"></i></div></div>
-        <div class="row"><div><span class="name">Associations</span><span class="ko">협회·기관</span></div><strong>5%</strong><div class="track"><i style="width:5%"></i></div></div>
-        <div class="row"><div><span class="name">Trade &amp; Tender</span><span class="ko">무역·입찰</span></div><strong>4%</strong><div class="track"><i style="width:4%"></i></div></div>
-        <div class="row"><div><span class="name">R&amp;D</span><span class="ko">연구기관</span></div><strong>4%</strong><div class="track"><i style="width:4%"></i></div></div>
-      </div>
-      <div>
-        <p class="side-title">Why They Visit</p>
-        <div class="reasons">
-          <div class="reason"><b>63.3%</b><span class="en">Purchasing</span></div>
-          <div class="reason"><b>37.7%</b><span class="en">Partnership</span></div>
-          <div class="reason"><b>37.7%</b><span class="en">New Trends</span></div>
-        </div>
-      </div>
-      </div>
-      </div>
+    <section class="market">
+      <h2>VIETNAM · 베트남</h2>
+      <article class="card">
+        <b>Medi-Pharm</b>
+        <em>Vietnam International Medical and Pharmaceutical Exhibition</em>
+      </article>
+      <article class="card">
+        <b>PHARMEDI</b>
+        <em>Vietnam International Medical and Pharmaceutical Exhibition</em>
+      </article>
     </section>
-
-    <section class="fold">
-      <button type="button" class="fold-btn" aria-expanded="false" aria-controls="chainBody">
-        <span><span class="en">Industry Chain</span><span class="ko">산업 분야</span></span>
-        <span class="chev" aria-hidden="true">+</span>
-      </button>
-      <div class="panel" id="chainBody">
-      <div class="fields">
-        <div><strong>Medical Imaging</strong><em>의료영상</em></div>
-        <div><strong>IVD</strong><em>체외진단</em></div>
-        <div><strong>Operating Room</strong><em>수술실</em></div>
-        <div><strong>Medical Electronics</strong><em>의료전자</em></div>
-        <div><strong>Medical Optics</strong><em>의료광학</em></div>
-        <div><strong>Medical Robotics</strong><em>의료용 로봇</em></div>
-        <div><strong>Consumables</strong><em>의료용 소모품</em></div>
-        <div><strong>Orthopedics</strong><em>정형외과</em></div>
-        <div><strong>Hospital Build</strong><em>병원 건설·시설</em></div>
-        <div><strong>Simulation</strong><em>의료 시뮬레이션</em></div>
-        <div><strong>Infection Control</strong><em>소독·감염관리</em></div>
-        <div><strong>Aesthetics</strong><em>미용 의료</em></div>
-        <div><strong>Asset Management</strong><em>병원 자산 관리</em></div>
-      </div>
-      </div>
-    </section>
-
-    <section class="fold">
-      <button type="button" class="fold-btn" aria-expanded="false" aria-controls="showBody">
-        <span><span class="en">Concurrent Shows</span><span class="ko">동기간 전시</span></span>
-        <span class="chev" aria-hidden="true">+</span>
-      </button>
-      <div class="panel" id="showBody">
-      <div class="shows">
-        <article class="show"><img src="data:image/png;base64,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" alt="ICMD"><p class="en">Component &amp; Design</p><p class="ko">부품·설계</p></article>
-        <article class="show"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAAAzCAYAAABc+8x9AAAFYklEQVR4nO2cbUxbVRjH/32nUGm7Ai2C42UbuBfezOaiM5vvYpwuWXQxxmQxyxITl6hfNH7yg5/UDyYucUsWgx/8ZKYhGzicS1gkgso7GxCgMGAMSkvH2lL6Xsy9iYawtve0t5ee3t5fchNy77kn9/C/z3POeZ7nVraxsbEBCdEiz/QDSAiLJLDIkQQWOZLAIkcSWORIAoscSWCRo0z1Rrc7gKEROyatTvZvjzfA+2FMxnyce//gQ+f7+m1ovz4JoZAB0BVoUFJcgJ2P6fFEowU6nSqlvvoHltE/uAiH04twJAqh+fyzo+kV2GbzorVtArcn7GkfQCQSO+ayth7CkmMNguJYw+SsE+gFfmkbR1NdKU6d3AutluxfFAhEcPH7AYxbHaCJpATu/usefmodhT8YhpjxB8Po6b+L6TtOfHD2EMzmgoTtmWDgtxf+wfT8KrJ2Du76cwE/Xh4Rvbibsd9fx6UfBsBFe8cMleISC+x0+nD56hii0dwLWy8sezA4tJzQNXd2zYBWiATu+H0GgRyy3K2MjjsSTltefwhZKzAzvwyPLiGXcXvi7xCGb9lAM5wCz8654fYGkcv4/fG919yiCzTDuYpeWhJ4e5Jmyi2FUKsUca/7/CHYVrysZ+LLks3L9pfVAnvX6R7AVt55qw7VVfqEba7+akX7DfLAiULBhEIeZmVlHbTDKXAkiWDGoYYynDndANppfrEKHZ1W4rEZjdqY51dd3NE7rUaJijID5HFeEmpDldmMSq2AXCZDhLB9SbEu5nmXy5/wPoVCjk8/PAKLJXGgREhyMtnQ8/ciQmEyeeVyGZrqS2JeC4cTewDmJTIY85BJRGfBXd3zGL6liXvd5fajf4R827d3VxFnqDIezEv0xZd/wBzHA5DALBh3luvR2GDGo6XJ9yM6gZkYcrrYodfi3bfrePXhfOBjDz4MjdnQdmMSj1cX4dTJfUm5/Jx00VwWU1qsw9HDFfjko6dhzLCL/Q8mTDxmdeDr892YuUO+95YE3kIoHIVGrUT9ATMM+viuPlN4fSFcbOmD3UHmFSSBt8AEQGbvPcB3Lb240jYFGnGvBfBz6xhRW0ngBC7xWqeVXXHTyO0JB1t8wYUkMIc1X7k2EbfSJJNEolH0DXInOiSBOVh1+zA8YgeNTFlXONtIAhMwPUtntYaNoE5NdPvg6p1G5GkSDysQCCdVYsNUjdLImi+UewK/eWIfZzaJ4fyFXoxO8auA1GpVMBYKs09mKkm5wqkkyRLRCUzK4YPlvAVufqmKPYTA7QniUssApmbv8+onZ+fghvoSNttDK4WPqNFYV8q7n5y1YI1GAYNOA6cr9Tjx3LwbdxfcEKpM6HqnlS6BJ6ZX8NU3PSnfbzTk4ex7TdguTDvyeQk8MGTDbzf5iyAknALnaVVJhdCYI1VKvNubGNflq5HN5Km57ZNzEjJRkk0RAqWS3jmYhIJ8buPjHOHuXUYoKV6M8EHDsV+mHQtBIQGncszXdXuqTOl6Jok0Ul7Gvd8nMs0Xjgmz15PgR1O9OT0CH9hfhKb9FoiNaBZ/TFdZZkBlZZosmOHM6UbUiMxVB0NklZUqFV1rEKbS83hzDVnbZFacH597Eq8+t5toeZ4NhAgEZhIXx56pAE288XIt61VJSEopmUyGE6/X4PlnK3Gzax6j43Y2ZZWtH4UHEwhcqNOgttqE15r3ZLRwfTNMYuP4K7U48lQZ8T2ydPwYKVMARmINXCgVspg1yEy6jqQ8haGiQs+GIUmwTq/C7lj/fy7O16rYey3mAphMsT9X2YzHE2STAtuBQi5L6UVLi8AS9ELX6kEi7UgCixxJYJEjCQxx8y+gauJqASBqhAAAAABJRU5ErkJggg==" alt="CRS"><p class="en">Rehabilitation</p><p class="ko">재활·개인 건강</p></article>
-        <article class="show"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJIAAAAzCAYAAAB8O1HFAAAE9UlEQVR4nO3d228UVRwH8O+Zy+7sbqWlpURSQ1psq4B3GyxBGkmDUUgqKYmIrVI12MYoKE+++B/ok0WFeH2whISYQKLB0AqmrVgocqmA1FSEoNgqst3ufS7HdKNGKG6H3TOzM7Pnk+zLZuf8Tna/nXOZ3SmhlFJwXJ6EfBvgOB4kjhl+RuKY4EHimOBB4pjgQeKY4EHimJByPdC4MAZ97DyMcBg0Fs+7I2Ld7ZAbV8x4Xu0/BP3ni7CLb3UzhFurTL+eTkWgj56FfnkcNBIFdC3vPigbngJ8vmvrTIahfjOY/UCfD75VzYBg7vygHuwDTSZNvVasq4VYewejICUTSPX1Qh38DsafU2DJR4QbBkk7NwZ1+CzsIj/UAJgIkn76JFJ9A9B+uAAYBtM++FtbQa4PUiSM5N6Dsx5rXPoVyqZNpuqkDgyY/hyVFsomSPrYKBIf7GIeINfRNCR39SA9eApOlD48AgR2Q3lyg611TQVJP3MK8Xd7QNX8T9uupmmIv/0OtHP2DbW5SH91FERR4G95AnaZdTClkUnEP97DQzQ9FOzb6/gQ/SP1RT/SvV/CMUFK7d8PGsl/Mu129PdxpHqH4CbJPb1QB752QJAMA+rQiC0dcTr1yFHmk2rrUSR6Pod2bKiwQZpe4tOYueWh12k/nocrGQYSH30G/fsThQuSfvk3S4u7iTF+BW5FNR3xnbuhj54pzKqNhifhBtKSakh1NUzaEioqb/i8cTUKN6NpFfH3PkVoy3MQqmuds7N9Pf/qRsgP3Jvz8eSWOTkfK9VWw/f4WjiBUBpCsKs9rzZIIAgr0HgKse2fIPTqZghVC50ZJKF8LoSaOlbNuZcoOPp9oFMJxLs/RPC1Lqbt8ou2Rci4GkW8+/3McOe4MxLnLsZEmGl7nghSun8Y6smbv7ArVt8GZeNGS/pUbDwRpMyKKodVFSmxZlJbjPgciWOCB4ljggfJg4g8PWMhttbkQfIgYX4ZlHWr7K1pazXONr7H1sD/6HLb6vEgeZi/dT18K++3pRYPkscpbW2Qly2xvI4n9pHk5XfD13Dzf3mkJIRiEOjoAE3sgDYyZlkNTwRJrKyAuPSeQnfDuQQBwc7Nlv5wgQ9txUKSEHzpRYg1CyxpngepmPgVBF/uhFg1z7lDW/rwMWijuY/B0uJ6yE2PwO1oNInEjp15tRHoeDbzoVuBhEoQ3NKF2FvdTL8BkDVIJBAw3ZB+cSLzyBUJBSHneGxy36HMg4XQtuch1s9c5ZCgP/MNw9nQtAr1+GhefVDaNRA/LENKyxDa2onYm9uZfYU469BG5pYyKeIFpKwEXkIqKiE33MWsvaxBEqsXMSvkduJCayapXpH9jFRWbtks323kpXcWuguONuuqzd8881YzxUh6cFnmYiiXY5CkhkbI9zn3VxG2EQQE2teDiGKhe+JIpvaRlGfaINWZv4uZV4n1i6E8vRZE4mHKKUiZvYetr8C/5mEQf66LdG+QVzQhuO0FSzb13Mz8hqQkwd+yDr6mlVCHjkA9cRrGpT+K8r5J4qJ6hN54HdrIcajfDkP/6Rfrf9JNCEjI5Calcu1tA/+XLJtvU85+AiF5/VMbSkGvTIDqes5N/NuRQAhkzsx9Kxq+CppKwC5C+TxANvlB/AeNRUGjETZ9mL8gExw3yS9IHPc3ftGWY4IHiWOCB4ljggeJAwt/AfGOftZw1am6AAAAAElFTkSuQmCC" alt="CECN"><p class="en">Elderly Care</p><p class="ko">노인 요양</p></article>
-        <article class="show"><img src="data:image/png;base64,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" alt="Home Care"><p class="en">Home Care</p><p class="ko">가정용 의료</p></article>
-        <article class="show"><img src="data:image/png;base64,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" alt="Intelligent Health"><p class="en">Intelligent Health</p><p class="ko">지능형 건강</p></article>
-        <article class="show"><img src="data:image/png;base64,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" alt="AHC"><p class="en">Animal Health</p><p class="ko">동물 건강</p></article>
-        <article class="show"><img src="data:image/png;base64,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" alt="Emergency Rescue"><p class="en">Emergency Rescue</p><p class="ko">응급·구조</p></article>
-        <article class="show"><svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="16" fill="none" stroke="#1a1a1a" stroke-width="1.6"/><path d="M16 26c2-6 4-8 8-8s6 2 8 8" fill="none" stroke="#1a1a1a" stroke-width="1.6" stroke-linecap="round"/></svg><p class="en">Healthy Lifestyle</p><p class="ko">건강 생활</p></article>
-      </div>
-      </div>
-    </section>
-  </div>
-  <script>
-    var fairs = [
-      { year: "2027", no: "95th", en: "Spring", ko: "봄", date: "2027.4.7–10", place: "NECC Shanghai", placeKo: "상하이 국가회의전람센터", note: "전시면적 320,000㎡ 이상 · 참가업체 4,700곳 이상" },
-      { year: "2026", no: "94th", en: "Autumn", ko: "가을", date: "2026.10.21–24", place: "CIECC Beijing", placeKo: "베이징" },
-      { year: "2026", no: "93rd", en: "Spring", ko: "봄", date: "2026.4.9–12", place: "Shanghai", placeKo: "상하이", report: true },
-      { year: "2025", no: "92nd", en: "Autumn", ko: "가을", date: "2025.9.26–29", place: "Guangzhou", placeKo: "광저우" },
-      { year: "2025", no: "91st", en: "Spring", ko: "봄", date: "2025.4.8–11", place: "Shanghai", placeKo: "상하이" },
-      { year: "2024", no: "90th", en: "Autumn", ko: "가을", date: "2024.10.12–15", place: "Shenzhen", placeKo: "선전" },
-      { year: "2024", no: "89th", en: "Spring", ko: "봄", date: "2024.4.11–14", place: "Shanghai", placeKo: "상하이" },
-      { year: "2023", no: "88th", en: "Autumn", ko: "가을", date: "2023.10.28–31", place: "Shenzhen", placeKo: "선전" },
-      { year: "2023", no: "87th", en: "Spring", ko: "봄", date: "2023.5.14–17", place: "Shanghai", placeKo: "상하이" },
-      { year: "2022", no: "86th", en: "Spring", ko: "봄", date: "2022.8.21–24", place: "Shanghai", placeKo: "상하이" },
-      { year: "2021", no: "85th", en: "Autumn", ko: "가을", date: "2021.10.13–16", place: "Shenzhen", placeKo: "선전" },
-      { year: "2021", no: "84th", en: "Spring", ko: "봄", date: "2021.5.13–16", place: "Shanghai", placeKo: "상하이" }
-    ];
-    var menu = document.getElementById("psrMenu");
-    var psrBtn = document.getElementById("psrBtn");
-    var briefBox = document.getElementById("historyBrief");
-    var byYear = {};
-    var yearOrder = [];
-    fairs.forEach(function (fair) {
-      if (!byYear[fair.year]) {
-        byYear[fair.year] = [];
-        yearOrder.push(fair.year);
-      }
-      byYear[fair.year].push(fair);
-    });
-    function showBrief(fair, button) {
-      menu.querySelectorAll("button").forEach(function (item) { item.classList.remove("on"); });
-      button.classList.add("on");
-      menu.hidden = true;
-      briefBox.hidden = false;
-      psrBtn.setAttribute("aria-expanded", "true");
-      psrBtn.querySelector(".chev").textContent = "–";
-      var html =
-        '<p class="en">' + fair.no + " " + fair.en + "</p>" +
-        '<p class="ko">' + fair.ko + " · " + fair.placeKo + "</p>" +
-        "<ul>" +
-        "<li>" + fair.date + "<span>일정</span></li>" +
-        "<li>" + fair.place + "<span>장소</span></li>" +
-        (fair.note ? "<li>" + fair.note + "<span>규모</span></li>" : "") +
-        "</ul>";
-      if (fair.report) {
-        html +=
-          '<div class="stats">' +
-          '<div class="stat"><b>320,000+</b><span class="en">sqm</span><span class="ko">전시면적</span></div>' +
-          '<div class="stat"><b>5,000</b><span class="en">Exhibitors</span><span class="ko">참가업체 · 약</span></div>' +
-          '<div class="stat"><b>19</b><span class="en">Countries</span><span class="ko">참가 국가·지역</span></div>' +
-          '<div class="stat"><b>150+</b><span class="en">Countries</span><span class="ko">참관 국가·지역</span></div>' +
-          '<div class="stat"><b>300,000+</b><span class="en">Professionals</span><span class="ko">전문 참관</span></div>' +
-          '<div class="stat"><b>1,000+</b><span class="en">Launches</span><span class="ko">신제품</span></div>' +
-          '<div class="stat"><b>100+</b><span class="en">Conferences</span><span class="ko">컨퍼런스</span></div>' +
-          '<div class="stat"><b>28%</b><span class="en">International Attendees</span><span class="ko">제91회 대비 증가</span></div>' +
-          '<div class="stat"><b>90.1%</b><span class="en">Exhibitor Satisfaction</span><span class="ko">참가업체 만족</span></div>' +
-          '<div class="stat"><b>91.5%</b><span class="en">Attendee Satisfaction</span><span class="ko">참관 만족</span></div>' +
-          '<div class="stat"><b>94.2%</b><span class="en">Return Exhibitors</span><span class="ko">다음 회 참가 의향</span></div>' +
-          '<div class="stat"><b>88.9%</b><span class="en">Return Visitors</span><span class="ko">다음 회 방문 의향</span></div>' +
-          "</div>" +
-          "<ul>" +
-          "<li>KMDA 한국 공동관<span>의료영상 · 수술기구 · 디지털 헬스</span></li>" +
-          "<li>WeTalk 19회 · 11개 국가·지역<span>한국 세션 포함</span></li>" +
-          "<li>러시아 인허가 기관 대표단<span>시장 진출 설명회</span></li>" +
-          "<li>현장 상담 200건 이상<span>혁신·프리미엄 제품 40종 이상</span></li>" +
-          "<li>iCMEF 연중 문의 10,000건 이상<span>혁신 제품 1,000종 이상</span></li>" +
-          "<li>CRS · CECN · Life Care<span>40,000㎡ 이상 · 참가 500곳 이상 · 신제품 2,000종 이상</span></li>" +
-          "<li>AHC, KMDA 단체 첫 참가<span>참가업체 약 30곳 · 900㎡</span></li>" +
-          "</ul>";
-      }
-      briefBox.innerHTML = html;
-    }
-    yearOrder.forEach(function (year) {
-      byYear[year].slice().reverse().forEach(function (fair) {
-        var button = document.createElement("button");
-        button.type = "button";
-        button.innerHTML = '<span class="en">' + fair.year + " " + fair.no + "</span><span class=\"ko\">" + fair.en + " · " + fair.ko + "</span>";
-        button.addEventListener("click", function (event) {
-          event.stopPropagation();
-          showBrief(fair, button);
-        });
-        menu.appendChild(button);
-      });
-    });
-    function markPsr(open) {
-      psrBtn.setAttribute("aria-expanded", open ? "true" : "false");
-      psrBtn.querySelector(".chev").textContent = open ? "–" : "+";
-    }
-    psrBtn.addEventListener("click", function (event) {
-      event.stopPropagation();
-      if (!menu.hidden) {
-        menu.hidden = true;
-        markPsr(!briefBox.hidden);
-        return;
-      }
-      if (!briefBox.hidden) {
-        briefBox.hidden = true;
-        markPsr(false);
-        return;
-      }
-      menu.hidden = false;
-      markPsr(true);
-    });
-    document.addEventListener("click", function () {
-      if (menu.hidden) return;
-      menu.hidden = true;
-      markPsr(!briefBox.hidden);
-    });
-
-    document.querySelectorAll(".fold-btn").forEach(function (button) {
-      if (button.id === "psrBtn") return;
-      button.addEventListener("click", function () {
-        var panel = document.getElementById(button.getAttribute("aria-controls"));
-        var open = button.getAttribute("aria-expanded") === "true";
-        button.setAttribute("aria-expanded", open ? "false" : "true");
-        panel.classList.toggle("open", !open);
-        button.querySelector(".chev").textContent = open ? "+" : "–";
-      });
-    });
-  </script>
-
+  </main>
   <footer>
-    <div class="wrap">수치는 주최사 브로셔와 Post Show Report에 적힌 것입니다. 이 화면은 시안이며, 아직 시노서울 사이트에는 올리지 않았습니다.</div>
+    <div class="wrap">이번 시안에서 열리는 전시는 CMEF입니다. 시노서울 홈페이지에는 아직 올리지 않았습니다.</div>
   </footer>
 </body>
 </html>
