@@ -7,11 +7,12 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <style>
     :root {
-      --ink: #1a1a1a;
-      --muted: #6f6a63;
-      --line: #e4e0d8;
-      --paper: #f6f4ef;
-      --red: #d31217;
+      --ink: #1c1a17;
+      --muted: #8a817a;
+      --line: #e4ddd2;
+      --paper: #faf7f2;
+      --red: #9b1b30;
+      --deep: #141210;
     }
     * { box-sizing: border-box; }
     body {
@@ -21,71 +22,81 @@
       font-family: Pretendard, "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
       letter-spacing: -0.02em;
     }
-    .draft { margin: 0; padding: 10px 16px; background: #1a1a1a; color: #fff; text-align: center; font-size: 13px; }
-    .wrap { width: min(1080px, calc(100% - 48px)); margin: 0 auto; }
-    header { padding: 48px 0 12px; }
-    .kicker { margin: 0 0 16px; color: var(--red); font-size: 13px; font-weight: 650; letter-spacing: 0.16em; }
-    h1 { margin: 0; font-size: clamp(36px, 5vw, 58px); font-weight: 720; line-height: 1.18; letter-spacing: -0.045em; }
-    .lead { margin: 18px 0 0; max-width: 640px; font-size: 17px; line-height: 1.6; }
-    .markets { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; padding: 36px 0 64px; }
-    .market h2 { margin: 0 0 14px; font-size: 13px; font-weight: 650; letter-spacing: 0.16em; }
-    .card {
-      display: block;
+    .draft { margin: 0; padding: 10px 16px; background: var(--deep); color: #faf7f2; text-align: center; font-size: 13px; }
+    .wrap { width: min(760px, calc(100% - 48px)); margin: 0 auto; padding: 88px 0 96px; }
+    .kicker { margin: 0 0 22px; color: var(--red); font-size: 12px; font-weight: 650; letter-spacing: 0.22em; }
+    h1 { margin: 0; font-size: clamp(64px, 10vw, 112px); font-weight: 720; letter-spacing: -0.06em; line-height: 0.92; }
+    .lead { margin: 18px 0 0; color: #3c3834; font-size: 18px; }
+    .china { position: relative; margin-top: 36px; }
+    .china > button {
+      width: 100%;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      padding: 26px 28px;
+      border: 0;
+      border-top: 3px solid var(--red);
+      background: var(--deep);
+      color: #fff;
+      font: inherit;
+      cursor: pointer;
+      text-align: left;
+    }
+    .china > button .en { font-size: 32px; font-weight: 720; letter-spacing: -0.04em; }
+    .china > button .ko { font-size: 14px; opacity: 0.85; }
+    .drop {
+      position: absolute;
+      z-index: 2;
+      left: 0;
+      right: 0;
+      margin-top: 8px;
       background: #fff;
       border: 1px solid var(--line);
-      padding: 22px 22px 20px;
-      margin-top: 12px;
-      text-decoration: none;
-      color: inherit;
     }
-    a.card:hover { border-color: var(--ink); }
-    .card b { display: block; font-size: 28px; font-weight: 720; letter-spacing: -0.04em; }
-    .card em { display: block; margin-top: 6px; color: var(--muted); font-style: normal; font-size: 14px; line-height: 1.45; }
-    .card .go { display: block; margin-top: 14px; color: var(--red); font-size: 13px; font-weight: 700; }
-    footer { padding: 0 0 48px; color: var(--muted); font-size: 12px; }
-    @media (max-width: 800px) { .markets { grid-template-columns: 1fr; } }
+    .drop[hidden] { display: none; }
+    .drop a {
+      display: block;
+      padding: 16px 22px;
+      border-bottom: 1px solid var(--line);
+      color: inherit;
+      text-decoration: none;
+    }
+    .drop a:hover { background: var(--paper); }
+    .drop b { display: block; font-size: 22px; letter-spacing: -0.03em; }
+    .drop span { display: block; margin-top: 3px; color: var(--muted); font-size: 13px; }
   </style>
 </head>
 <body>
   <p class="draft">검토용 시안입니다. 전시 도면만 로그인 후 열립니다. 올리는 위치는 나중에 정합니다.</p>
-  <header>
-    <div class="wrap">
-      <p class="kicker">SINOSEOUL MARKETING</p>
-      <h1>중국·베트남 의료기기 전시</h1>
-      <p class="lead">시노서울은 중국과 베트남 의료기기 전시회의 한국 에이전트입니다. 참가 기업 모집, 한국관, 참가 신청, 바이어 매칭을 안내합니다.</p>
+  <main class="wrap">
+    <p class="kicker">SINOSEOUL MARKETING</p>
+    <h1>중국</h1>
+    <p class="lead">담당 전시회를 고르면 전시 소개가 열립니다.</p>
+    <div class="china">
+      <button type="button" id="chinaBtn" aria-expanded="false" aria-controls="chinaMenu">
+        <span class="en">중국</span>
+        <span class="ko">CMEF · CDS · CHCC</span>
+      </button>
+      <div class="drop" id="chinaMenu" hidden>
+        <a href="cmef.html"><b>CMEF</b><span>China International Medical Equipment Fair</span></a>
+        <a href="cds.html"><b>CDS</b><span>China Dental Show</span></a>
+        <a href="chcc.html"><b>CHCC</b><span>China Hospital Construction Conference</span></a>
+      </div>
     </div>
-  </header>
-  <main class="wrap markets">
-    <section class="market">
-      <h2>CHINA · 중국</h2>
-      <a class="card" href="cmef.html">
-        <b>CMEF</b>
-        <em>China International Medical Equipment Fair</em>
-        <span class="go">제95회 시안 열기</span>
-      </a>
-      <article class="card">
-        <b>CDS</b>
-        <em>China Dental Show</em>
-      </article>
-      <article class="card">
-        <b>CHCC</b>
-        <em>China Hospital Construction Conference</em>
-      </article>
-    </section>
-    <section class="market">
-      <h2>VIETNAM · 베트남</h2>
-      <article class="card">
-        <b>Medi-Pharm</b>
-        <em>Vietnam International Medical and Pharmaceutical Exhibition</em>
-      </article>
-      <article class="card">
-        <b>PHARMEDI</b>
-        <em>Vietnam International Medical and Pharmaceutical Exhibition</em>
-      </article>
-    </section>
   </main>
-  <footer>
-    <div class="wrap">이번 시안에서 열리는 전시는 CMEF입니다. 시노서울 홈페이지에는 아직 올리지 않았습니다.</div>
-  </footer>
+  <script>
+    var btn = document.getElementById("chinaBtn");
+    var menu = document.getElementById("chinaMenu");
+    btn.addEventListener("click", function (event) {
+      event.stopPropagation();
+      var open = btn.getAttribute("aria-expanded") === "true";
+      menu.hidden = open;
+      btn.setAttribute("aria-expanded", open ? "false" : "true");
+    });
+    document.addEventListener("click", function () {
+      menu.hidden = true;
+      btn.setAttribute("aria-expanded", "false");
+    });
+  </script>
 </body>
 </html>

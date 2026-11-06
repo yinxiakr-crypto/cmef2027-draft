@@ -7,11 +7,12 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <style>
     :root {
-      --ink: #1a1a1a;
-      --muted: #6f6a63;
-      --line: #e4e0d8;
-      --paper: #f6f4ef;
-      --red: #d31217;
+      --ink: #1c1a17;
+      --muted: #8a817a;
+      --line: #e4ddd2;
+      --paper: #faf7f2;
+      --red: #9b1b30;
+      --deep: #141210;
     }
     * { box-sizing: border-box; }
     body {
@@ -24,8 +25,8 @@
     .draft {
       margin: 0;
       padding: 10px 16px;
-      background: #1a1a1a;
-      color: #fff;
+      background: var(--deep);
+      color: #faf7f2;
       text-align: center;
       font-size: 13px;
     }
@@ -75,8 +76,8 @@
       justify-content: space-between;
       gap: 16px;
       text-align: left;
-      color: #fff;
-      background: var(--red);
+      color: #faf7f2;
+      background: var(--deep);
       border: 0;
       cursor: pointer;
       padding: 18px 22px;
@@ -85,7 +86,7 @@
     .fold-btn .en { display: block; font-size: 26px; font-weight: 720; letter-spacing: -0.04em; line-height: 1.1; }
     .fold-btn .ko { display: block; margin-top: 4px; font-size: 13px; font-weight: 450; opacity: 0.85; }
     .fold-btn .chev { font-size: 28px; font-weight: 400; line-height: 1; }
-    .fold-btn[aria-expanded="true"] { background: #a30d11; }
+    .fold-btn[aria-expanded="true"] { background: var(--red); }
     .panel { display: none; padding: 22px 4px 8px; }
     .panel.open { display: block; }
 
@@ -193,7 +194,7 @@
       position: sticky;
       top: 0;
       z-index: 6;
-      background: rgba(246, 244, 239, 0.94);
+      background: rgba(250, 247, 242, 0.94);
       border-bottom: 1px solid var(--line);
     }
     .nav-row { display: flex; align-items: center; justify-content: space-between; gap: 18px; min-height: 64px; }
@@ -208,11 +209,60 @@
     .lock-card b, .plain-card b { display: block; font-size: 22px; font-weight: 720; }
     .lock-card span, .plain-card span { display: block; margin-top: 6px; color: var(--muted); font-size: 14px; line-height: 1.5; }
     .steps { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; }
+    .hall { display: grid; grid-template-columns: 1.3fr 0.7fr; gap: 10px; min-height: 360px; margin-top: 18px; }
+    .zone { background: #efece6; border: 1px solid var(--line); }
+    .zone.korea {
+      grid-row: 1 / span 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: flex-start;
+      padding: 24px;
+      border: 0;
+      background: var(--red);
+      color: #fff;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+    .zone.korea b { font-size: 36px; font-weight: 720; letter-spacing: -0.04em; }
+    .zone.korea span { margin-top: 4px; font-size: 14px; opacity: 0.85; }
+    .booths { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 16px; }
+    .booth {
+      min-height: 92px;
+      background: #fff;
+      border: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 10px;
+    }
+    .booth b { font-size: 14px; font-weight: 720; }
+    .booth span { color: var(--muted); font-size: 12px; }
+    .back {
+      margin-top: 18px;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: var(--red);
+      font: inherit;
+      font-size: 15px;
+      font-weight: 720;
+      cursor: pointer;
+    }
+    .roster { margin-top: 28px; }
+    .roster h3 { margin: 0; font-size: 22px; font-weight: 720; letter-spacing: -0.04em; }
+    .roster p { margin: 8px 0 0; color: var(--muted); font-size: 14px; }
+    .roster table { width: 100%; margin-top: 16px; border-collapse: collapse; background: #fff; }
+    .roster th, .roster td { padding: 14px 12px; border-bottom: 1px solid var(--line); text-align: left; font-size: 14px; }
+    .roster th { color: var(--muted); font-size: 12px; font-weight: 650; letter-spacing: 0.04em; }
     footer { padding: 36px 0 56px; color: var(--muted); font-size: 12px; }
 
     @media (max-width: 860px) {
       .stats, .fields, .shows, .steps { grid-template-columns: 1fr 1fr; }
       .nav-row { align-items: flex-start; flex-direction: column; padding: 14px 0; }
+      .hall { grid-template-columns: 1fr; grid-template-rows: 200px 80px 80px; }
+      .zone.korea { grid-row: auto; }
       .split { grid-template-columns: 1fr; gap: 36px; }
     }
   </style>
@@ -224,7 +274,7 @@
       <a class="brand" href="index.html">SINOSEOUL</a>
       <div class="nav-links">
         <a href="#intro">전시 소개</a>
-        <a class="lock" href="#map">한국관 도면</a>
+        <a href="#map">전시 도면</a>
         <a href="#apply">참가 신청</a>
         <a href="#match">바이어 매칭</a>
         <a href="#notice">공지</a>
@@ -334,12 +384,40 @@
 
   <div class="wrap">
     <section class="block" id="map">
-      <p class="kicker">KOREA PAVILION</p>
-      <h2>한국관 도면</h2>
-      <p class="lead">국제관 안의 한국관입니다. 위치를 정한 업체의 이름이 그 칸에 표시됩니다.</p>
-      <div class="lock-card">
-        <b>로그인 후 열람</b>
-        <span>도면, 부스 위치, 업체 이름은 로그인한 회원만 볼 수 있습니다.</span>
+      <p class="kicker">FLOOR PLAN</p>
+      <h2>전시 도면</h2>
+      <div id="hallMap" class="hall">
+        <button type="button" class="zone korea" id="openKorea">
+          <b>한국관</b>
+          <span>국제관</span>
+        </button>
+        <div class="zone"></div>
+        <div class="zone"></div>
+      </div>
+      <div id="koreaMap" hidden>
+        <button type="button" class="back" id="backHall">전체 도면</button>
+        <div class="booths" aria-label="한국관 부스">
+          <div class="booth"><b>번호</b><span>3×3</span></div>
+          <div class="booth"><b>번호</b><span>3×3</span></div>
+          <div class="booth"><b>번호</b><span>3×3</span></div>
+          <div class="booth"><b>번호</b><span>3×3</span></div>
+          <div class="booth"><b>번호</b><span>3×3</span></div>
+          <div class="booth"><b>번호</b><span>3×3</span></div>
+          <div class="booth"><b>번호</b><span>3×3</span></div>
+          <div class="booth"><b>번호</b><span>3×3</span></div>
+        </div>
+        <div class="roster">
+          <h3>참가 기업</h3>
+          <p>신청서에 적은 전시 제품과 인허가 여부가 이 목록에 표시됩니다.</p>
+          <table>
+            <thead>
+              <tr><th>부스 번호</th><th>기업명</th><th>전시 제품</th><th>인허가</th></tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="4">아직 표시할 신청이 없습니다.</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
 
@@ -476,6 +554,17 @@
       if (menu.hidden) return;
       menu.hidden = true;
       markPsr(!briefBox.hidden);
+    });
+
+    var hallMap = document.getElementById("hallMap");
+    var koreaMap = document.getElementById("koreaMap");
+    document.getElementById("openKorea").addEventListener("click", function () {
+      hallMap.hidden = true;
+      koreaMap.hidden = false;
+    });
+    document.getElementById("backHall").addEventListener("click", function () {
+      koreaMap.hidden = true;
+      hallMap.hidden = false;
     });
 
     document.querySelectorAll(".fold-btn").forEach(function (button) {
