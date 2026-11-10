@@ -625,6 +625,7 @@
       border-width: 6px 0 6px 8px;
       border-color: transparent transparent transparent currentColor;
     }
+    .drawer-tab .tab-name { display: none; }
     #map.list-closed .drawer { flex-basis: 22px; width: 22px; gap: 0; }
     #map.list-closed .drawer-tab .chev { transform: rotate(180deg); }
     #map.list-closed .roster { visibility: hidden; }
@@ -816,15 +817,47 @@
       .split { grid-template-columns: 1fr; gap: 28px; }
       .type-grid, .match-grid { grid-template-columns: 1fr; }
       .roster { overflow-x: auto; }
+      #map { padding-left: 0; padding-right: 0; }
+      #map .map-head, #map .hall-row, #map .back { padding-left: 16px; padding-right: 16px; }
+      #map .place-pick { display: none; }
+      #map .pair, #map.list-right .pair, #map.list-bottom .pair { flex-direction: column; }
+      #map .drawer,
+      #map.list-closed .drawer,
+      #map.list-right .drawer,
+      #map.list-bottom .drawer,
+      #map.list-bottom.list-closed .drawer {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        flex-basis: auto;
+        gap: 0;
+      }
+      #map .drawer-tab {
+        width: 100%;
+        height: 46px;
+        min-height: 46px;
+        border-radius: 0;
+        border-left: 0;
+        border-right: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 14px;
+        font-weight: 680;
+      }
+      #map .drawer-tab .tab-name { display: inline; }
+      #map .drawer-tab .chev { transform: rotate(90deg); }
+      #map.list-closed .drawer-tab .chev,
+      #map.list-bottom.list-closed .drawer-tab .chev { transform: rotate(90deg); }
+      #map:not(.list-closed) .drawer-tab .chev { transform: rotate(-90deg); }
+      #map .roster, #map.list-bottom .roster { width: 100%; padding: 0 16px 12px; box-sizing: border-box; }
+      #map.list-closed .roster { display: none; }
       .reason b { font-size: 32px; }
       .fold-btn .en { font-size: 22px; }
     }
     @media (max-width: 640px) {
       .pair { flex-direction: column; }
-      .drawer, #map.list-closed .drawer, #map.list-right .drawer { width: 100%; flex-basis: auto; }
-      .drawer-tab { width: 22px; height: 22px; min-height: 22px; border-radius: 50%; }
-      .pair .roster, #map.list-closed .roster { width: 100%; flex-basis: auto; visibility: visible; }
-      #map.list-closed .roster { display: none; }
       .booths { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .product-card { padding: 12px; }
     }
@@ -1086,7 +1119,7 @@ HQI light × 1</span></td>
         <p class="hall-hint" id="hallHint" hidden></p>
       </div>
       <div class="drawer">
-        <button type="button" class="drawer-tab" aria-expanded="true" aria-label="참가 기업 감추기"><span class="chev" aria-hidden="true"></span></button>
+        <button type="button" class="drawer-tab" aria-expanded="true" aria-label="참가 기업 감추기"><span class="chev" aria-hidden="true"></span><span class="tab-name">참가 기업</span></button>
         <div class="roster" id="applyRoster">
         <h3>참가 기업</h3>
         <table>
@@ -1104,7 +1137,7 @@ HQI light × 1</span></td>
         <div class="pair">
         <div class="plan plain" id="sectionPlan"></div>
         <div class="drawer">
-          <button type="button" class="drawer-tab" aria-expanded="true" aria-label="참가 기업 감추기"><span class="chev" aria-hidden="true"></span></button>
+          <button type="button" class="drawer-tab" aria-expanded="true" aria-label="참가 기업 감추기"><span class="chev" aria-hidden="true"></span><span class="tab-name">참가 기업</span></button>
           <div class="roster">
           <h3>참가 기업</h3>
           <table>
@@ -1132,7 +1165,7 @@ HQI light × 1</span></td>
         </div>
         </div>
         <div class="drawer">
-          <button type="button" class="drawer-tab" aria-expanded="true" aria-label="참가 기업 감추기"><span class="chev" aria-hidden="true"></span></button>
+          <button type="button" class="drawer-tab" aria-expanded="true" aria-label="참가 기업 감추기"><span class="chev" aria-hidden="true"></span><span class="tab-name">참가 기업</span></button>
           <div class="roster">
           <h3>참가 기업 <button class="release" type="button" id="clearSpot">표시 끄기</button></h3>
           <p class="hall-hint" id="spotNote" hidden></p>
@@ -1867,6 +1900,10 @@ HQI light × 1</span></td>
       openPlace = savedSide === "bottom" || savedPlace === "bottom" ? "bottom" : "right";
       listOpen = savedPlace !== "closed";
     } catch (error) {}
+    if (window.matchMedia("(max-width: 860px)").matches) {
+      openPlace = "bottom";
+      listOpen = false;
+    }
     applyList();
 
     var productCount = 0;
