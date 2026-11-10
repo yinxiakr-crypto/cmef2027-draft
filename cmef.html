@@ -402,14 +402,25 @@
       padding-right: 0;
     }
     body.preview #map .pair,
-    body.preview #map.list-right .pair { flex-direction: column; }
+    body.preview #map.list-right .pair { flex-direction: row; }
     body.preview #map .drawer,
     body.preview #map.list-right .drawer {
-      width: 100%;
-      flex-basis: auto;
-      flex-direction: column;
+      width: min(320px, 38%);
+      flex: 0 0 min(320px, 38%);
+      max-width: 38%;
+      overflow: auto;
+      align-items: flex-start;
     }
-    body.preview #map .roster { width: 100%; }
+    body.preview #map.list-bottom .pair { flex-direction: column; }
+    body.preview #map.list-bottom .drawer {
+      width: 100%;
+      max-width: 100%;
+      flex: 1 1 auto;
+      flex-basis: auto;
+      overflow: hidden;
+      align-items: stretch;
+    }
+    body.preview #map .roster { width: 100%; max-width: 100%; }
     .block { padding: 36px 0 8px; }
     .block h2 { margin: 0; font-size: clamp(28px, 4vw, 40px); font-weight: 720; letter-spacing: -0.04em; }
     .block .lead { margin: 12px 0 0; max-width: 640px; font-size: 16px; line-height: 1.55; }
@@ -628,7 +639,7 @@
     }
     .place-pick button[data-place="bottom"] .mark { transform: rotate(90deg); }
     [hidden] { display: none !important; }
-    .pair { display: flex; align-items: flex-start; gap: 8px; }
+    .pair { display: flex; align-items: flex-start; gap: 8px; max-width: 100%; min-width: 0; }
     .pair > :first-child { flex: 1 1 auto; min-width: 0; }
     .drawer {
       flex: 0 0 420px;
@@ -667,8 +678,15 @@
     #map.list-closed .drawer-tab .chev { transform: rotate(180deg); }
     #map.list-closed .roster { visibility: hidden; }
     #map.list-bottom .pair { flex-direction: column; }
-    #map.list-bottom .drawer { flex-direction: column; width: 100%; flex-basis: auto; }
-    #map.list-bottom .drawer { align-items: flex-end; }
+    #map.list-bottom .drawer {
+      flex-direction: column;
+      width: 100%;
+      max-width: 100%;
+      flex: 1 1 auto;
+      flex-basis: auto;
+      align-items: stretch;
+      overflow: hidden;
+    }
     #map.list-bottom .drawer-tab {
       width: 22px;
       height: 22px;
@@ -787,7 +805,7 @@
     .roster tr.hit td { background: #fdecef; }
     .roster tbody tr { cursor: pointer; }
     .pin.hit { outline: 3px solid #1c1a17; box-shadow: 0 0 0 3px #fff; z-index: 4; }
-    .pin.idle, .plan .booth-box.idle { opacity: 0; }
+    .pin.idle, .plan .booth-box.idle { opacity: 0; pointer-events: none; }
     .roster h3 button.release {
       margin-left: 8px;
       padding: 2px 8px;
@@ -1360,6 +1378,7 @@ HQI light × 1</span></td>
     </section>
   </div>
   <script>
+    if (location.search.indexOf("preview=1") >= 0) document.body.classList.add("preview");
     var fairs = [
       { year: "2027", no: "95th", en: "Spring", ko: "봄", date: "2027.4.7–10", place: "NECC Shanghai", placeKo: "상하이 국가회의전람센터", note: "전시면적 320,000㎡ 이상 · 참가업체 4,700곳 이상" },
       { year: "2026", no: "94th", en: "Autumn", ko: "가을", date: "2026.10.21–24", place: "CIECC Beijing", placeKo: "베이징" },
@@ -1533,7 +1552,27 @@ HQI light × 1</span></td>
       if (!board) return;
       board.addEventListener("click", function (event) {
         if (event.target.closest(".pin") || event.target.closest(".booth-box")) return;
-        clearCompanyLock();
+        var rect = board.getBoundingClientRect();
+        if (!rect.width || !rect.height) {
+          clearCompanyLock();
+          return;
+        }
+        var x = (event.clientX - rect.left) / rect.width * 100;
+        var y = (event.clientY - rect.top) / rect.height * 100;
+        var best = -1;
+        var bestDistance = 6;
+        hallApps.forEach(function (item, index) {
+          if (item.x == null || item.y == null) return;
+          var dx = item.x - x;
+          var dy = item.y - y;
+          var distance = Math.sqrt(dx * dx + dy * dy);
+          if (distance < bestDistance) {
+            bestDistance = distance;
+            best = index;
+          }
+        });
+        if (best >= 0) toggleCompany(best);
+        else clearCompanyLock();
       });
     });
     var clearSpot = document.getElementById("clearSpot");
@@ -1939,10 +1978,14 @@ HQI light × 1</span></td>
       }
       function openHall(hall) {
         var match = null;
+        var name = String(hall || "");
         document.querySelectorAll("#hallMap .zone").forEach(function (node) {
-          if (node.getAttribute("data-hall") === hall) match = node;
+          var id = node.getAttribute("data-hall") || "";
+          if (id === name || name.indexOf(id) === 0 || id.indexOf(name) === 0) match = node;
         });
-        if (match) openZone(match);
+        if (!match) return false;
+        openZone(match);
+        return true;
       }
       var frame = document.querySelector("#hallMap .venue-frame");
       if (!frame) return;
@@ -1954,10 +1997,7 @@ HQI light × 1</span></td>
         for (var n = 0; n < lists.length; n++) {
           var list = lists[n];
           for (var i = list.length - 1; i >= 0; i--) {
-            if (list[i].points && inside(point, list[i].points)) {
-              openHall(list[i].hall);
-              return;
-            }
+            if (list[i].points && inside(point, list[i].points) && openHall(list[i].hall)) return;
           }
         }
       });
@@ -2480,4 +2520,6 @@ HQI light × 1</span></td>
 
   <footer>
     <div class="wrap"></div>
-  </foo
+  </footer>
+</body>
+</html>
