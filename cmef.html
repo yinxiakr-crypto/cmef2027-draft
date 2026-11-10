@@ -623,6 +623,8 @@
       border-radius: 7px;
       background: #fff;
       color: var(--ink);
+      font-size: 0;
+      line-height: 0;
       cursor: pointer;
     }
     .place-pick button.on { background: var(--deep); color: #fff; border-color: var(--deep); }
@@ -1608,7 +1610,7 @@ HQI light × 1</span></td>
         var row = document.createElement("tr");
         var cell = document.createElement("td");
         cell.colSpan = 5;
-        cell.textContent = "참가 기업이 아직 없습니다.";
+        cell.textContent = "";
         row.appendChild(cell);
         tbody.appendChild(row);
       }
@@ -1636,7 +1638,7 @@ HQI light × 1</span></td>
         var row = document.createElement("tr");
         var cell = document.createElement("td");
         cell.colSpan = 5;
-        cell.textContent = "참가 기업이 아직 없습니다.";
+        cell.textContent = "";
         row.appendChild(cell);
         tbody.appendChild(row);
       }
