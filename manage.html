@@ -415,7 +415,7 @@
         <button type="button" id="visitorRefresh">다시 보기</button>
         <button type="button" id="visitorFold" aria-expanded="true">접기</button>
       </div>
-      <iframe id="visitorFrame" title="방문자 화면" src="cmef.html?preview=1#intro"></iframe>
+      <iframe id="visitorFrame" title="방문자 화면" src="cmef.html?preview=1&v=2#intro"></iframe>
     </section>
   </div>
   <main class="wrap">
@@ -1783,7 +1783,7 @@
         var visitorLink = document.querySelector(".to-visitor");
         if (visitorLink) visitorLink.setAttribute("href", "cmef.html#" + id);
         var frame = document.getElementById("visitorFrame");
-        if (frame) frame.src = "cmef.html?preview=1#" + id;
+        if (frame) frame.src = "cmef.html?preview=1&v=2#" + id;
         if (location.hash !== "#" + id) history.replaceState(null, "", "#" + id);
         window.scrollTo(0, 0);
       }
@@ -1810,7 +1810,7 @@
           var frame = document.getElementById("visitorFrame");
           if (!frame) return;
           var id = (location.hash || "#intro").replace("#", "");
-          frame.src = "cmef.html?preview=1#" + id;
+          frame.src = "cmef.html?preview=1&v=2#" + id;
         });
       }
     })();
