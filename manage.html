@@ -79,7 +79,71 @@
       background: var(--paper);
     }
     .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .booths { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; }
+    .booths {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-auto-rows: minmax(92px, auto);
+      gap: 10px;
+      margin-top: 12px;
+      padding: 10px;
+      background: var(--paper);
+      border: 1px dashed var(--line);
+    }
+    .booths .spot {
+      grid-column: var(--c);
+      grid-row: var(--r);
+      background: #fff;
+      border: 1px solid var(--line);
+      padding: 6px;
+      cursor: grab;
+    }
+    .booths .spot input { margin-top: 4px; padding: 6px; width: 100%; }
+    .booths .spot button {
+      margin-top: 4px;
+      min-height: 28px;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .plan-board {
+      position: relative;
+      margin-top: 12px;
+      min-height: 240px;
+      background: #efece6;
+      border: 1px solid var(--line);
+      cursor: crosshair;
+    }
+    .plan-board img { display: block; width: 100%; height: auto; background: #fff; }
+    .plan-board p { margin: 0; padding: 16px; }
+    #sectionBoard { aspect-ratio: 16 / 9; min-height: 0; }
+    .plan-board .pin {
+      position: absolute;
+      z-index: 1;
+      transform: translate(-50%, -50%);
+      max-width: 150px;
+      padding: 6px 8px;
+      border: 0;
+      background: #fff;
+      box-shadow: 0 6px 16px rgba(28, 26, 23, 0.12);
+      font: inherit;
+      text-align: left;
+      cursor: grab;
+    }
+    .plan-board .pin b, .plan-board .pin span { display: block; }
+    .plan-board .pin span { color: var(--muted); font-size: 12px; }
+    .plan-board .pin button {
+      margin-top: 4px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
     button.save, button.add {
       margin-top: 16px;
       min-height: 48px;
@@ -105,7 +169,10 @@
       cursor: pointer;
       overflow: hidden;
     }
-    .frame img { width: 100%; height: 140px; object-fit: cover; }
+    .frame img { width: 100%; height: 180px; object-fit: contain; background: #fff; }
+    @media (max-width: 640px) {
+      .booths { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
     .editor {
       min-height: 88px;
       margin-top: 6px;
@@ -157,32 +224,91 @@
         <div id="introNote" class="editor" contenteditable="true"></div>
       </label>
       <h2 style="margin-top:22px">부스 <span class="tag">금액 · 종류</span></h2>
-      <p>종류마다 그림 한 장을 올립니다. 이 그림은 회차가 바뀌어도 그대로 씁니다. 전시관 섹션은 그림 파일을 올리지 않습니다.</p>
+      <p>Raw space는 양탄자 그림입니다. Shell scheme 사진은 하나이고, Information을 Standard와 Upgrade 두 줄로 나눕니다. 금액이 달라서 셋 다 고를 수 있습니다. 화폐는 베트남과 같은 화면이라 여기서 고릅니다.</p>
+      <label>화폐
+        <select id="currency">
+          <option value="USD">USD</option>
+          <option value="KRW">KRW</option>
+          <option value="VND">VND</option>
+          <option value="CNY">CNY</option>
+        </select>
+      </label>
+      <label>1. Raw space<input id="typeName0"></label>
+      <label>Information<input id="typeInfo0"></label>
       <div class="row">
-        <label>1. 종류<input id="boothName0"></label>
-        <label>크기<input id="boothArea0"></label>
+        <label>크기<input id="typeArea0"></label>
+        <label>금액 <span class="money-name">USD</span> · 9㎡<input id="typePrice0"></label>
       </div>
-      <label>금액<input id="boothPrice0"></label>
+      <label>비품<input id="typeKit0"></label>
       <label class="pic">그림
         <input id="pic0" type="file" accept="image/*" hidden>
-        <span class="frame" id="frame0">그림을 올리세요</span>
+        <span class="frame" id="frame0"><img src="booths/raw.png" alt="Raw space"></span>
       </label>
-      <div class="row">
-        <label>2. 종류<input id="boothName1"></label>
-        <label>크기<input id="boothArea1"></label>
-      </div>
-      <label>금액<input id="boothPrice1"></label>
-      <label class="pic">그림
+      <label class="pic">Shell scheme 그림
         <input id="pic1" type="file" accept="image/*" hidden>
-        <span class="frame" id="frame1">그림을 올리세요</span>
+        <span class="frame" id="frame1"><img src="booths/standard.png" alt="Shell scheme"></span>
       </label>
+      <label>2. Standard<input id="typeName1"></label>
+      <label>Information<input id="typeInfo1"></label>
+      <div class="row">
+        <label>크기<input id="typeArea1"></label>
+        <label>금액 <span class="money-name">USD</span> · 9㎡<input id="typePrice1"></label>
+      </div>
+      <label>비품<input id="typeKit1"></label>
+      <label>3. Upgrade<input id="typeName2"></label>
+      <label>Information<input id="typeInfo2"></label>
+      <div class="row">
+        <label>크기<input id="typeArea2"></label>
+        <label>금액 <span class="money-name">USD</span> · 9㎡<input id="typePrice2" placeholder="이 타입 금액"></label>
+      </div>
+      <label>비품<input id="typeKit2"></label>
     </article>
 
     <article id="map">
       <p class="see">방문자 화면 · <a href="cmef.html#map">전시 도면</a></p>
       <h2>전시 도면 <span class="tag">CMEF</span></h2>
-      <p>부스는 한 줄이 아닙니다. 전시관 전체에서 섹션에 마우스를 올리고 누르면 그 위치로 들어갑니다. 한국관 칸은 3×3이고, 번호는 여기서 정합니다. 베트남 전시에는 이 단계를 두지 않습니다.</p>
+      <p>전시장은 상하이 국가회의전시관의 네 잎 모양입니다. 관 번호는 확정 번호가 아니므로, 회차가 바뀌면 아래 번호를 고칩니다. 국제관이 있는 관을 누르면 한국관 섹션으로 들어갑니다.</p>
+      <div class="row">
+        <label>관 번호<input id="hall0" placeholder="8.2"></label>
+        <label>관 번호<input id="hall1" placeholder="7.2"></label>
+      </div>
+      <div class="row">
+        <label>관 번호<input id="hall2" placeholder="6.2"></label>
+        <label>관 번호<input id="hall3" placeholder="5.2"></label>
+      </div>
+      <label>관 번호<input id="hall4" placeholder="4.2"></label>
+      <label>국제관이 있는 관<input id="koreaHall" placeholder="5.2"></label>
+      <div class="row">
+        <label>관 이름<input id="hallName0" placeholder="이름"></label>
+        <label>관 이름<input id="hallName1" placeholder="Imaging"></label>
+      </div>
+      <div class="row">
+        <label>관 이름<input id="hallName2" placeholder="이름"></label>
+        <label>관 이름<input id="hallName3" placeholder="국제관"></label>
+      </div>
+      <label>관 이름<input id="hallName4" placeholder="이름"></label>
+      <h2 style="margin-top:22px">한국관 도면</h2>
+      <p>전시회마다 한국관 전체 도면을 그려 올립니다. 올린 그림은 한국관 섹션 안에 맞게 들어갑니다. 부스 번호와 기업명을 적고 도면을 누르면 그 자리에 놓입니다. 방문자 화면에서 그 위치를 누르면 아래 기업 정보로 이동합니다. 다른 관은 관을 고른 뒤 섹션 칸을 누릅니다.</p>
+      <label>도면 그림<input id="planFile" type="file" accept="image/*"></label>
+      <label>관<select id="pinHall"></select></label>
+      <div class="row">
+        <label>부스 번호<input id="pinBooth" placeholder="번호"></label>
+        <label>기업명<input id="pinCompany" placeholder="기업명"></label>
+      </div>
+      <div class="row">
+        <label>전시 제품<input id="pinProduct" placeholder="공개할 제품"></label>
+        <label>인허가<input id="pinAuth" placeholder="취득 또는 미취득"></label>
+      </div>
+      <div class="plan-board" id="planBoard">
+        <img id="planImg" alt="" hidden>
+        <p id="planEmpty">도면을 올리면 이 칸에 맞게 들어갑니다. 올린 뒤 여기를 누르면 기업 위치가 놓입니다.</p>
+      </div>
+      <div class="plan-board" id="sectionBoard" hidden>
+        <p>이 관의 섹션입니다. 누르면 기업 위치가 놓입니다.</p>
+      </div>
       <div class="booths" id="boothInputs"></div>
+      <button class="add" type="button" id="addBooth">부스 추가</button>
+      <p>부스가 늘어나면 빈 칸부터 채워지고, 칸이 차면 아래 줄이 늘어납니다. 멀리 떨어진 자리는 칸을 끌어 옮깁니다. 자리는 예시입니다.</p>
     </article>
 
     <article id="apply">
@@ -245,16 +371,40 @@
       brochure: "",
       hostName: "Reed Sinopharm Exhibitions",
       applyPeriod: "",
-      boothName0: "면적만 제공",
-      boothArea0: "3m × 3m",
-      boothPrice0: "2,000,000",
-      boothName1: "기본 부스",
-      boothArea1: "3m × 3m × 높이 3.5m · 일반 방문 간판",
-      boothPrice1: "2,800,000",
-      boothPic0: "",
-      boothPic1: "",
+      typeName0: "Raw space",
+      typeInfo0: "면적만 제공",
+      typeArea0: "가로 3m × 세로 3m",
+      typePrice0: "4,230",
+      typeKit0: "비품 없음",
+      typeName1: "Standard Shell Scheme",
+      typeInfo1: "기본조립부스",
+      typeArea1: "가로 3m × 세로 3m × 높이 4m",
+      typePrice1: "4,770",
+      typeKit1: "비품 없음",
+      typeName2: "Upgraded Shell Scheme",
+      typeInfo2: "기본 조립부스 + 라이트박스(간판, 국가관 이미지) + HQI light(×1)",
+      typeArea2: "가로 3m × 세로 3m × 높이 4m",
+      typePrice2: "",
+      typeKit2: "비품 Luminous International image · Luminous fascia board · HQI light × 1",
+      currency: "USD",
+      typePic0: "",
+      typePic1: "",
+      typePic2: "",
       introNote: "",
-      booths: ["", "", "", "", "", "", "", ""],
+      halls: ["8.2", "7.2", "6.2", "5.2", "4.2"],
+      hallNames: ["", "Imaging", "", "국제관", ""],
+      koreaHall: "5.2",
+      koreaPlan: "",
+      booths: [
+        { n: "", c: 1, r: 1 },
+        { n: "", c: 3, r: 1 },
+        { n: "", c: 2, r: 2 },
+        { n: "", c: 4, r: 2 },
+        { n: "", c: 1, r: 4 },
+        { n: "", c: 4, r: 4 },
+        { n: "", c: 2, r: 5 },
+        { n: "", c: 3, r: 6 }
+      ],
       applyLink: "",
       apps: [],
       sector: "",
@@ -267,16 +417,102 @@
       if (stored) data = Object.assign(data, stored);
     } catch (error) {}
 
+    var seeds = [
+      { c: 1, r: 1 }, { c: 3, r: 1 }, { c: 2, r: 2 }, { c: 4, r: 2 },
+      { c: 1, r: 4 }, { c: 4, r: 4 }, { c: 2, r: 5 }, { c: 3, r: 6 }
+    ];
+    data.booths = (Array.isArray(data.booths) ? data.booths : []).map(function (item, index) {
+      var name = typeof item === "string" ? item : (item && item.n) || "";
+      if (item && item.c) return { n: name, c: item.c, r: item.r };
+      var seed = seeds[index] || { c: (index % 4) + 1, r: Math.floor(index / 4) + 1 };
+      return { n: name, c: seed.c, r: seed.r };
+    });
+    if (!data.booths.length) {
+      data.booths = seeds.map(function (item) { return { n: "", c: item.c, r: item.r }; });
+    }
+    function nextCell(list) {
+      var used = {};
+      var maxRow = 1;
+      list.forEach(function (item) {
+        used[item.c + "," + item.r] = true;
+        if (item.r > maxRow) maxRow = item.r;
+      });
+      for (var row = 1; row <= maxRow + 1; row++) {
+        for (var col = 1; col <= 4; col++) {
+          if (!used[col + "," + row]) return { c: col, r: row };
+        }
+      }
+      return { c: 1, r: maxRow + 1 };
+    }
+    function place(item) {
+      if (window.innerWidth >= 640) return { c: item.c, r: item.r, cols: 4 };
+      return {
+        c: ((item.c - 1) % 2) + 1,
+        r: (item.r - 1) * 2 + Math.floor((item.c - 1) / 2) + 1,
+        cols: 2
+      };
+    }
     var boothBox = document.getElementById("boothInputs");
-    data.booths.forEach(function (value, index) {
-      var label = document.createElement("label");
-      label.textContent = "3×3";
-      var input = document.createElement("input");
-      input.value = value || "";
-      input.placeholder = "번호";
-      input.addEventListener("input", function () { data.booths[index] = input.value; });
-      label.appendChild(input);
-      boothBox.appendChild(label);
+    function drawBooths() {
+      boothBox.innerHTML = "";
+      data.booths.forEach(function (item, index) {
+        var at = place(item);
+        var spot = document.createElement("div");
+        spot.className = "spot";
+        spot.style.setProperty("--c", String(at.c));
+        spot.style.setProperty("--r", String(at.r));
+        var input = document.createElement("input");
+        input.value = item.n || "";
+        input.placeholder = "번호";
+        input.addEventListener("pointerdown", function (event) { event.stopPropagation(); });
+        input.addEventListener("input", function () { item.n = input.value; });
+        var remove = document.createElement("button");
+        remove.type = "button";
+        remove.textContent = "빼기";
+        remove.addEventListener("click", function () {
+          data.booths.splice(index, 1);
+          drawBooths();
+        });
+        spot.appendChild(input);
+        spot.appendChild(remove);
+        spot.addEventListener("pointerdown", function (event) {
+          if (event.target !== spot) return;
+          function move(ev) {
+            var rect = boothBox.getBoundingClientRect();
+            var cols = window.innerWidth < 640 ? 2 : 4;
+            var col = Math.min(cols, Math.max(1, Math.floor((ev.clientX - rect.left) / (rect.width / cols)) + 1));
+            var rowHeight = spot.getBoundingClientRect().height + 10;
+            var row = Math.max(1, Math.floor((ev.clientY - rect.top) / rowHeight) + 1);
+            var logicalC = cols === 2 ? (row % 2 === 0 ? col + 2 : col) : col;
+            var logicalR = cols === 2 ? Math.ceil(row / 2) : row;
+            logicalC = Math.min(4, Math.max(1, logicalC));
+            var taken = data.booths.some(function (other, otherIndex) {
+              return otherIndex !== index && other.c === logicalC && other.r === logicalR;
+            });
+            if (!taken) {
+              item.c = logicalC;
+              item.r = logicalR;
+              var at = place(item);
+              spot.style.setProperty("--c", String(at.c));
+              spot.style.setProperty("--r", String(at.r));
+            }
+          }
+          function up() {
+            spot.removeEventListener("pointermove", move);
+            spot.removeEventListener("pointerup", up);
+          }
+          spot.addEventListener("pointermove", move);
+          spot.addEventListener("pointerup", up);
+        });
+        boothBox.appendChild(spot);
+      });
+    }
+    drawBooths();
+    window.addEventListener("resize", drawBooths);
+    document.getElementById("addBooth").addEventListener("click", function () {
+      var cell = nextCell(data.booths);
+      data.booths.push({ n: "", c: cell.c, r: cell.r });
+      drawBooths();
     });
 
     function fill(id, field) {
@@ -287,12 +523,33 @@
     fill("brochure", "brochure");
     fill("hostName", "hostName");
     fill("applyPeriod", "applyPeriod");
-    fill("boothName0", "boothName0");
-    fill("boothArea0", "boothArea0");
-    fill("boothPrice0", "boothPrice0");
-    fill("boothName1", "boothName1");
-    fill("boothArea1", "boothArea1");
-    fill("boothPrice1", "boothPrice1");
+    fill("typeName0", "typeName0");
+    fill("typeInfo0", "typeInfo0");
+    fill("typeArea0", "typeArea0");
+    fill("typePrice0", "typePrice0");
+    fill("typeKit0", "typeKit0");
+    fill("typeName1", "typeName1");
+    fill("typeInfo1", "typeInfo1");
+    fill("typeArea1", "typeArea1");
+    fill("typePrice1", "typePrice1");
+    fill("typeKit1", "typeKit1");
+    fill("typeName2", "typeName2");
+    fill("typeInfo2", "typeInfo2");
+    fill("typeArea2", "typeArea2");
+    fill("typePrice2", "typePrice2");
+    fill("typeKit2", "typeKit2");
+    var currency = document.getElementById("currency");
+    currency.value = data.currency || "USD";
+    function showCurrency() {
+      document.querySelectorAll(".money-name").forEach(function (node) {
+        node.textContent = data.currency || "USD";
+      });
+    }
+    showCurrency();
+    currency.addEventListener("change", function () {
+      data.currency = currency.value;
+      showCurrency();
+    });
     var editor = document.getElementById("introNote");
     editor.textContent = data.introNote || "";
     editor.addEventListener("input", function () { data.introNote = editor.textContent; });
@@ -327,20 +584,175 @@
         reader.readAsDataURL(file);
       });
     }
-    bindPic("pic0", "frame0", "boothPic0");
-    bindPic("pic1", "frame1", "boothPic1");
+    bindPic("pic0", "frame0", "typePic0");
+    bindPic("pic1", "frame1", "typePic1");
     fill("applyLink", "applyLink");
     fill("sector", "sector");
     fill("sectorNote", "sectorNote");
     fill("noticeTitle", "noticeTitle");
     fill("noticeBody", "noticeBody");
+    if (!Array.isArray(data.hallNames)) data.hallNames = ["", "Imaging", "", "국제관", ""];
+    var pinHall = document.getElementById("pinHall");
+    var planBoard = document.getElementById("planBoard");
+    var sectionBoard = document.getElementById("sectionBoard");
+    function hallOptions() {
+      var current = pinHall.value;
+      pinHall.innerHTML = "";
+      (data.halls || []).forEach(function (hall, index) {
+        if (!hall) return;
+        var opt = document.createElement("option");
+        opt.value = hall;
+        var name = data.hallNames[index] || "";
+        opt.textContent = name ? hall + " " + name : hall;
+        pinHall.appendChild(opt);
+      });
+      var values = Array.prototype.map.call(pinHall.options, function (opt) { return opt.value; });
+      pinHall.value = values.indexOf(current) >= 0 ? current : (data.koreaHall || values[0] || "");
+      showBoard();
+    }
+    function showBoard() {
+      var korea = pinHall.value && pinHall.value === (data.koreaHall || "");
+      planBoard.hidden = !korea;
+      sectionBoard.hidden = korea;
+      drawPins();
+    }
+    ["hall0", "hall1", "hall2", "hall3", "hall4"].forEach(function (id, index) {
+      var node = document.getElementById(id);
+      node.value = (data.halls && data.halls[index]) || "";
+      node.addEventListener("input", function () {
+        data.halls[index] = node.value;
+        hallOptions();
+      });
+    });
+    ["hallName0", "hallName1", "hallName2", "hallName3", "hallName4"].forEach(function (id, index) {
+      var node = document.getElementById(id);
+      node.value = data.hallNames[index] || "";
+      node.addEventListener("input", function () {
+        data.hallNames[index] = node.value;
+        hallOptions();
+      });
+    });
+    var koreaHall = document.getElementById("koreaHall");
+    koreaHall.value = data.koreaHall || "";
+    koreaHall.addEventListener("input", function () {
+      data.koreaHall = koreaHall.value;
+      showBoard();
+    });
+    pinHall.addEventListener("change", showBoard);
+
+    var planImg = document.getElementById("planImg");
+    var planEmpty = document.getElementById("planEmpty");
+    function showPlan(src) {
+      if (!src) {
+        planImg.hidden = true;
+        planEmpty.hidden = false;
+        return;
+      }
+      planImg.src = src;
+      planImg.hidden = false;
+      planEmpty.hidden = true;
+    }
+    showPlan(data.koreaPlan || "");
+    document.getElementById("planFile").addEventListener("change", function (event) {
+      var file = event.target.files && event.target.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function () {
+        var image = new Image();
+        image.onload = function () {
+          var canvas = document.createElement("canvas");
+          var scale = Math.min(1, 1400 / image.width);
+          canvas.width = Math.max(1, Math.round(image.width * scale));
+          canvas.height = Math.max(1, Math.round(image.height * scale));
+          canvas.getContext("2d").drawImage(image, 0, 0, canvas.width, canvas.height);
+          data.koreaPlan = canvas.toDataURL("image/jpeg", 0.82);
+          showPlan(data.koreaPlan);
+        };
+        image.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function placeOn(board, event) {
+      if (event.target.closest(".pin")) return;
+      var company = document.getElementById("pinCompany").value.trim();
+      var booth = document.getElementById("pinBooth").value.trim();
+      if (!company) return;
+      if (board === planBoard && !data.koreaPlan) return;
+      var rect = board.getBoundingClientRect();
+      data.apps.push({
+        hall: pinHall.value,
+        booth: booth,
+        company: company,
+        category: "",
+        product: document.getElementById("pinProduct").value.trim(),
+        auth: document.getElementById("pinAuth").value.trim(),
+        x: Math.min(98, Math.max(2, (event.clientX - rect.left) / rect.width * 100)),
+        y: Math.min(98, Math.max(2, (event.clientY - rect.top) / rect.height * 100))
+      });
+      ["pinBooth", "pinCompany", "pinProduct", "pinAuth"].forEach(function (id) {
+        document.getElementById(id).value = "";
+      });
+      drawApps();
+    }
+    planBoard.addEventListener("click", function (event) { placeOn(planBoard, event); });
+    sectionBoard.addEventListener("click", function (event) { placeOn(sectionBoard, event); });
+
+    function drawPins() {
+      [planBoard, sectionBoard].forEach(function (board) {
+        board.querySelectorAll(".pin").forEach(function (node) { node.remove(); });
+      });
+      var board = planBoard.hidden ? sectionBoard : planBoard;
+      var hall = pinHall.value;
+      data.apps.forEach(function (item, index) {
+        if (item.hall !== hall || item.x == null || item.y == null) return;
+        var pin = document.createElement("div");
+        pin.className = "pin";
+        pin.style.left = item.x + "%";
+        pin.style.top = item.y + "%";
+        var booth = document.createElement("b");
+        booth.textContent = item.booth || "번호";
+        var company = document.createElement("span");
+        company.textContent = item.company || "";
+        var remove = document.createElement("button");
+        remove.type = "button";
+        remove.textContent = "빼기";
+        remove.addEventListener("click", function (event) {
+          event.stopPropagation();
+          data.apps.splice(index, 1);
+          drawApps();
+        });
+        pin.appendChild(booth);
+        pin.appendChild(company);
+        pin.appendChild(remove);
+        pin.addEventListener("pointerdown", function (event) {
+          if (event.target === remove) return;
+          event.preventDefault();
+          pin.setPointerCapture(event.pointerId);
+          function move(ev) {
+            var rect = board.getBoundingClientRect();
+            item.x = Math.min(98, Math.max(2, (ev.clientX - rect.left) / rect.width * 100));
+            item.y = Math.min(98, Math.max(2, (ev.clientY - rect.top) / rect.height * 100));
+            pin.style.left = item.x + "%";
+            pin.style.top = item.y + "%";
+          }
+          function up() {
+            pin.removeEventListener("pointermove", move);
+            pin.removeEventListener("pointerup", up);
+          }
+          pin.addEventListener("pointermove", move);
+          pin.addEventListener("pointerup", up);
+        });
+        board.appendChild(pin);
+      });
+    }
 
     var list = document.getElementById("appList");
     function drawApps() {
       list.innerHTML = "";
       data.apps.forEach(function (item, index) {
         var li = document.createElement("li");
-        li.textContent = [item.booth, item.company, item.category, item.auth].filter(Boolean).join(" · ");
+        li.textContent = [item.hall, item.booth, item.company, item.category, item.auth].filter(Boolean).join(" · ");
         var remove = document.createElement("button");
         remove.type = "button";
         remove.textContent = "빼기";
@@ -352,11 +764,14 @@
         li.appendChild(remove);
         list.appendChild(li);
       });
+      drawPins();
     }
+    hallOptions();
     drawApps();
 
     document.getElementById("addApp").addEventListener("click", function () {
       var item = {
+        hall: data.koreaHall || "",
         booth: document.getElementById("appBooth").value.trim(),
         company: document.getElementById("appCompany").value.trim(),
         category: document.getElementById("appCategory").value.trim(),
