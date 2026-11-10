@@ -1834,6 +1834,17 @@ HQI light × 1</span></td>
         }
       }
     } catch (error) {}
+    if (!hallApps.some(boothReady)) {
+      hallApps = [
+        { hall: "5.2", booth: "5.2F37", company: "비나셀", category: "의료기기", product: "매일착용소프트콘택트렌즈", auth: "미취득", grade: "" },
+        { hall: "5.2", booth: "5.2F38", company: "시노서울", category: "의료기기", product: "RF", auth: "미취득", grade: "" },
+        { hall: "5.2", booth: "5.2F39", company: "가나다", category: "의료기기", product: "test", auth: "미취득", grade: "" }
+      ];
+    }
+    var koreaSheet = document.getElementById("koreaPlanImg");
+    if (koreaSheet && !koreaSheet.hidden && (!koreaSheet.getAttribute("src") || koreaSheet.getAttribute("src").indexOf("korea-plan") >= 0)) {
+      showKoreaImage(koreaSheet.getAttribute("src") || "halls/korea-plan.png");
+    }
     paintApplicantList();
 
     document.querySelectorAll(".fold-btn").forEach(function (button) {
