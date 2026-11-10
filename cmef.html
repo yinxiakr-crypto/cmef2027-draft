@@ -49,13 +49,25 @@
     .en-title { margin: 12px 0 0; font-size: 18px; font-weight: 500; color: #3c3c3c; }
     .when { margin: 22px 0 0; font-size: 16px; color: var(--muted); }
 
+    .data-title {
+      margin: 32px 0 0;
+      color: var(--red);
+      font-size: 13px;
+      font-weight: 650;
+      letter-spacing: 0.16em;
+    }
     .stats {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       margin-top: 28px;
       border-top: 1px solid var(--ink);
     }
+    header .stats {
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      margin-top: 10px;
+    }
     .stat { padding: 26px 8px 22px 0; }
+    header .stat { padding: 18px 4px 16px; text-align: center; }
     .stat b {
       display: block;
       font-size: clamp(34px, 3.4vw, 46px);
@@ -64,8 +76,11 @@
       line-height: 1;
       font-variant-numeric: tabular-nums;
     }
+    header .stat b { font-size: clamp(18px, 1.7vw, 28px); }
     .stat .en { display: block; margin-top: 10px; font-size: 16px; font-weight: 680; }
+    header .stat .en { margin-top: 8px; font-size: 13px; }
     .stat .ko { display: block; margin-top: 2px; color: var(--muted); font-size: 12px; }
+    header .stat .ko { font-size: 11px; }
 
     .folds { display: grid; gap: 12px; padding: 28px 0 8px; }
     .fold { border: 0; padding: 0; background: transparent; }
@@ -790,7 +805,11 @@
       .fields { grid-template-columns: 1fr 1fr; }
     }
     @media (max-width: 860px) {
-      .stats, .steps { grid-template-columns: 1fr 1fr; }
+      .steps { grid-template-columns: 1fr 1fr; }
+      header .stat b { font-size: clamp(12px, 2.6vw, 16px); }
+      header .stat .en { font-size: 10px; }
+      header .stat .ko { font-size: 9px; }
+      header .stat { padding: 12px 2px 10px; }
       .nav-row { align-items: flex-start; flex-direction: column; padding: 14px 0; }
       .nav-links a { padding: 8px 2px; }
       .hall { height: 460px; }
@@ -811,8 +830,9 @@
     }
     @media (max-width: 520px) {
       .wrap { width: min(1080px, calc(100% - 28px)); }
-      .stats { grid-template-columns: 1fr 1fr; }
-      .stat { padding: 18px 8px 14px 0; }
+      header .stat b { font-size: 11px; }
+      header .stat .en { font-size: 8px; letter-spacing: -0.03em; }
+      header .stat .ko { font-size: 8px; }
       .shows, .fields, .steps, .type-grid, .fee, .basics { grid-template-columns: 1fr; }
       header { padding-top: 28px; }
     }
@@ -839,7 +859,8 @@
       <p class="en-title">China International Medical Equipment Fair</p>
       <p class="when">2027.4.7 – 10 · NECC Shanghai</p>
 
-      <div class="stats" aria-label="전시 규모">
+      <p class="data-title">data</p>
+      <div class="stats" aria-label="data">
         <div class="stat"><b>320,000+</b><span class="en">sqm</span><span class="ko">전시면적</span></div>
         <div class="stat"><b>4,700+</b><span class="en">Exhibitors</span><span class="ko">참가업체</span></div>
         <div class="stat"><b>150+</b><span class="en">Countries</span><span class="ko">국가·지역</span></div>
