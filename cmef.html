@@ -883,6 +883,21 @@
       #map:not(.list-closed) .drawer-tab .chev { transform: rotate(-90deg); }
       #map .roster, #map.list-bottom .roster { width: 100%; padding: 0 16px 12px; box-sizing: border-box; }
       #map.list-closed .roster { display: none; }
+      #koreaMap .plan {
+        width: 100vw;
+        max-width: 100vw;
+        margin-left: calc(50% - 50vw);
+        margin-top: 8px;
+        border-left: 0;
+        border-right: 0;
+        overflow-x: auto;
+        background: #fff;
+      }
+      #koreaMap .plan img.sheet {
+        width: 190vw;
+        max-width: none;
+        height: auto;
+      }
       .reason b { font-size: 32px; }
       .fold-btn .en { font-size: 22px; }
     }
