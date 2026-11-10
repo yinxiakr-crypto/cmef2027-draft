@@ -380,9 +380,19 @@
     }
     .nav-row { display: flex; align-items: center; justify-content: space-between; gap: 18px; min-height: 64px; }
     .brand { color: var(--ink); font-size: 13px; font-weight: 720; letter-spacing: 0.12em; text-decoration: none; }
-    .nav-links { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+    .nav-links { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-left: auto; }
     .nav-links a { color: var(--ink); font-size: 14px; font-weight: 650; text-decoration: none; }
     nav a.on { color: var(--red); }
+    .to-admin {
+      flex: 0 0 auto;
+      color: #fff;
+      background: var(--deep);
+      text-decoration: none;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 680;
+    }
     .block { padding: 36px 0 8px; }
     .block h2 { margin: 0; font-size: clamp(28px, 4vw, 40px); font-weight: 720; letter-spacing: -0.04em; }
     .block .lead { margin: 12px 0 0; max-width: 640px; font-size: 16px; line-height: 1.55; }
@@ -823,6 +833,7 @@
         grid-template-columns: 1fr 1fr;
         gap: 6px;
         width: 100%;
+        margin-left: 0;
       }
       .nav-links a,
       .nav-links a.lock {
@@ -839,6 +850,7 @@
         text-align: center;
       }
       .nav-links a:last-child { grid-column: 1 / -1; }
+      .to-admin { align-self: flex-start; min-height: 36px; display: inline-flex; align-items: center; }
       .hall { height: 460px; }
       .split { grid-template-columns: 1fr; gap: 28px; }
       .type-grid, .match-grid { grid-template-columns: 1fr; }
@@ -946,6 +958,7 @@
         <a href="#match">바이어 매칭</a>
         <a href="#notice">공지</a>
       </div>
+      <a class="to-admin" href="manage.html#intro">관리자</a>
     </div>
     <div class="wrap"><p class="crumb"><a href="index.html">1. 플랫폼</a> · <a href="marketing.html">2. 마케팅</a> · 3. 중국 · 4. CMEF</p></div>
   </nav>
@@ -1924,6 +1937,8 @@ HQI light × 1</span></td>
         link.classList.toggle("on", on);
         link.style.fontWeight = on ? "800" : "550";
       });
+      var adminLink = document.querySelector(".to-admin");
+      if (adminLink) adminLink.setAttribute("href", "manage.html#" + id);
       if (location.hash !== "#" + id) history.replaceState(null, "", "#" + id);
       window.scrollTo(0, 0);
     }

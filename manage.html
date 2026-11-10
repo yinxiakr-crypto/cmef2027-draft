@@ -370,7 +370,7 @@
   <header>
     <div class="wrap">
       <h1>전시회 관리</h1>
-      <p class="who">방문자 메뉴와 같은 순서입니다. 이 주소는 방문자 화면에 없습니다. 저장은 이 브라우저의 시안에만 반영되고, 시노서울 서버에는 쓰이지 않습니다.</p>
+      <p class="who">같은 메뉴에서 내용을 넣고 고칩니다. 저장은 이 브라우저의 시안에만 반영됩니다.</p>
     </div>
   </header>
   <div class="bar">
@@ -1730,6 +1730,8 @@
         document.querySelectorAll(".bar nav a[href^='#']").forEach(function (link) {
           link.classList.toggle("on", link.getAttribute("href") === "#" + id);
         });
+        var visitorLink = document.querySelector(".to-visitor");
+        if (visitorLink) visitorLink.setAttribute("href", "cmef.html#" + id);
         if (location.hash !== "#" + id) history.replaceState(null, "", "#" + id);
         window.scrollTo(0, 0);
       }
