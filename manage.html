@@ -201,6 +201,7 @@
       align-items: start;
       margin-top: 12px;
     }
+    .editor-pair > * { min-width: 0; }
     .editor-side {
       min-width: 0;
       max-height: 70vh;
@@ -256,7 +257,7 @@
       cursor: crosshair;
       overflow: hidden;
     }
-    .plan-board img { display: block; width: 100%; max-width: 100%; height: auto; background: #fff; }
+    .plan-board img { display: block; width: 100%; max-width: 100%; min-width: 0; height: auto; background: #fff; }
     .plan-board p { margin: 0; padding: 16px; }
     #sectionBoard { aspect-ratio: 16 / 9; min-height: 0; }
     .plan-board .booth-box {
@@ -382,9 +383,11 @@
     .list { margin: 14px 0 0; padding: 0; list-style: none; }
     .list li { padding: 12px 0; border-top: 1px solid var(--line); font-size: 14px; }
     .status { margin: 18px 0 0; font-size: 14px; }
+    @media (max-width: 900px) {
+      .editor-pair { grid-template-columns: 1fr; }
+    }
     @media (max-width: 720px) {
       .row, .booths { grid-template-columns: 1fr 1fr; }
-      .editor-pair { grid-template-columns: 1fr; }
       h1 { font-size: 28px; }
     }
   </style>
