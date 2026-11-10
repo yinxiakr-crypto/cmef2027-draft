@@ -401,19 +401,16 @@
       padding-left: 0;
       padding-right: 0;
     }
-    body.preview #map.list-right .pair { flex-direction: row; }
-    body.preview #map.list-right .drawer {
-      width: min(320px, 38%);
-      flex: 0 0 min(320px, 38%);
-      max-width: 38%;
-      overflow: auto;
-      align-items: flex-start;
-    }
+    body.preview #map .pair,
+    body.preview #map.list-right .pair,
     body.preview #map.list-bottom .pair { display: block; }
+    body.preview #map .drawer,
+    body.preview #map.list-right .drawer,
     body.preview #map.list-bottom .drawer {
       display: block;
       width: 100%;
       max-width: 100%;
+      flex: none;
       margin-top: 12px;
       overflow: hidden;
     }
@@ -2127,6 +2124,10 @@ HQI light × 1</span></td>
     if (window.matchMedia("(max-width: 860px)").matches) {
       openPlace = "bottom";
       listOpen = false;
+    }
+    if (document.body.classList.contains("preview")) {
+      openPlace = "bottom";
+      listOpen = true;
     }
     applyList();
 
