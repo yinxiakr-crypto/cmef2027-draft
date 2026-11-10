@@ -605,28 +605,31 @@
     .zone.korea:hover, .zone.korea:focus-visible { background: #7a1526; outline-color: #fff; }
     .zone em { display: block; margin-top: 4px; font-style: normal; font-size: 12px; opacity: 0.85; }
     #map {
-      width: 100vw;
-      max-width: 100vw;
-      margin-left: calc(50% - 50vw);
-      padding: 0 18px 28px;
+      width: 100%;
+      max-width: 100%;
+      margin: 0;
+      padding: 0 0 28px;
       box-sizing: border-box;
       position: relative;
-      left: auto;
-      transform: none;
+      overflow-x: hidden;
     }
     .map-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
     .map-head h2 { margin-top: 0; }
     .place-pick { display: flex; gap: 6px; margin-bottom: 2px; }
     .place-pick button {
-      width: 26px;
-      height: 26px;
-      padding: 0;
-      display: grid;
-      place-items: center;
+      width: auto;
+      height: 32px;
+      padding: 0 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
       border: 1px solid var(--line);
       border-radius: 7px;
       background: #fff;
       color: var(--ink);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
       cursor: pointer;
     }
     .place-pick button.on { background: var(--deep); color: #fff; border-color: var(--deep); }
@@ -642,14 +645,15 @@
     .pair { display: flex; align-items: flex-start; gap: 8px; max-width: 100%; min-width: 0; }
     .pair > :first-child { flex: 1 1 auto; min-width: 0; }
     .drawer {
-      flex: 0 0 420px;
-      width: 420px;
+      flex: 0 0 320px;
+      width: 320px;
+      max-width: 100%;
       display: flex;
       align-items: flex-start;
       gap: 10px;
-      overflow: visible;
-      transition: flex-basis 0.28s ease, width 0.28s ease;
+      overflow: hidden;
     }
+    #map:not(.list-closed) .drawer-tab { display: none; }
     .drawer-tab {
       flex: 0 0 22px;
       width: 22px;
@@ -706,6 +710,19 @@
     .clover .venue { display: block; width: 100%; height: auto; }
     .clover .venue[hidden] { display: none; }
     .venue-frame { position: relative; }
+    .hall-hot {
+      position: absolute;
+      left: 50%;
+      top: 29%;
+      width: 19%;
+      height: 21%;
+      border: 0;
+      padding: 0;
+      background: transparent;
+      cursor: pointer;
+      z-index: 3;
+    }
+    .hall-hot:hover, .hall-hot:focus-visible { background: rgba(155, 27, 48, 0.2); outline: none; }
     .zone-layer {
       position: absolute;
       inset: 0;
@@ -1213,14 +1230,15 @@ HQI light × 1</span></td>
           <h2>전시 도면</h2>
         </div>
         <div class="place-pick" role="group" aria-label="참가 기업 목록 위치">
-          <button type="button" data-place="right" aria-label="목록을 오른쪽에"><span class="mark" aria-hidden="true"></span></button>
-          <button type="button" data-place="bottom" aria-label="목록을 아래에"><span class="mark" aria-hidden="true"></span></button>
+          <button type="button" data-place="right" aria-label="목록을 오른쪽에"><span class="mark" aria-hidden="true"></span>오른쪽</button>
+          <button type="button" data-place="bottom" aria-label="목록을 아래에"><span class="mark" aria-hidden="true"></span>아래</button>
         </div>
       </div>
       <div class="pair" id="venuePair">
       <div id="hallMap" class="clover">
         <div class="venue-frame">
           <img class="venue" id="venuePic" src="halls/venue.jpg?v=2" alt="상하이 전시장 모식도">
+          <button type="button" class="hall-hot" data-hall="5.2" aria-label="5.2 국제관"></button>
           <svg class="zone-layer" id="zoneLayer" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
         </div>
         <p class="plan-note" id="venueEmpty" hidden>전체 도면이 아직 없습니다.</p>
@@ -1288,9 +1306,7 @@ HQI light × 1</span></td>
             <thead>
               <tr><th>부스 번호</th><th>기업명</th><th>품목분류</th><th>전시 제품</th><th>인허가</th></tr>
             </thead>
-            <tbody id="rosterBody">
-              <tr><td colspan="5">참가 기업이 아직 없습니다.</td></tr>
-            </tbody>
+            <tbody id="rosterBody"></tbody>
           </table>
           </div>
         </div>
@@ -1728,6 +1744,17 @@ HQI light × 1</span></td>
       sectionMap.hidden = true;
       if (hallHint) hallHint.textContent = "";
     }
+    document.querySelectorAll(".hall-hot").forEach(function (button) {
+      button.addEventListener("click", function (event) {
+        event.stopPropagation();
+        var hall = button.getAttribute("data-hall");
+        var match = null;
+        document.querySelectorAll("#hallMap .zone").forEach(function (node) {
+          if ((node.getAttribute("data-hall") || "") === hall) match = node;
+        });
+        if (match) openZone(match);
+      });
+    });
     document.querySelectorAll("#hallMap .zone").forEach(function (zone) {
       zone.addEventListener("mouseenter", function () {
         var name = zone.getAttribute("data-name");
@@ -2079,6 +2106,11 @@ HQI light × 1</span></td>
       document.querySelectorAll(".place-pick button").forEach(function (button) {
         button.classList.toggle("on", button.dataset.place === openPlace);
       });
+      var shown = null;
+      document.querySelectorAll("#map .roster").forEach(function (node) {
+        if (node.offsetParent) shown = node;
+      });
+      if (openPlace === "bottom" && shown) shown.scrollIntoView({ block: "nearest" });
       try {
         localStorage.setItem("cmef2027-list-place", listOpen ? openPlace : "closed");
         localStorage.setItem("cmef2027-list-side", openPlace);
