@@ -393,6 +393,7 @@
       font-size: 13px;
       font-weight: 680;
     }
+    body.preview .to-admin { display: none; }
     .block { padding: 36px 0 8px; }
     .block h2 { margin: 0; font-size: clamp(28px, 4vw, 40px); font-weight: 720; letter-spacing: -0.04em; }
     .block .lead { margin: 12px 0 0; max-width: 640px; font-size: 16px; line-height: 1.55; }
@@ -1884,13 +1885,15 @@ HQI light × 1</span></td>
         }
       }
     } catch (error) {}
-    if (!hallApps.some(boothReady)) {
-      hallApps = [
-        { hall: "5.2", booth: "5.2F37", company: "비나셀", category: "의료기기", product: "매일착용소프트콘택트렌즈", auth: "미취득", grade: "" },
-        { hall: "5.2", booth: "5.2F38", company: "시노서울", category: "의료기기", product: "RF", auth: "미취득", grade: "" },
-        { hall: "5.2", booth: "5.2F39", company: "가나다", category: "의료기기", product: "test", auth: "미취득", grade: "" }
-      ];
-    }
+    var koreaSamples = [
+      { hall: "5.2", booth: "5.2F37", company: "비나셀", category: "의료기기", product: "매일착용소프트콘택트렌즈", auth: "미취득", grade: "" },
+      { hall: "5.2", booth: "5.2F38", company: "시노서울", category: "의료기기", product: "RF", auth: "미취득", grade: "" },
+      { hall: "5.2", booth: "5.2F39", company: "가나다", category: "의료기기", product: "test", auth: "미취득", grade: "" }
+    ];
+    koreaSamples.forEach(function (sample) {
+      var found = hallApps.some(function (item) { return item.booth === sample.booth && item.company === sample.company; });
+      if (!found) hallApps.push(sample);
+    });
     var koreaSheet = document.getElementById("koreaPlanImg");
     if (koreaSheet && !koreaSheet.hidden && (!koreaSheet.getAttribute("src") || koreaSheet.getAttribute("src").indexOf("korea-plan") >= 0)) {
       showKoreaImage(koreaSheet.getAttribute("src") || "halls/korea-plan.png");
@@ -1951,6 +1954,7 @@ HQI light × 1</span></td>
       });
     });
     showPage((location.hash || "#intro").replace("#", ""));
+    if (location.search.indexOf("preview=1") >= 0) document.body.classList.add("preview");
     document.querySelectorAll("header .stat").forEach(function (button) {
       button.addEventListener("click", function () {
         var open = button.classList.contains("on");

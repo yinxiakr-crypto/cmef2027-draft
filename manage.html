@@ -57,6 +57,26 @@
       border-color: var(--deep);
     }
     [hidden] { display: none !important; }
+    .visitor-check { margin-top: 14px; background: #fff; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+    .visitor-check-bar { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+    .visitor-check-bar b { margin-right: auto; font-size: 15px; }
+    .visitor-check-bar button {
+      width: auto;
+      margin: 0;
+      min-height: 36px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 680;
+      cursor: pointer;
+    }
+    .visitor-check iframe { display: block; width: 100%; height: 70vh; border: 0; background: var(--paper); }
+    .visitor-check.folded iframe,
+    .visitor-check.folded .visitor-check-bar { border-bottom: 0; }
+    .visitor-check.folded iframe { display: none; }
     main { padding-bottom: 48px; }
     article {
       background: #fff;
@@ -385,6 +405,16 @@
       </nav>
     </div>
   </div>
+  <div class="wrap">
+    <section class="visitor-check" id="visitorCheck">
+      <div class="visitor-check-bar">
+        <b>방문자 화면</b>
+        <button type="button" id="visitorRefresh">다시 보기</button>
+        <button type="button" id="visitorFold" aria-expanded="true">접기</button>
+      </div>
+      <iframe id="visitorFrame" title="방문자 화면" src="cmef.html?preview=1#intro"></iframe>
+    </section>
+  </div>
   <main class="wrap">
     <article id="intro">
       <p class="see">방문자 화면 · <a href="cmef.html#intro">전시 소개</a></p>
@@ -668,6 +698,16 @@
       var stored = JSON.parse(localStorage.getItem(key) || "null");
       if (stored) data = Object.assign(data, stored);
     } catch (error) {}
+    var koreaSamples = [
+      { hall: "5.2", booth: "5.2F37", company: "비나셀", category: "의료기기", product: "매일착용소프트콘택트렌즈", auth: "미취득", grade: "" },
+      { hall: "5.2", booth: "5.2F38", company: "시노서울", category: "의료기기", product: "RF", auth: "미취득", grade: "" },
+      { hall: "5.2", booth: "5.2F39", company: "가나다", category: "의료기기", product: "test", auth: "미취득", grade: "" }
+    ];
+    if (!Array.isArray(data.apps)) data.apps = [];
+    koreaSamples.forEach(function (sample) {
+      var found = data.apps.some(function (item) { return item.booth === sample.booth && item.company === sample.company; });
+      if (!found) data.apps.push(sample);
+    });
 
     var seeds = [
       { c: 1, r: 1 }, { c: 3, r: 1 }, { c: 2, r: 2 }, { c: 4, r: 2 },
@@ -1732,6 +1772,8 @@
         });
         var visitorLink = document.querySelector(".to-visitor");
         if (visitorLink) visitorLink.setAttribute("href", "cmef.html#" + id);
+        var frame = document.getElementById("visitorFrame");
+        if (frame) frame.src = "cmef.html?preview=1#" + id;
         if (location.hash !== "#" + id) history.replaceState(null, "", "#" + id);
         window.scrollTo(0, 0);
       }
@@ -1742,6 +1784,25 @@
         });
       });
       showMenu((location.hash || "#intro").replace("#", ""));
+      var fold = document.getElementById("visitorFold");
+      var box = document.getElementById("visitorCheck");
+      if (fold && box) {
+        fold.addEventListener("click", function () {
+          var open = fold.getAttribute("aria-expanded") === "true";
+          fold.setAttribute("aria-expanded", open ? "false" : "true");
+          fold.textContent = open ? "방문자 화면 보기" : "접기";
+          box.classList.toggle("folded", open);
+        });
+      }
+      var refresh = document.getElementById("visitorRefresh");
+      if (refresh) {
+        refresh.addEventListener("click", function () {
+          var frame = document.getElementById("visitorFrame");
+          if (!frame) return;
+          var id = (location.hash || "#intro").replace("#", "");
+          frame.src = "cmef.html?preview=1#" + id;
+        });
+      }
     })();
   </script>
 </body>
