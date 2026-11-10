@@ -634,15 +634,13 @@
     }
     .place-pick button[data-place="bottom"] .mark { transform: rotate(90deg); }
     [hidden] { display: none !important; }
-    .pair { display: flex; align-items: flex-start; gap: 8px; max-width: 100%; min-width: 0; }
-    .pair > :first-child { flex: 1 1 auto; min-width: 0; }
+    .pair { display: block; max-width: 100%; min-width: 0; }
+    .pair > :first-child { min-width: 0; max-width: 100%; }
     .drawer {
-      flex: 0 0 320px;
-      width: 320px;
+      display: block;
+      width: 100%;
       max-width: 100%;
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
+      margin-top: 12px;
       overflow: hidden;
     }
     #map:not(.list-closed) .drawer-tab { display: none; }
