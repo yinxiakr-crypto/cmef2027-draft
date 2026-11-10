@@ -51,6 +51,12 @@
       border-color: var(--deep);
       font-weight: 680;
     }
+    nav a.on {
+      background: var(--deep);
+      color: #fff;
+      border-color: var(--deep);
+    }
+    [hidden] { display: none !important; }
     main { padding-bottom: 48px; }
     article {
       background: #fff;
@@ -1709,6 +1715,32 @@
       }
       document.getElementById("status").textContent = "다른 정보까지 이 브라우저 시안에 반영했습니다.";
     });
+  </script>
+  <script>
+    (function () {
+      var menuIds = ["intro", "apply", "map", "match", "notice"];
+      function showMenu(id) {
+        if (menuIds.indexOf(id) < 0) id = "intro";
+        menuIds.forEach(function (name) {
+          var node = document.getElementById(name);
+          if (node) node.hidden = name !== id;
+        });
+        var shows = document.getElementById("shows");
+        if (shows) shows.hidden = id !== "intro";
+        document.querySelectorAll(".bar nav a[href^='#']").forEach(function (link) {
+          link.classList.toggle("on", link.getAttribute("href") === "#" + id);
+        });
+        if (location.hash !== "#" + id) history.replaceState(null, "", "#" + id);
+        window.scrollTo(0, 0);
+      }
+      document.querySelectorAll(".bar nav a[href^='#']").forEach(function (link) {
+        link.addEventListener("click", function (event) {
+          event.preventDefault();
+          showMenu((link.getAttribute("href") || "").replace("#", ""));
+        });
+      });
+      showMenu((location.hash || "#intro").replace("#", ""));
+    })();
   </script>
 </body>
 </html>
