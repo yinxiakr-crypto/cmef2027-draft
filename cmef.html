@@ -1674,8 +1674,14 @@ HQI light × 1</span></td>
     });
     var boothMoney = "USD";
     function chooseType() {
-      var form = document.getElementById("basicForm");
-      if (form) form.scrollIntoView({ behavior: "smooth", block: "start" });
+      var field = document.getElementById("coName");
+      if (!field) return;
+      var label = field.closest("label") || field;
+      var nav = document.querySelector(".site-nav");
+      var navHeight = nav ? nav.offsetHeight : 0;
+      var top = label.getBoundingClientRect().top + window.pageYOffset - navHeight - 16;
+      window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+      field.focus({ preventScroll: true });
     }
     document.getElementById("boothFold").addEventListener("click", function () {
       var box = document.getElementById("boothTypes");
