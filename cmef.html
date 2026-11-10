@@ -75,7 +75,8 @@
       background: transparent;
       border: 0;
       width: 100%;
-      cursor: pointer;
+      cursor: default;
+      pointer-events: none;
     }
     .stat b {
       display: block;
@@ -930,6 +931,7 @@
       header .stat b { display: none; order: 2; font-size: 28px; margin-top: 10px; }
       header .stat.on b { display: block; }
       header .stat.on { background: #141210; color: #fff; }
+      header .stat { cursor: pointer; pointer-events: auto; }
     }
   </style>
 </head>
