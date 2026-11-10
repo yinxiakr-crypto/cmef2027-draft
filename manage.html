@@ -708,6 +708,7 @@
       var found = data.apps.some(function (item) { return item.booth === sample.booth && item.company === sample.company; });
       if (!found) data.apps.push(sample);
     });
+    try { localStorage.setItem(key, JSON.stringify(data)); } catch (error) {}
 
     var seeds = [
       { c: 1, r: 1 }, { c: 3, r: 1 }, { c: 2, r: 2 }, { c: 4, r: 2 },
@@ -1480,9 +1481,15 @@
       if (editorList) {
         editorList.innerHTML = "";
         var hall = pinHall.value;
+        var korea = data.koreaHall || "5.2";
+        var selectedText = pinHall.selectedOptions && pinHall.selectedOptions[0] ? pinHall.selectedOptions[0].textContent : hall;
+        var viewingKorea = hall === korea || String(hall).indexOf(korea) === 0 || String(selectedText).indexOf(korea) === 0;
         var any = false;
         data.apps.forEach(function (item, index) {
-          if (item.hall && item.hall !== hall) return;
+          var itemHall = item.hall || "";
+          var onThisHall = !itemHall || itemHall === hall || String(hall).indexOf(itemHall) === 0 || String(itemHall).indexOf(hall) === 0;
+          var onKorea = viewingKorea && (itemHall === korea || itemHall === "5.2");
+          if (!onThisHall && !onKorea) return;
           any = true;
           var row = document.createElement("div");
           row.className = "entry";
