@@ -693,12 +693,14 @@
       inset: 0;
       width: 100%;
       height: 100%;
+      pointer-events: none;
     }
     .zone-layer polygon {
       fill: rgba(155, 27, 48, 0.12);
       stroke: #9b1b30;
       stroke-width: 0.35;
       cursor: pointer;
+      pointer-events: auto;
     }
     .zone-layer polygon:hover { fill: rgba(155, 27, 48, 0.32); }
     .hall-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
@@ -1838,6 +1840,7 @@ HQI light × 1</span></td>
           }];
         }
         var layer = document.getElementById("zoneLayer");
+        window.cmefZones = zones;
         zones.forEach(function (zone) {
           if (!zone.points || zone.points.length < 3) return;
           var poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
@@ -1903,19 +1906,62 @@ HQI light × 1</span></td>
       }
     } catch (error) {}
     var koreaSamples = [
-      { hall: "5.2", booth: "5.2F37", company: "비나셀", category: "의료기기", product: "매일착용소프트콘택트렌즈", auth: "미취득", grade: "" },
-      { hall: "5.2", booth: "5.2F38", company: "시노서울", category: "의료기기", product: "RF", auth: "미취득", grade: "" },
-      { hall: "5.2", booth: "5.2F39", company: "가나다", category: "의료기기", product: "test", auth: "미취득", grade: "" }
+      { hall: "5.2", booth: "5.2F37", company: "비나셀", category: "의료기기", product: "매일착용소프트콘택트렌즈", auth: "미취득", grade: "", x: 29.8, y: 47.5 },
+      { hall: "5.2", booth: "5.2F38", company: "시노서울", category: "의료기기", product: "RF", auth: "미취득", grade: "", x: 21.8, y: 52.5 },
+      { hall: "5.2", booth: "5.2F39", company: "가나다", category: "의료기기", product: "test", auth: "미취득", grade: "", x: 39.9, y: 67.2 }
     ];
     koreaSamples.forEach(function (sample) {
-      var found = hallApps.some(function (item) { return item.booth === sample.booth && item.company === sample.company; });
+      var found = null;
+      hallApps.forEach(function (item) {
+        if (item.booth === sample.booth && item.company === sample.company) found = item;
+      });
       if (!found) hallApps.push(sample);
+      else if (found.x == null || found.y == null) {
+        found.x = sample.x;
+        found.y = sample.y;
+      }
     });
     var koreaSheet = document.getElementById("koreaPlanImg");
     if (koreaSheet && !koreaSheet.hidden && (!koreaSheet.getAttribute("src") || koreaSheet.getAttribute("src").indexOf("korea-plan") >= 0)) {
       showKoreaImage(koreaSheet.getAttribute("src") || "halls/korea-plan.png");
     }
     paintApplicantList();
+    (function () {
+      var fallback = [{ hall: "5.2", points: [[51, 31], [67, 30], [68, 47], [50, 48]] }];
+      function inside(point, poly) {
+        var x = point[0], y = point[1], hit = false;
+        for (var i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+          var xi = poly[i][0], yi = poly[i][1], xj = poly[j][0], yj = poly[j][1];
+          var den = (yj - yi) || 0.0001;
+          if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / den + xi)) hit = !hit;
+        }
+        return hit;
+      }
+      function openHall(hall) {
+        var match = null;
+        document.querySelectorAll("#hallMap .zone").forEach(function (node) {
+          if (node.getAttribute("data-hall") === hall) match = node;
+        });
+        if (match) openZone(match);
+      }
+      var frame = document.querySelector("#hallMap .venue-frame");
+      if (!frame) return;
+      frame.addEventListener("click", function (event) {
+        var rect = frame.getBoundingClientRect();
+        if (!rect.width || !rect.height) return;
+        var point = [(event.clientX - rect.left) / rect.width * 100, (event.clientY - rect.top) / rect.height * 100];
+        var lists = [window.cmefZones || [], fallback];
+        for (var n = 0; n < lists.length; n++) {
+          var list = lists[n];
+          for (var i = list.length - 1; i >= 0; i--) {
+            if (list[i].points && inside(point, list[i].points)) {
+              openHall(list[i].hall);
+              return;
+            }
+          }
+        }
+      });
+    })();
 
     document.querySelectorAll(".fold-btn").forEach(function (button) {
       if (button.id === "psrBtn") return;
