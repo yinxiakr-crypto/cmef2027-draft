@@ -401,9 +401,7 @@
       padding-left: 0;
       padding-right: 0;
     }
-    body.preview #map .pair,
     body.preview #map.list-right .pair { flex-direction: row; }
-    body.preview #map .drawer,
     body.preview #map.list-right .drawer {
       width: min(320px, 38%);
       flex: 0 0 min(320px, 38%);
@@ -411,14 +409,13 @@
       overflow: auto;
       align-items: flex-start;
     }
-    body.preview #map.list-bottom .pair { flex-direction: column; }
+    body.preview #map.list-bottom .pair { display: block; }
     body.preview #map.list-bottom .drawer {
+      display: block;
       width: 100%;
       max-width: 100%;
-      flex: 1 1 auto;
-      flex-basis: auto;
+      margin-top: 12px;
       overflow: hidden;
-      align-items: stretch;
     }
     body.preview #map .roster { width: 100%; max-width: 100%; }
     .block { padding: 36px 0 8px; }
@@ -617,19 +614,15 @@
     .map-head h2 { margin-top: 0; }
     .place-pick { display: flex; gap: 6px; margin-bottom: 2px; }
     .place-pick button {
-      width: auto;
-      height: 32px;
-      padding: 0 10px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
+      width: 26px;
+      height: 26px;
+      padding: 0;
+      display: grid;
+      place-items: center;
       border: 1px solid var(--line);
       border-radius: 7px;
       background: #fff;
       color: var(--ink);
-      font: inherit;
-      font-size: 13px;
-      font-weight: 700;
       cursor: pointer;
     }
     .place-pick button.on { background: var(--deep); color: #fff; border-color: var(--deep); }
@@ -681,14 +674,12 @@
     #map.list-closed .drawer { flex-basis: 22px; width: 22px; gap: 0; }
     #map.list-closed .drawer-tab .chev { transform: rotate(180deg); }
     #map.list-closed .roster { visibility: hidden; }
-    #map.list-bottom .pair { flex-direction: column; }
+    #map.list-bottom .pair { display: block; }
     #map.list-bottom .drawer {
-      flex-direction: column;
+      display: block;
       width: 100%;
       max-width: 100%;
-      flex: 1 1 auto;
-      flex-basis: auto;
-      align-items: stretch;
+      margin-top: 12px;
       overflow: hidden;
     }
     #map.list-bottom .drawer-tab {
@@ -784,7 +775,7 @@
     }
     .plan { position: relative; margin-top: 16px; background: #efece6; border: 1px solid var(--line); min-height: 180px; }
     #booths { display: none; }
-    .plan img.sheet { display: block; width: 100%; height: auto; background: #fff; }
+    .plan img.sheet { display: block; width: 100%; max-width: 100%; min-width: 0; height: auto; background: #fff; }
     .plan img.sheet[hidden] { display: none; }
     .plan.plain { aspect-ratio: 16 / 9; min-height: 0; }
     .plan-note { margin: 0; padding: 16px; color: var(--muted); font-size: 14px; }
@@ -1230,8 +1221,8 @@ HQI light × 1</span></td>
           <h2>전시 도면</h2>
         </div>
         <div class="place-pick" role="group" aria-label="참가 기업 목록 위치">
-          <button type="button" data-place="right" aria-label="목록을 오른쪽에"><span class="mark" aria-hidden="true"></span>오른쪽</button>
-          <button type="button" data-place="bottom" aria-label="목록을 아래에"><span class="mark" aria-hidden="true"></span>아래</button>
+          <button type="button" data-place="right" aria-label="목록을 오른쪽에"><span class="mark" aria-hidden="true"></span></button>
+          <button type="button" data-place="bottom" aria-label="목록을 아래에"><span class="mark" aria-hidden="true"></span></button>
         </div>
       </div>
       <div class="pair" id="venuePair">
@@ -1527,13 +1518,9 @@ HQI light × 1</span></td>
       }
       var marks = document.querySelectorAll('.plan [data-index="' + lockedCo + '"]');
       if (!note) return;
-      if (marks.length) {
+      if (marks.length || note) {
         note.hidden = true;
         note.textContent = "";
-      } else {
-        var item = hallApps[lockedCo];
-        note.hidden = false;
-        note.textContent = (item.booth || "") + " " + (item.company || "") + " 은 도면에 아직 놓이지 않았습니다.";
       }
     }
     function lockCompany(index) {

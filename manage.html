@@ -415,7 +415,7 @@
         <button type="button" id="visitorRefresh">다시 보기</button>
         <button type="button" id="visitorFold" aria-expanded="true">접기</button>
       </div>
-      <iframe id="visitorFrame" title="방문자 화면" src="cmef.html?preview=1&v=5#intro"></iframe>
+      <iframe id="visitorFrame" title="방문자 화면" src="cmef.html?preview=1&v=6#intro"></iframe>
     </section>
   </div>
   <main class="wrap">
@@ -1155,7 +1155,7 @@
       }
       document.getElementById("status").textContent = zoneHall.value + " 구획을 확정했습니다. 업체 화면에서 그 구획을 누르면 이 관의 기업 위치로 이동합니다. 아래 시안 반영은 다른 정보를 다 적은 뒤에 누릅니다.";
       var frame = document.getElementById("visitorFrame");
-      if (frame) frame.src = "cmef.html?preview=1&v=5#map";
+      if (frame) frame.src = "cmef.html?preview=1&v=6#map";
     });
     document.getElementById("zoneCancel").addEventListener("click", function () {
       draftPoints.pop();
@@ -1792,7 +1792,7 @@
         var visitorLink = document.querySelector(".to-visitor");
         if (visitorLink) visitorLink.setAttribute("href", "cmef.html#" + id);
         var frame = document.getElementById("visitorFrame");
-        if (frame) frame.src = "cmef.html?preview=1&v=5#" + id;
+        if (frame) frame.src = "cmef.html?preview=1&v=6#" + id;
         if (location.hash !== "#" + id) history.replaceState(null, "", "#" + id);
         window.scrollTo(0, 0);
       }
@@ -1819,7 +1819,7 @@
           var frame = document.getElementById("visitorFrame");
           if (!frame) return;
           var id = (location.hash || "#intro").replace("#", "");
-          frame.src = "cmef.html?preview=1&v=5#" + id;
+          frame.src = "cmef.html?preview=1&v=6#" + id;
         });
       }
     })();
