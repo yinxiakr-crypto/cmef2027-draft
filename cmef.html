@@ -112,6 +112,9 @@
     .fold-btn .ko { display: block; margin-top: 4px; font-size: 13px; font-weight: 450; opacity: 0.85; }
     .fold-btn .chev { font-size: 28px; font-weight: 400; line-height: 1; }
     .fold-btn[aria-expanded="true"] { background: var(--red); }
+    body.preview .fold-btn { cursor: grab; }
+    body.preview .fold.drag { opacity: 0.45; }
+    body.preview .fold.drop .fold-btn { box-shadow: inset 0 4px 0 #fff; }
     .panel { display: none; padding: 22px 4px 8px; }
     .panel.open { display: block; }
 
@@ -2091,7 +2094,14 @@ HQI light × 1</span></td>
       });
     })();
 
+    var foldDragged = false;
     document.querySelectorAll(".fold-btn").forEach(function (button) {
+      button.addEventListener("click", function (event) {
+        if (!foldDragged) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        foldDragged = false;
+      }, true);
       if (button.id === "psrBtn") return;
       button.addEventListener("click", function () {
         var panel = document.getElementById(button.getAttribute("aria-controls"));
@@ -2101,6 +2111,54 @@ HQI light × 1</span></td>
         button.querySelector(".chev").textContent = open ? "+" : "–";
       });
     });
+    if (location.search.indexOf("preview=1") >= 0) {
+      var foldBoxDrag = document.getElementById("folds");
+      var dragFold = "";
+      foldBoxDrag.querySelectorAll(".fold").forEach(function (section) {
+        var button = section.querySelector(".fold-btn");
+        button.draggable = true;
+        button.addEventListener("dragstart", function (event) {
+          dragFold = section.getAttribute("data-fold");
+          foldDragged = true;
+          section.classList.add("drag");
+          event.dataTransfer.effectAllowed = "move";
+          try { event.dataTransfer.setData("text/plain", dragFold); } catch (error) {}
+        });
+        button.addEventListener("dragend", function () {
+          section.classList.remove("drag");
+          foldBoxDrag.querySelectorAll(".fold").forEach(function (item) { item.classList.remove("drop"); });
+          setTimeout(function () { foldDragged = false; }, 0);
+        });
+        section.addEventListener("dragover", function (event) {
+          if (!dragFold || section.getAttribute("data-fold") === dragFold) return;
+          event.preventDefault();
+          section.classList.add("drop");
+        });
+        section.addEventListener("dragleave", function () { section.classList.remove("drop"); });
+        section.addEventListener("drop", function (event) {
+          event.preventDefault();
+          section.classList.remove("drop");
+          var target = section.getAttribute("data-fold");
+          if (!dragFold || dragFold === target) return;
+          var names = [].map.call(foldBoxDrag.querySelectorAll(".fold"), function (item) {
+            return item.getAttribute("data-fold");
+          });
+          var from = names.indexOf(dragFold);
+          var to = names.indexOf(target);
+          names.splice(from, 1);
+          names.splice(to, 0, dragFold);
+          names.forEach(function (name) {
+            var node = foldBoxDrag.querySelector('[data-fold="' + name + '"]');
+            if (node) foldBoxDrag.appendChild(node);
+          });
+          try {
+            var saved = JSON.parse(localStorage.getItem("cmef2027-draft") || "{}") || {};
+            saved.foldOrder = names;
+            localStorage.setItem("cmef2027-draft", JSON.stringify(saved));
+          } catch (error) {}
+        });
+      });
+    }
     function fitBooths() {
       var narrow = window.innerWidth < 640;
       document.querySelectorAll("#booths .booth").forEach(function (node) {
