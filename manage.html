@@ -400,6 +400,17 @@
     .psr-edit textarea { width: 220px; min-height: 72px; }
     .psr-edit input[type="file"] { max-width: 190px; }
     .psr-edit button { margin-left: auto; }
+    .psr-tools { display: flex; gap: 8px; align-items: center; margin-top: 12px; }
+    .psr-drop {
+      margin-top: 10px;
+      padding: 14px;
+      border: 1px dashed var(--line);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .psr-drop.drop, .psr-edit li.drop { border-color: var(--deep); background: #f3f6f4; }
     @media (max-width: 900px) {
       .editor-pair { grid-template-columns: 1fr; }
     }
@@ -435,7 +446,7 @@
         <button type="button" id="visitorRefresh">다시 보기</button>
         <button type="button" id="visitorFold" aria-expanded="true">접기</button>
       </div>
-      <iframe id="visitorFrame" title="방문자 화면" src="show5.html?preview=1#intro"></iframe>
+      <iframe id="visitorFrame" title="방문자 화면" src="show6.html?preview=1#intro"></iframe>
     </section>
   </div>
   <main class="wrap">
@@ -458,9 +469,13 @@
       <p>오른쪽 방문자 화면의 참관객, 산업 분야, 동기간 전시, PSR 단추를 마우스로 끌어 순서를 바꿉니다. 아래 목록으로도 같은 순서를 바꿉니다.</p>
       <ul class="fold-order" id="foldOrder"></ul>
       <h2 style="margin-top:22px">PSR</h2>
-      <p>각 회차의 자료에 그 전시회의 PSR PDF를 올립니다. 방문자 화면에는 회차와, 파일에서 읽힌 일정·장소·규모만 짧게 보입니다. 요약은 고칠 수 있고, 빼기로 그 회차를 지웁니다.</p>
-      <label>새 회차 PDF<input id="psrFile" type="file" accept="application/pdf,.pdf"></label>
+      <p>회차는 추가로 넣고, 빼기로 지웁니다. 보고서 PDF는 그 회차 위에 끌어다 놓습니다. 아래 칸에 놓으면 새 회차로 들어갑니다. 방문자 화면에는 회차와, 파일에서 읽힌 일정·장소·규모만 짧게 보입니다.</p>
+      <div class="psr-tools">
+        <button type="button" id="psrAdd">추가</button>
+        <label>파일로 새 회차<input id="psrFile" type="file" accept="application/pdf,.pdf"></label>
+      </div>
       <p id="psrNote"></p>
+      <div class="psr-drop" id="psrDrop">보고서 PDF를 여기에 끌어다 놓으면 새 회차가 생깁니다.</div>
       <ul class="psr-edit" id="psrEdit"></ul>
       <h2 style="margin-top:22px">부스 <span class="tag">금액 · 종류</span></h2>
       <p>Raw space는 양탄자 그림입니다. Shell scheme 사진은 하나이고, Information을 Standard와 Upgrade 두 줄로 나눕니다. 금액이 달라서 셋 다 고를 수 있습니다. 화폐는 베트남과 같은 화면이라 여기서 고릅니다.</p>
@@ -1167,7 +1182,7 @@
               ? "넣었습니다. " + wrote.join(" · ") + (missed.length ? ". 브로셔에서 찾지 못해 그대로 둔 항목: " + missed.join(", ") : "") + extra.note
               : "이 PDF에서 규모 숫자를 찾지 못했습니다. 있는 숫자는 그대로 둡니다." + extra.note;
             var frame = document.getElementById("visitorFrame");
-            if (frame) stayHere(function () { frame.src = "show5.html?preview=1&t=" + Date.now(); });
+            if (frame) stayHere(function () { frame.src = "show6.html?preview=1&t=" + Date.now(); });
           }).catch(function () {
             note.textContent = "이 PDF에서 글자를 읽지 못했습니다.";
           });
@@ -1200,7 +1215,7 @@
         stayHere(function () {
           try { localStorage.setItem(key, JSON.stringify(data)); } catch (error) {}
           var frame = document.getElementById("visitorFrame");
-          if (frame) frame.src = "show5.html?preview=1&t=" + Date.now();
+          if (frame) frame.src = "show6.html?preview=1&t=" + Date.now();
         });
       }
       var orderList = document.getElementById("foldOrder");
@@ -1356,8 +1371,7 @@
           no.addEventListener("change", keep);
           season.addEventListener("change", keep);
           summary.addEventListener("change", keep);
-          file.addEventListener("change", function () {
-            var picked = file.files && file.files[0];
+          function takeReport(picked) {
             var note = document.getElementById("psrNote");
             if (!picked) return;
             note.textContent = (item.no || "이 회차") + " 자료를 읽고 있습니다.";
@@ -1365,6 +1379,22 @@
               if (!result.text) {
                 note.textContent = "이 파일은 Beijing 내용만 있어 넣지 않았습니다.";
                 return;
+              }
+              if (!item.year && !item.no) {
+                var number = result.text.match(/\b(\d{2,3}(?:st|nd|rd|th))\b/i);
+                var foundYear = result.text.match(/\b(20\d{2})\b/);
+                var springAt = result.text.search(/spring/i);
+                var autumnAt = result.text.search(/autumn|fall/i);
+                var seasonName = "";
+                if (springAt >= 0 && (autumnAt < 0 || springAt < autumnAt)) seasonName = "Spring";
+                else if (autumnAt >= 0) seasonName = "Autumn";
+                item.year = foundYear ? foundYear[1] : "";
+                item.no = number ? number[1] : "";
+                item.en = seasonName;
+                item.ko = seasonKo[seasonName] || "";
+                year.value = item.year;
+                no.value = item.no;
+                season.value = item.en;
               }
               item.file = picked.name;
               item.summary = result.summary;
@@ -1376,6 +1406,27 @@
             }).catch(function () {
               note.textContent = "이 PDF에서 글자를 읽지 못했습니다.";
             });
+          }
+          file.addEventListener("change", function () {
+            takeReport(file.files && file.files[0]);
+          });
+          row.addEventListener("dragover", function (event) {
+            if (!event.dataTransfer || !event.dataTransfer.types || [].indexOf.call(event.dataTransfer.types, "Files") < 0) return;
+            event.preventDefault();
+            event.stopPropagation();
+            row.classList.add("drop");
+          });
+          row.addEventListener("dragleave", function () { row.classList.remove("drop"); });
+          row.addEventListener("drop", function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            row.classList.remove("drop");
+            var dropped = event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0];
+            if (!dropped || (!/pdf$/i.test(dropped.type) && !/\.pdf$/i.test(dropped.name))) {
+              document.getElementById("psrNote").textContent = "보고서 PDF를 끌어다 놓으세요.";
+              return;
+            }
+            takeReport(dropped);
           });
           remove.addEventListener("mousedown", function (event) { event.preventDefault(); });
           remove.addEventListener("click", function () {
@@ -1393,10 +1444,12 @@
         });
       }
       paintPsrEdit();
-      document.getElementById("psrFile").addEventListener("change", function (event) {
-        var file = event.target.files && event.target.files[0];
+      function addReport(file) {
         var note = document.getElementById("psrNote");
-        if (!file) return;
+        if (!file || (!/pdf$/i.test(file.type) && !/\.pdf$/i.test(file.name))) {
+          note.textContent = "보고서 PDF를 끌어다 놓으세요.";
+          return;
+        }
         note.textContent = "PSR을 읽고 있습니다.";
         readPsrFile(file).then(function (result) {
           if (!result.text) {
@@ -1425,6 +1478,30 @@
         }).catch(function () {
           note.textContent = "이 PDF에서 글자를 읽지 못했습니다.";
         });
+      }
+      document.getElementById("psrAdd").addEventListener("mousedown", function (event) { event.preventDefault(); });
+      document.getElementById("psrAdd").addEventListener("click", function () {
+        data.psrList.unshift({ year: "", no: "", en: "", ko: "", summary: "" });
+        paintPsrEdit();
+        refreshIntro();
+        document.getElementById("psrNote").textContent = "빈 회차를 앞에 넣었습니다. 연도와 회차를 적고, 보고서 PDF를 그 줄 위에 놓으세요.";
+      });
+      document.getElementById("psrFile").addEventListener("change", function (event) {
+        var file = event.target.files && event.target.files[0];
+        if (file) addReport(file);
+      });
+      var dropBox = document.getElementById("psrDrop");
+      dropBox.addEventListener("dragover", function (event) {
+        if (!event.dataTransfer || !event.dataTransfer.types || [].indexOf.call(event.dataTransfer.types, "Files") < 0) return;
+        event.preventDefault();
+        dropBox.classList.add("drop");
+      });
+      dropBox.addEventListener("dragleave", function () { dropBox.classList.remove("drop"); });
+      dropBox.addEventListener("drop", function (event) {
+        event.preventDefault();
+        dropBox.classList.remove("drop");
+        var file = event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0];
+        addReport(file);
       });
     })();
     fill("hostName", "hostName");
@@ -1452,7 +1529,7 @@
         data.applyPeriod = from && to ? from + " – " + to : (from || to);
         try { localStorage.setItem(key, JSON.stringify(data)); } catch (error) {}
         var frame = document.getElementById("visitorFrame");
-        if (frame) stayHere(function () { frame.src = "show5.html?preview=1&t=" + Date.now(); });
+        if (frame) stayHere(function () { frame.src = "show6.html?preview=1&t=" + Date.now(); });
       }
       startInput.value = data.applyStart || "";
       endInput.value = data.applyEnd || "";
@@ -1703,7 +1780,7 @@
       }
       document.getElementById("status").textContent = zoneHall.value + " 구획을 확정했습니다. 업체 화면에서 그 구획을 누르면 이 관의 기업 위치로 이동합니다. 아래 시안 반영은 다른 정보를 다 적은 뒤에 누릅니다.";
       var frame = document.getElementById("visitorFrame");
-      if (frame) frame.src = "show5.html?preview=1#map";
+      if (frame) frame.src = "show6.html?preview=1#map";
     });
     document.getElementById("zoneCancel").addEventListener("click", function () {
       draftPoints.pop();
@@ -2339,7 +2416,7 @@
         var visitorLink = document.querySelector(".to-visitor");
         if (visitorLink) visitorLink.setAttribute("href", "fair.html#" + id);
         var frame = document.getElementById("visitorFrame");
-        if (frame) frame.src = "show5.html?preview=1#" + id;
+        if (frame) frame.src = "show6.html?preview=1#" + id;
         if (location.hash !== "#" + id) history.replaceState(null, "", "#" + id);
         window.scrollTo(0, 0);
       }
@@ -2366,7 +2443,7 @@
           var frame = document.getElementById("visitorFrame");
           if (!frame) return;
           var id = (location.hash || "#intro").replace("#", "");
-          frame.src = "show5.html?preview=1#" + id;
+          frame.src = "show6.html?preview=1#" + id;
         });
       }
     })();

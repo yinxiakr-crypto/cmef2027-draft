@@ -1493,6 +1493,7 @@ HQI light × 1</span></td>
       briefBox.hidden = true;
       briefBox.innerHTML = "";
       list.forEach(function (fair) {
+        if (!fair.year && !fair.no && !fair.summary) return;
         var button = document.createElement("button");
         button.type = "button";
         button.innerHTML = '<span class="en">' + (fair.year ? fair.year + " " : "") + fair.no + "</span><span class=\"ko\">" + fair.en + (fair.ko ? " · " + fair.ko : "") + "</span>";
