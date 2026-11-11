@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>한국관 도면</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <style>
+    :root {
+      --ink: #1c1a17;
+      --muted: #8a817a;
+      --line: #e4ddd2;
+      --paper: #faf7f2;
+      --red: #9b1b30;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Pretendard, "Malgun Gothic", sans-serif;
+    }
+    .wrap { width: min(1100px, calc(100% - 28px)); margin: 0 auto; padding: 22px 0 40px; }
+    h1 { margin: 0; font-size: 28px; font-weight: 720; letter-spacing: -0.04em; }
+    .plan {
+      margin-top: 16px;
+      background: #fff;
+      border: 1px solid var(--line);
+      overflow: hidden;
+    }
+    .plan img { display: block; width: 100%; height: auto; }
+    .list {
+      margin-top: 14px;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+    .list h2 {
+      margin: 0;
+      padding: 12px 14px;
+      font-size: 16px;
+      font-weight: 720;
+      border-bottom: 1px solid var(--line);
+    }
+    .list button {
+      display: block;
+      width: 100%;
+      padding: 12px 14px;
+      border: 0;
+      border-bottom: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 15px;
+      text-align: left;
+      cursor: pointer;
+    }
+    .list button.on { background: #fdecef; }
+    .list button b { margin-right: 8px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>한국관 도면</h1>
+    <div class="plan">
+      <img src="halls/korea-plan.png" alt="한국관 도면">
+    </div>
+    <div class="list">
+      <h2>참가 기업</h2>
+      <button type="button"><b>5.2F37</b>비나셀</button>
+      <button type="button"><b>5.2F38</b>시노서울</button>
+      <button type="button"><b>5.2F39</b>가나다</button>
+    </div>
+  </div>
+  <script>
+    document.querySelectorAll(".list button").forEach(function (button) {
+      button.addEventListener("click", function () {
+        var on = button.classList.contains("on");
+        document.querySelectorAll(".list button.on").forEach(function (other) { other.classList.remove("on"); });
+        if (!on) button.classList.add("on");
+      });
+    });
+  </script>
+</body>
+</html>
