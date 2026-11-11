@@ -609,7 +609,7 @@
     }
     .map-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
     .map-head h2 { margin-top: 0; }
-    .place-pick { display: flex; gap: 6px; margin-bottom: 2px; }
+    .place-pick { display: none; }
     .place-pick button {
       width: 26px;
       height: 26px;
@@ -636,12 +636,25 @@
     [hidden] { display: none !important; }
     .pair { display: block; max-width: 100%; min-width: 0; }
     .pair > :first-child { min-width: 0; max-width: 100%; }
+    .company-list,
     .drawer {
       display: block;
       width: 100%;
       max-width: 100%;
       margin-top: 12px;
       overflow: hidden;
+      position: static;
+      flex: none;
+    }
+    #map.list-closed .drawer,
+    #map.list-right .drawer,
+    #map.list-bottom .drawer,
+    #map.list-bottom.list-closed .drawer,
+    #map .company-list {
+      width: 100%;
+      max-width: 100%;
+      flex-basis: auto;
+      align-self: stretch;
     }
     #map:not(.list-closed) .drawer-tab { display: none; }
     .drawer-tab {
@@ -668,9 +681,8 @@
       border-color: transparent transparent transparent currentColor;
     }
     .drawer-tab .tab-name { display: none; }
-    #map.list-closed .drawer { flex-basis: 22px; width: 22px; gap: 0; }
-    #map.list-closed .drawer-tab .chev { transform: rotate(180deg); }
-    #map.list-closed .roster { visibility: hidden; }
+    #map.list-closed .drawer { width: 100%; max-width: 100%; }
+    #map.list-closed .roster { visibility: visible; }
     #map.list-bottom .pair { display: block; }
     #map.list-bottom .drawer {
       display: block;
@@ -688,8 +700,7 @@
     }
     #map.list-bottom .drawer-tab .chev { transform: rotate(90deg); }
     #map.list-bottom .roster { width: 100%; flex-basis: auto; max-height: none; }
-    #map.list-bottom.list-closed .drawer { width: 22px; flex-basis: 22px; align-self: flex-end; }
-    #map.list-bottom.list-closed .drawer-tab .chev { transform: rotate(-90deg); }
+    #map.list-bottom.list-closed .drawer { width: 100%; max-width: 100%; align-self: stretch; }
     #map .clover .venue, #map .plan img.sheet {
       width: 100%;
       height: auto;
@@ -1215,10 +1226,6 @@ HQI light × 1</span></td>
           <p class="kicker">FLOOR PLAN</p>
           <h2>전시 도면</h2>
         </div>
-        <div class="place-pick" role="group" aria-label="참가 기업 목록 위치">
-          <button type="button" data-place="right" aria-label="목록을 오른쪽에"><span class="mark" aria-hidden="true"></span></button>
-          <button type="button" data-place="bottom" aria-label="목록을 아래에"><span class="mark" aria-hidden="true"></span></button>
-        </div>
       </div>
       <div class="pair" id="venuePair">
       <div id="hallMap" class="clover">
@@ -1237,8 +1244,7 @@ HQI light × 1</span></td>
         </div>
         <p class="hall-hint" id="hallHint" hidden></p>
       </div>
-      <div class="drawer">
-        <button type="button" class="drawer-tab" aria-expanded="true" aria-label="참가 기업 감추기"><span class="chev" aria-hidden="true"></span><span class="tab-name">참가 기업</span></button>
+      <div class="company-list">
         <div class="roster" id="applyRoster">
         <h3>참가 기업</h3>
         <table>
@@ -1255,8 +1261,7 @@ HQI light × 1</span></td>
         </div>
         <div class="pair">
         <div class="plan plain" id="sectionPlan"></div>
-        <div class="drawer">
-          <button type="button" class="drawer-tab" aria-expanded="true" aria-label="참가 기업 감추기"><span class="chev" aria-hidden="true"></span><span class="tab-name">참가 기업</span></button>
+        <div class="company-list">
           <div class="roster">
           <h3>참가 기업</h3>
           <table>
@@ -1283,8 +1288,7 @@ HQI light × 1</span></td>
           <div class="booth" data-c="3" data-r="6" style="--c:3;--r:6"><b>번호</b><span>3×3</span></div>
         </div>
         </div>
-        <div class="drawer">
-          <button type="button" class="drawer-tab" aria-expanded="true" aria-label="참가 기업 감추기"><span class="chev" aria-hidden="true"></span><span class="tab-name">참가 기업</span></button>
+        <div class="company-list">
           <div class="roster">
           <h3>참가 기업 <button class="release" type="button" id="clearSpot">표시 끄기</button></h3>
           <p class="hall-hint" id="spotNote" hidden></p>
@@ -2074,58 +2078,11 @@ HQI light × 1</span></td>
         if (!open) button.classList.add("on");
       });
     });
-    var openPlace = "right";
-    var listOpen = true;
-    function applyList() {
-      var map = document.getElementById("map");
-      map.classList.toggle("list-right", openPlace !== "bottom");
-      map.classList.toggle("list-bottom", openPlace === "bottom");
-      map.classList.toggle("list-closed", !listOpen);
-      document.querySelectorAll(".drawer-tab").forEach(function (button) {
-        button.setAttribute("aria-expanded", listOpen ? "true" : "false");
-        button.setAttribute("aria-label", listOpen ? "참가 기업 감추기" : "참가 기업 보이기");
-      });
-      document.querySelectorAll(".place-pick button").forEach(function (button) {
-        button.classList.toggle("on", button.dataset.place === openPlace);
-      });
-      var shown = null;
-      document.querySelectorAll("#map .roster").forEach(function (node) {
-        if (node.offsetParent) shown = node;
-      });
-      if (openPlace === "bottom" && shown) shown.scrollIntoView({ block: "nearest" });
-      try {
-        localStorage.setItem("cmef2027-list-place", listOpen ? openPlace : "closed");
-        localStorage.setItem("cmef2027-list-side", openPlace);
-      } catch (error) {}
+    var mapNode = document.getElementById("map");
+    if (mapNode) {
+      mapNode.classList.remove("list-right", "list-closed");
+      mapNode.classList.add("list-bottom");
     }
-    document.querySelectorAll(".drawer-tab").forEach(function (button) {
-      button.addEventListener("click", function () {
-        listOpen = !listOpen;
-        applyList();
-      });
-    });
-    document.querySelectorAll(".place-pick button").forEach(function (button) {
-      button.addEventListener("click", function () {
-        openPlace = button.dataset.place === "bottom" ? "bottom" : "right";
-        listOpen = true;
-        applyList();
-      });
-    });
-    try {
-      var savedPlace = localStorage.getItem("cmef2027-list-place") || "right";
-      var savedSide = localStorage.getItem("cmef2027-list-side") || savedPlace;
-      openPlace = savedSide === "bottom" || savedPlace === "bottom" ? "bottom" : "right";
-      listOpen = savedPlace !== "closed";
-    } catch (error) {}
-    if (window.matchMedia("(max-width: 860px)").matches) {
-      openPlace = "bottom";
-      listOpen = false;
-    }
-    if (document.body.classList.contains("preview")) {
-      openPlace = "bottom";
-      listOpen = true;
-    }
-    applyList();
 
     var productCount = 0;
     function levelSelect(title) {
