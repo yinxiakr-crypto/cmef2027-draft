@@ -680,6 +680,18 @@
   </main>
   <script>
     var key = "cmef2027-draft";
+    function stayHere(work) {
+      var x = window.scrollX;
+      var y = window.scrollY;
+      if (work) work();
+      function back() { window.scrollTo(x, y); }
+      back();
+      requestAnimationFrame(back);
+      setTimeout(back, 0);
+      setTimeout(back, 80);
+      var frame = document.getElementById("visitorFrame");
+      if (frame) frame.addEventListener("load", back, { once: true });
+    }
     var data = {
       brochure: "",
       hostName: "Reed Sinopharm Exhibitions",
@@ -1155,7 +1167,7 @@
               ? "넣었습니다. " + wrote.join(" · ") + (missed.length ? ". 브로셔에서 찾지 못해 그대로 둔 항목: " + missed.join(", ") : "") + extra.note
               : "이 PDF에서 규모 숫자를 찾지 못했습니다. 있는 숫자는 그대로 둡니다." + extra.note;
             var frame = document.getElementById("visitorFrame");
-            if (frame) frame.src = "show5.html?preview=1&t=" + Date.now() + "#intro";
+            if (frame) stayHere(function () { frame.src = "show5.html?preview=1&t=" + Date.now(); });
           }).catch(function () {
             note.textContent = "이 PDF에서 글자를 읽지 못했습니다.";
           });
@@ -1185,9 +1197,11 @@
       if (!Array.isArray(data.foldOrder) || !data.foldOrder.length) data.foldOrder = ["visitor", "chain", "shows", "psr"];
       if (!Array.isArray(data.psrList)) data.psrList = basePsr.map(function (item) { return { year: item.year, no: item.no, en: item.en, ko: item.ko }; });
       function refreshIntro() {
-        try { localStorage.setItem(key, JSON.stringify(data)); } catch (error) {}
-        var frame = document.getElementById("visitorFrame");
-        if (frame) frame.src = "show5.html?preview=1&t=" + Date.now() + "#intro";
+        stayHere(function () {
+          try { localStorage.setItem(key, JSON.stringify(data)); } catch (error) {}
+          var frame = document.getElementById("visitorFrame");
+          if (frame) frame.src = "show5.html?preview=1&t=" + Date.now();
+        });
       }
       var orderList = document.getElementById("foldOrder");
       var dragId = "";
@@ -1363,6 +1377,7 @@
               note.textContent = "이 PDF에서 글자를 읽지 못했습니다.";
             });
           });
+          remove.addEventListener("mousedown", function (event) { event.preventDefault(); });
           remove.addEventListener("click", function () {
             data.psrList.splice(index, 1);
             paintPsrEdit();
@@ -1437,7 +1452,7 @@
         data.applyPeriod = from && to ? from + " – " + to : (from || to);
         try { localStorage.setItem(key, JSON.stringify(data)); } catch (error) {}
         var frame = document.getElementById("visitorFrame");
-        if (frame) frame.src = "show5.html?preview=1&t=" + Date.now() + "#intro";
+        if (frame) stayHere(function () { frame.src = "show5.html?preview=1&t=" + Date.now(); });
       }
       startInput.value = data.applyStart || "";
       endInput.value = data.applyEnd || "";
