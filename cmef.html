@@ -161,9 +161,16 @@
     .brief ul { margin: 16px 0 0; padding: 0; list-style: none; }
     .brief li { padding: 8px 0; border-top: 1px solid var(--line); font-size: 16px; }
     .brief li span { display: block; margin-top: 2px; color: var(--muted); font-size: 12px; }
-    .brief .stats { margin-top: 8px; border-top: 1px solid var(--line); }
-    .brief .stat { padding: 18px 8px 14px 0; }
-    .brief .stat b { font-size: clamp(26px, 2.6vw, 34px); }
+    .brief { cursor: pointer; }
+    .brief .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 4px 18px;
+      margin-top: 16px;
+    }
+    .brief .stat { padding: 16px 8px 12px 0; }
+    .brief .stat b { display: block; font-size: clamp(26px, 2.6vw, 34px); letter-spacing: -0.04em; }
+    .brief .stat span { display: block; margin-top: 4px; color: var(--muted); font-size: 13px; }
 
     .split { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 56px; }
     .row {
@@ -1479,14 +1486,29 @@ HQI light × 1</span></td>
       briefBox.appendChild(title);
       briefBox.appendChild(season);
       var lines = String(fair.summary || "").split(/\n/).filter(function (line) { return line.trim(); });
-      if (!lines.length) return;
-      var list = document.createElement("ul");
-      lines.slice(0, 6).forEach(function (line) {
+      var notes = document.createElement("ul");
+      var stats = document.createElement("div");
+      stats.className = "stats";
+      lines.forEach(function (line) {
+        var match = line.trim().match(/^(\d{1,3}(?:,\d{3})+\+?|\d+\+|\d{1,3}(?:\.\d+)?%)\s+(.+)$/);
+        if (match) {
+          var stat = document.createElement("p");
+          stat.className = "stat";
+          var num = document.createElement("b");
+          num.textContent = match[1];
+          var name = document.createElement("span");
+          name.textContent = match[2];
+          stat.appendChild(num);
+          stat.appendChild(name);
+          stats.appendChild(stat);
+          return;
+        }
         var item = document.createElement("li");
         item.textContent = line.trim();
-        list.appendChild(item);
+        notes.appendChild(item);
       });
-      briefBox.appendChild(list);
+      if (notes.childNodes.length) briefBox.appendChild(notes);
+      if (stats.childNodes.length) briefBox.appendChild(stats);
     }
     function paintPsr(list) {
       menu.innerHTML = "";
@@ -1518,9 +1540,17 @@ HQI light × 1</span></td>
       }
       if (!briefBox.hidden) {
         briefBox.hidden = true;
-        markPsr(false);
+        menu.hidden = false;
+        markPsr(true);
         return;
       }
+      menu.hidden = false;
+      markPsr(true);
+    });
+    briefBox.addEventListener("click", function (event) {
+      event.stopPropagation();
+      if (briefBox.hidden) return;
+      briefBox.hidden = true;
       menu.hidden = false;
       markPsr(true);
     });

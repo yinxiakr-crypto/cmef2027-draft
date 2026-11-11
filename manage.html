@@ -452,7 +452,7 @@
         <button type="button" id="visitorRefresh">다시 보기</button>
         <button type="button" id="visitorFold" aria-expanded="true">접기</button>
       </div>
-      <iframe id="visitorFrame" title="방문자 화면" src="show6.html?preview=1#intro"></iframe>
+      <iframe id="visitorFrame" title="방문자 화면" src="show7.html?preview=1#intro"></iframe>
     </section>
   </div>
   <main class="wrap">
@@ -476,7 +476,7 @@
       <p>오른쪽 방문자 화면의 참관객, 산업 분야, 동기간 전시, PSR 단추를 마우스로 끌어 순서를 바꿉니다. 아래 목록으로도 같은 순서를 바꿉니다.</p>
       <ul class="fold-order" id="foldOrder"></ul>
       <h2 style="margin-top:22px">PSR</h2>
-      <p>회차는 추가로 넣고, 빼기로 지웁니다. 보고서 PDF는 아래 칸에 끌어다 놓으면 새 회차가 생깁니다. 이미 있는 회차는 그 줄의 보고서 놓기에 놓습니다. 방문자 화면에는 회차와, 파일에서 읽힌 일정·장소·규모만 짧게 보입니다.</p>
+      <p>회차는 추가로 넣고, 빼기로 지웁니다. 보고서 PDF는 아래 칸에 끌어다 놓으면 새 회차가 생깁니다. 이미 있는 회차는 그 줄의 보고서 놓기에 놓습니다. 방문자 화면에는 일정·장소와, 파일에 있는 주요 수치가 보입니다.</p>
       <div class="psr-tools">
         <button type="button" id="psrAdd">추가</button>
       </div>
@@ -705,14 +705,31 @@
     function stayHere(work) {
       var x = window.scrollX;
       var y = window.scrollY;
+      var until = Date.now() + 1600;
+      var userMoved = false;
+      function markUser() { userMoved = true; }
+      window.addEventListener("wheel", markUser, { passive: true });
+      window.addEventListener("touchmove", markUser, { passive: true });
+      window.addEventListener("keydown", markUser);
       if (work) work();
-      function back() { window.scrollTo(x, y); }
-      back();
-      requestAnimationFrame(back);
-      setTimeout(back, 0);
-      setTimeout(back, 80);
       var frame = document.getElementById("visitorFrame");
-      if (frame) frame.addEventListener("load", back, { once: true });
+      if (document.activeElement && frame && document.activeElement === frame) frame.blur();
+      function back() {
+        if (userMoved || Date.now() > until) return;
+        if (window.scrollX !== x || window.scrollY !== y) window.scrollTo(x, y);
+      }
+      back();
+      window.addEventListener("scroll", back, { passive: true });
+      if (frame) frame.addEventListener("load", back);
+      var timer = setInterval(back, 40);
+      setTimeout(function () {
+        clearInterval(timer);
+        window.removeEventListener("scroll", back);
+        window.removeEventListener("wheel", markUser);
+        window.removeEventListener("touchmove", markUser);
+        window.removeEventListener("keydown", markUser);
+        if (frame) frame.removeEventListener("load", back);
+      }, 1600);
     }
     var data = {
       brochure: "",
@@ -1191,7 +1208,7 @@
               ? "넣었습니다. " + wrote.join(" · ") + (missed.length ? ". 브로셔에서 찾지 못해 그대로 둔 항목: " + missed.join(", ") : "") + extra.note
               : "이 PDF에서 규모 숫자를 찾지 못했습니다. 있는 숫자는 그대로 둡니다." + extra.note;
             var frame = document.getElementById("visitorFrame");
-            if (frame) stayHere(function () { frame.src = "show6.html?preview=1&t=" + Date.now(); });
+            if (frame) stayHere(function () { frame.src = "show7.html?preview=1&t=" + Date.now(); });
           }).catch(function () {
             note.textContent = "이 PDF에서 글자를 읽지 못했습니다.";
           });
@@ -1227,7 +1244,7 @@
         stayHere(function () {
           try { localStorage.setItem(key, JSON.stringify(data)); } catch (error) {}
           var frame = document.getElementById("visitorFrame");
-          if (frame) frame.src = "show6.html?preview=1&t=" + Date.now();
+          if (frame) frame.src = "show7.html?preview=1&t=" + Date.now();
         });
       }
       var orderList = document.getElementById("foldOrder");
@@ -1294,9 +1311,17 @@
         if (when) lines.push(when);
         if (where) lines.push(where);
         var found = readStats(text);
-        var labels = { sqm: "sqm", exhibitors: "Exhibitors", countries: "Countries", visits: "Visits" };
-        ["sqm", "exhibitors", "countries", "visits"].forEach(function (name) {
-          if (found[name] && lines.length < 6) lines.push(found[name] + " " + labels[name]);
+        var labels = {
+          sqm: "전시면적",
+          exhibitors: "참가업체",
+          countries: "국가·지역",
+          innovations: "혁신제품",
+          visits: "방문",
+          buyers: "바이어",
+          conferences: "컨퍼런스"
+        };
+        ["sqm", "exhibitors", "countries", "innovations", "visits", "buyers", "conferences"].forEach(function (name) {
+          if (found[name]) lines.push(found[name] + " " + labels[name]);
         });
         var professionals = "";
         text.split(/\n/).some(function (line) {
@@ -1304,7 +1329,32 @@
           professionals = readLine(line, ["professional"]);
           return !!professionals;
         });
-        if (professionals && lines.length < 6) lines.push(professionals + " Professionals");
+        if (professionals) lines.push(professionals + " 전문 참관");
+        var rows = text.split(/\n/).map(function (line) { return line.trim(); }).filter(Boolean);
+        var seen = {};
+        rows.forEach(function (line, index) {
+          if (line.length > 80 || !/%/.test(line)) return;
+          var pct = line.match(/(\d{1,3}(?:\.\d+)?)\s*%/);
+          if (!pct) return;
+          var around = line;
+          if (!/[A-Za-z]/.test(line)) {
+            function labelLine(value) {
+              return value && value.length <= 80 && /[A-Za-z]/.test(value) && !/%/.test(value);
+            }
+            if (labelLine(rows[index - 1])) around = rows[index - 1];
+            else if (labelLine(rows[index + 1])) around = rows[index + 1];
+          }
+          var lower = around.toLowerCase();
+          var label = "";
+          if (/re-?visit|visit again|return visit/.test(lower)) label = "재방문 의향";
+          else if (/intention/.test(lower) && /exhibit|participat|return|next/.test(lower)) label = "다음 회 참가 의향";
+          else if (/visitor/.test(lower) && /satisf/.test(lower)) label = "참관 만족";
+          else if (/satisf/.test(lower)) label = "만족";
+          else if (/(overseas|international)/.test(lower) && /(increas|grew|growth|higher)/.test(lower)) label = "해외 참관 증가";
+          if (!label || seen[label]) return;
+          seen[label] = true;
+          lines.push(pct[1] + "% " + label);
+        });
         return lines.join("\n");
       }
       function readPsrFile(file) {
@@ -1316,7 +1366,7 @@
               return pdfjs.getDocument({ data: reader.result }).promise;
             }).then(function (pdf) {
               var jobs = [];
-              var limit = Math.min(pdf.numPages, 8);
+              var limit = Math.min(pdf.numPages, 16);
               for (var pageNo = 1; pageNo <= limit; pageNo += 1) {
                 jobs.push(pdf.getPage(pageNo).then(function (page) {
                   return page.getTextContent().then(function (content) { return pageLines(content.items); });
@@ -1420,7 +1470,7 @@
               file.textContent = picked.name || "보고서 놓기";
               keep();
               note.textContent = result.summary
-                ? (item.no || "이 회차") + " 요약을 넣었습니다. 방문자 화면에는 이 몇 줄만 보입니다."
+                ? (item.no || "이 회차") + " 주요 수치를 넣었습니다."
                 : "일정과 규모를 짧게 추리지 못했습니다. 요약칸에 직접 적을 수 있습니다.";
             }).catch(function () {
               note.textContent = "이 PDF에서 글자를 읽지 못했습니다.";
@@ -1428,7 +1478,9 @@
           }
           var justDropped = false;
           picker.addEventListener("change", function () {
-            takeReport(picker.files && picker.files[0]);
+            var picked = picker.files && picker.files[0];
+            picker.blur();
+            takeReport(picked);
           });
           file.addEventListener("click", function () {
             if (justDropped) { justDropped = false; return; }
@@ -1503,7 +1555,7 @@
           });
           paintPsrEdit();
           refreshIntro();
-          note.textContent = (number ? number[1] : "회차 미정") + (season ? " " + season : "") + " 을 목록 앞에 넣었습니다." + (result.summary ? " 일정·장소·규모만 짧게 보입니다." : " 요약은 비어 있어 회차만 보입니다.");
+          note.textContent = (number ? number[1] : "회차 미정") + (season ? " " + season : "") + " 을 목록 앞에 넣었습니다." + (result.summary ? " 주요 수치가 보입니다." : " 요약은 비어 있어 회차만 보입니다.");
         }).catch(function () {
           note.textContent = "이 PDF에서 글자를 읽지 못했습니다.";
         });
@@ -1582,7 +1634,7 @@
         data.applyPeriod = from && to ? from + " – " + to : (from || to);
         try { localStorage.setItem(key, JSON.stringify(data)); } catch (error) {}
         var frame = document.getElementById("visitorFrame");
-        if (frame) stayHere(function () { frame.src = "show6.html?preview=1&t=" + Date.now(); });
+        if (frame) stayHere(function () { frame.src = "show7.html?preview=1&t=" + Date.now(); });
       }
       startInput.value = data.applyStart || "";
       endInput.value = data.applyEnd || "";
@@ -1833,7 +1885,7 @@
       }
       document.getElementById("status").textContent = zoneHall.value + " 구획을 확정했습니다. 업체 화면에서 그 구획을 누르면 이 관의 기업 위치로 이동합니다. 아래 시안 반영은 다른 정보를 다 적은 뒤에 누릅니다.";
       var frame = document.getElementById("visitorFrame");
-      if (frame) frame.src = "show6.html?preview=1#map";
+      if (frame) frame.src = "show7.html?preview=1#map";
     });
     document.getElementById("zoneCancel").addEventListener("click", function () {
       draftPoints.pop();
@@ -2469,7 +2521,7 @@
         var visitorLink = document.querySelector(".to-visitor");
         if (visitorLink) visitorLink.setAttribute("href", "fair.html#" + id);
         var frame = document.getElementById("visitorFrame");
-        if (frame) frame.src = "show6.html?preview=1#" + id;
+        if (frame) frame.src = "show7.html?preview=1#" + id;
         if (location.hash !== "#" + id) history.replaceState(null, "", "#" + id);
         window.scrollTo(0, 0);
       }
@@ -2496,7 +2548,7 @@
           var frame = document.getElementById("visitorFrame");
           if (!frame) return;
           var id = (location.hash || "#intro").replace("#", "");
-          frame.src = "show6.html?preview=1#" + id;
+          frame.src = "show7.html?preview=1#" + id;
         });
       }
     })();
