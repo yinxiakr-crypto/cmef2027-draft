@@ -770,8 +770,8 @@
     .pair { margin-top: 12px; }
     .pair .plan { margin-top: 0; min-height: 0; }
     .pair .roster {
-      flex: 1 1 auto;
-      width: auto;
+      flex: none;
+      width: 100%;
       min-width: 0;
       margin-top: 0;
       max-height: 70vh;
@@ -997,6 +997,30 @@
       header .stat.on { background: #141210; color: #fff; }
       header .stat { cursor: pointer; pointer-events: auto; }
     }
+    #map .place-pick,
+    #map .drawer,
+    #map .drawer-tab { display: none !important; }
+    #map .pair,
+    #map .company-list,
+    #map .roster,
+    #map .clover,
+    #venuePair {
+      display: block !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0 !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      float: none !important;
+      position: static !important;
+      left: auto !important;
+      right: auto !important;
+      overflow: hidden !important;
+    }
+    #map .plan { position: relative !important; width: 100% !important; max-width: 100% !important; overflow: hidden !important; }
+    #map .venue-frame { position: relative !important; width: 100% !important; }
+    #map img.venue,
+    #map img.sheet { display: block !important; width: 100% !important; max-width: 100% !important; height: auto !important; }
   </style>
 </head>
 <body>
@@ -1221,38 +1245,34 @@ HQI light × 1</span></td>
     </section>
 
     <section class="block" id="map">
-      <div class="map-head">
-        <div>
-          <p class="kicker">FLOOR PLAN</p>
-          <h2>전시 도면</h2>
+      <p class="kicker">FLOOR PLAN</p>
+      <h2>전시 도면</h2>
+      <div id="venuePair">
+        <div id="hallMap" class="clover">
+          <div class="venue-frame">
+            <img class="venue" id="venuePic" src="halls/venue.jpg?v=3" alt="상하이 전시장 모식도">
+            <button type="button" class="hall-hot" data-hall="5.2" aria-label="5.2 국제관"></button>
+            <svg class="zone-layer" id="zoneLayer" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+          </div>
+          <p id="venueEmpty" hidden></p>
+          <div class="hall-row">
+            <button type="button" class="zone" data-slot="0" data-hall="8.2" data-korea="0" data-name="" aria-label="8.2"><span class="hall-no">8.2</span></button>
+            <button type="button" class="zone" data-slot="1" data-hall="7.2" data-korea="0" data-name="" aria-label="7.2"><span class="hall-no">7.2</span></button>
+            <button type="button" class="zone" data-slot="2" data-hall="6.2" data-korea="0" data-name="" aria-label="6.2"><span class="hall-no">6.2</span></button>
+            <button type="button" class="zone korea" data-slot="3" data-hall="5.2" data-korea="1" data-name="국제관" aria-label="5.2 국제관"><span class="hall-no">5.2</span></button>
+            <button type="button" class="zone" data-slot="4" data-hall="4.2" data-korea="0" data-name="" aria-label="4.2"><span class="hall-no">4.2</span></button>
+          </div>
+          <p class="hall-hint" id="hallHint" hidden></p>
         </div>
-      </div>
-      <div class="pair" id="venuePair">
-      <div id="hallMap" class="clover">
-        <div class="venue-frame">
-          <img class="venue" id="venuePic" src="halls/venue.jpg?v=2" alt="상하이 전시장 모식도">
-          <button type="button" class="hall-hot" data-hall="5.2" aria-label="5.2 국제관"></button>
-          <svg class="zone-layer" id="zoneLayer" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+        <div class="company-list">
+          <div class="roster" id="applyRoster">
+            <h3>참가 기업</h3>
+            <table>
+              <thead><tr><th>부스 번호</th><th>기업명</th><th>품목분류</th><th>전시 제품</th><th>등급</th></tr></thead>
+              <tbody id="applyRosterBody"></tbody>
+            </table>
+          </div>
         </div>
-        <p class="plan-note" id="venueEmpty" hidden>전체 도면이 아직 없습니다.</p>
-        <div class="hall-row">
-          <button type="button" class="zone" data-slot="0" data-hall="8.2" data-korea="0" data-name="" aria-label="8.2"><span class="hall-no">8.2</span></button>
-          <button type="button" class="zone" data-slot="1" data-hall="7.2" data-korea="0" data-name="" aria-label="7.2"><span class="hall-no">7.2</span></button>
-          <button type="button" class="zone" data-slot="2" data-hall="6.2" data-korea="0" data-name="" aria-label="6.2"><span class="hall-no">6.2</span></button>
-          <button type="button" class="zone korea" data-slot="3" data-hall="5.2" data-korea="1" data-name="국제관" aria-label="5.2 국제관"><span class="hall-no">5.2</span></button>
-          <button type="button" class="zone" data-slot="4" data-hall="4.2" data-korea="0" data-name="" aria-label="4.2"><span class="hall-no">4.2</span></button>
-        </div>
-        <p class="hall-hint" id="hallHint" hidden></p>
-      </div>
-      <div class="company-list">
-        <div class="roster" id="applyRoster">
-        <h3>참가 기업</h3>
-        <table>
-          <thead><tr><th>부스 번호</th><th>기업명</th><th>품목분류</th><th>전시 제품</th><th>등급</th></tr></thead>
-          <tbody id="applyRosterBody"></tbody>
-        </table>
-        </div>
-      </div>
       </div>
       <div id="sectionMap" hidden>
         <button type="button" class="back" id="backSection">전체 도면</button>
@@ -1274,7 +1294,6 @@ HQI light × 1</span></td>
       </div>
       <div id="koreaMap" hidden>
         <button type="button" class="back" id="backHall">전체 도면</button>
-        <div class="pair">
         <div class="plan" id="koreaPlan">
           <img class="sheet" id="koreaPlanImg" alt="한국관 도면" src="halls/korea-plan.png">
         <div class="booths" id="booths" aria-label="한국관 부스">
@@ -1299,7 +1318,6 @@ HQI light × 1</span></td>
             <tbody id="rosterBody"></tbody>
           </table>
           </div>
-        </div>
         </div>
       </div>
     </section>
