@@ -401,20 +401,6 @@
       padding-left: 0;
       padding-right: 0;
     }
-    body.preview #map .pair,
-    body.preview #map.list-right .pair,
-    body.preview #map.list-bottom .pair { display: block; }
-    body.preview #map .drawer,
-    body.preview #map.list-right .drawer,
-    body.preview #map.list-bottom .drawer {
-      display: block;
-      width: 100%;
-      max-width: 100%;
-      flex: none;
-      margin-top: 12px;
-      overflow: hidden;
-    }
-    body.preview #map .roster { width: 100%; max-width: 100%; }
     .block { padding: 36px 0 8px; }
     .block h2 { margin: 0; font-size: clamp(28px, 4vw, 40px); font-weight: 720; letter-spacing: -0.04em; }
     .block .lead { margin: 12px 0 0; max-width: 640px; font-size: 16px; line-height: 1.55; }
@@ -609,7 +595,7 @@
     }
     .map-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
     .map-head h2 { margin-top: 0; }
-    .place-pick { display: none; }
+    .place-pick { display: flex; gap: 6px; margin-bottom: 2px; }
     .place-pick button {
       width: 26px;
       height: 26px;
@@ -912,7 +898,10 @@
       #map { padding-left: 0; padding-right: 0; }
       #map .map-head, #map .hall-row, #map .back { padding-left: 16px; padding-right: 16px; }
       #map .place-pick { display: none; }
-      #map .pair, #map.list-right .pair, #map.list-bottom .pair { flex-direction: column; }
+      #map.list-right .sheet-row,
+      #map.list-bottom .sheet-row { display: block; }
+      #map.list-right .company-list,
+      #map.list-bottom .company-list { width: 100%; max-width: 100%; margin-top: 12px; }
       #map .drawer,
       #map.list-closed .drawer,
       #map.list-right .drawer,
@@ -997,30 +986,34 @@
       header .stat.on { background: #141210; color: #fff; }
       header .stat { cursor: pointer; pointer-events: auto; }
     }
-    #map .place-pick,
-    #map .drawer,
-    #map .drawer-tab { display: none !important; }
-    #map .pair,
-    #map .company-list,
-    #map .roster,
-    #map .clover,
-    #venuePair {
-      display: block !important;
-      width: 100% !important;
-      max-width: 100% !important;
-      min-width: 0 !important;
-      margin-left: 0 !important;
-      margin-right: 0 !important;
-      float: none !important;
-      position: static !important;
-      left: auto !important;
-      right: auto !important;
-      overflow: hidden !important;
+    #map.list-right .sheet-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 12px;
     }
-    #map .plan { position: relative !important; width: 100% !important; max-width: 100% !important; overflow: hidden !important; }
-    #map .venue-frame { position: relative !important; width: 100% !important; }
-    #map img.venue,
-    #map img.sheet { display: block !important; width: 100% !important; max-width: 100% !important; height: auto !important; }
+    #map.list-right .sheet-row > :first-child {
+      flex: 1 1 360px;
+      min-width: 0;
+      max-width: 100%;
+    }
+    #map.list-right .company-list {
+      flex: 0 1 300px;
+      width: 300px;
+      max-width: 100%;
+      margin-top: 0;
+    }
+    #map.list-right .company-list:has(.roster.is-closed) {
+      flex: 0 0 auto;
+      width: auto;
+    }
+    #map.list-bottom .sheet-row { display: block; }
+    #map.list-bottom .company-list {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      margin-top: 12px;
+    }
     .list-hide {
       display: block;
       margin: 10px 0 6px auto;
@@ -1261,10 +1254,18 @@ HQI light × 1</span></td>
       </form>
     </section>
 
-    <section class="block" id="map">
-      <p class="kicker">FLOOR PLAN</p>
-      <h2>전시 도면</h2>
-      <div id="venuePair">
+    <section class="block list-right" id="map">
+      <div class="map-head">
+        <div>
+          <p class="kicker">FLOOR PLAN</p>
+          <h2>전시 도면</h2>
+        </div>
+        <div class="place-pick" role="group" aria-label="참가 기업 목록 위치">
+          <button type="button" data-place="right" class="on" aria-label="목록을 오른쪽에"><span class="mark" aria-hidden="true"></span></button>
+          <button type="button" data-place="bottom" aria-label="목록을 아래에"><span class="mark" aria-hidden="true"></span></button>
+        </div>
+      </div>
+      <div id="venuePair" class="sheet-row">
         <div id="hallMap" class="clover">
           <div class="venue-frame">
             <img class="venue" id="venuePic" src="halls/venue.jpg?v=3" alt="상하이 전시장 모식도">
@@ -1297,7 +1298,7 @@ HQI light × 1</span></td>
         <div class="plain-card">
           <b id="sectionTitle">섹션</b>
         </div>
-        <div class="pair">
+        <div class="pair sheet-row">
         <div class="plan plain" id="sectionPlan"></div>
         <div class="company-list">
           <div class="roster">
@@ -1313,6 +1314,7 @@ HQI light × 1</span></td>
       </div>
       <div id="koreaMap" hidden>
         <button type="button" class="back" id="backHall">전체 도면</button>
+        <div class="sheet-row">
         <div class="plan" id="koreaPlan">
           <img class="sheet" id="koreaPlanImg" alt="한국관 도면" src="halls/korea-plan.png">
         <div class="booths" id="booths" aria-label="한국관 부스">
@@ -1338,6 +1340,7 @@ HQI light × 1</span></td>
           </table>
           <button type="button" class="list-hide">감추기</button>
           </div>
+        </div>
         </div>
       </div>
     </section>
@@ -2117,10 +2120,28 @@ HQI light × 1</span></td>
       });
     });
     var mapNode = document.getElementById("map");
-    if (mapNode) {
-      mapNode.classList.remove("list-right", "list-closed");
-      mapNode.classList.add("list-bottom");
+    var openPlace = "right";
+    function applyList() {
+      if (!mapNode) return;
+      mapNode.classList.toggle("list-right", openPlace === "right");
+      mapNode.classList.toggle("list-bottom", openPlace !== "right");
+      document.querySelectorAll(".place-pick button").forEach(function (button) {
+        button.classList.toggle("on", button.dataset.place === openPlace);
+      });
+      try { localStorage.setItem("cmef2027-list-spot", openPlace); } catch (error) {}
     }
+    document.querySelectorAll(".place-pick button").forEach(function (button) {
+      button.addEventListener("click", function () {
+        openPlace = button.dataset.place === "bottom" ? "bottom" : "right";
+        applyList();
+      });
+    });
+    try {
+      var savedSpot = localStorage.getItem("cmef2027-list-spot");
+      if (savedSpot === "bottom" || savedSpot === "right") openPlace = savedSpot;
+    } catch (error) {}
+    if (window.matchMedia("(max-width: 860px)").matches) openPlace = "bottom";
+    applyList();
     document.querySelectorAll("#map .list-hide").forEach(function (button) {
       button.addEventListener("click", function () {
         var roster = button.closest(".roster");
