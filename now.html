@@ -1045,12 +1045,19 @@
     var planEmpty = document.getElementById("planEmpty");
     if (!data.hallPlans) data.hallPlans = {};
     if (!data.hallPlanOff) data.hallPlanOff = {};
+    var cleanPlan = "halls/korea-plan5.png";
+    function useClean(src) {
+      if (!src) return cleanPlan;
+      if (src.indexOf("data:") === 0) return src;
+      if (src.indexOf("korea-plan") >= 0) return cleanPlan;
+      return src;
+    }
     function planFor(hall) {
       if (data.hallPlanOff[hall]) return "";
-      if (data.hallPlans[hall]) return data.hallPlans[hall];
+      if (data.hallPlans[hall]) return useClean(data.hallPlans[hall]);
       if (hall && hall === (data.koreaHall || "5.2")) {
         if (data.planOff) return "";
-        return data.koreaPlan || "halls/korea-plan.png";
+        return useClean(data.koreaPlan);
       }
       return "";
     }
