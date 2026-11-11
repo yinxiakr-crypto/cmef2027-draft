@@ -1064,13 +1064,13 @@
 
       <p class="data-title">Data</p>
       <div class="stats" aria-label="Data">
-        <button type="button" class="stat"><b>320,000+</b><span class="en">sqm</span></button>
-        <button type="button" class="stat"><b>4,700+</b><span class="en">Exhibitors</span></button>
-        <button type="button" class="stat"><b>150+</b><span class="en">Countries</span></button>
-        <button type="button" class="stat"><b>1,000+</b><span class="en">Innovations</span></button>
-        <button type="button" class="stat"><b>300,000+</b><span class="en">Visits</span></button>
-        <button type="button" class="stat"><b>13,000+</b><span class="en">Buyers</span></button>
-        <button type="button" class="stat"><b>100+</b><span class="en">Conferences</span></button>
+        <button type="button" class="stat" data-stat="sqm"><b>320,000+</b><span class="en">sqm</span></button>
+        <button type="button" class="stat" data-stat="exhibitors"><b>4,700+</b><span class="en">Exhibitors</span></button>
+        <button type="button" class="stat" data-stat="countries"><b>150+</b><span class="en">Countries</span></button>
+        <button type="button" class="stat" data-stat="innovations"><b>1,000+</b><span class="en">Innovations</span></button>
+        <button type="button" class="stat" data-stat="visits"><b>300,000+</b><span class="en">Visits</span></button>
+        <button type="button" class="stat" data-stat="buyers"><b>13,000+</b><span class="en">Buyers</span></button>
+        <button type="button" class="stat" data-stat="conferences"><b>100+</b><span class="en">Conferences</span></button>
       </div>
 
       <div class="basics" id="basics">
@@ -1959,6 +1959,12 @@ HQI light × 1</span></td>
           boothMoney = saved.currency;
           document.querySelectorAll(".unit").forEach(function (node) {
             node.textContent = boothMoney + " · 9㎡";
+          });
+        }
+        if (saved.dataStats) {
+          Object.keys(saved.dataStats).forEach(function (name) {
+            var button = document.querySelector('.stat[data-stat="' + name + '"]');
+            if (button && saved.dataStats[name]) button.querySelector("b").textContent = saved.dataStats[name];
           });
         }
         if (saved.hostName) document.getElementById("hostName").textContent = saved.hostName;
