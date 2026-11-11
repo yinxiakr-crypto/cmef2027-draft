@@ -398,19 +398,25 @@
     .fold-order li.drag { opacity: 0.45; }
     .psr-edit input, .psr-edit select, .psr-edit textarea { width: auto; min-width: 0; }
     .psr-edit textarea { width: 220px; min-height: 72px; }
-    .psr-edit input[type="file"] { max-width: 190px; }
-    .psr-edit button { margin-left: auto; }
+    .psr-edit .remove { margin-left: auto; }
     .psr-tools { display: flex; gap: 8px; align-items: center; margin-top: 12px; }
-    .psr-drop {
+    .file-drop, .psr-edit .row-drop {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 84px;
       margin-top: 10px;
-      padding: 14px;
-      border: 1px dashed var(--line);
+      padding: 18px;
+      border: 2px dashed var(--deep);
       border-radius: 10px;
-      background: #fff;
-      color: var(--muted);
-      font-size: 14px;
+      background: #f4f8f6;
+      color: var(--deep);
+      font-size: 15px;
+      text-align: center;
+      cursor: copy;
     }
-    .psr-drop.drop, .psr-edit li.drop { border-color: var(--deep); background: #f3f6f4; }
+    .psr-edit .row-drop { flex: 1; min-width: 160px; min-height: 64px; margin-top: 0; }
+    .file-drop.drop, .psr-edit li.drop .row-drop { background: #e5f0ea; }
     @media (max-width: 900px) {
       .editor-pair { grid-template-columns: 1fr; }
     }
@@ -453,13 +459,14 @@
     <article id="intro">
       <p class="see">방문자 화면 · <a href="fair.html#intro">전시 소개</a></p>
       <h2>전시 소개</h2>
-      <p>기본 정보와 부스 종류는 여기 있습니다. 브로셔 PDF를 올리면 규모 숫자를 읽어서 방문자 화면의 Data에 넣습니다. 파일에 없는 숫자는 바꾸지 않습니다.</p>
+      <p>기본 정보와 부스 종류는 여기 있습니다. 브로셔 PDF는 아래 칸에 끌어다 놓습니다. 규모 숫자를 읽어서 방문자 화면의 Data에 넣습니다. 파일에 없는 숫자는 바꾸지 않습니다.</p>
       <label>주최<input id="hostName" placeholder="주최"></label>
       <div class="row">
         <label>신청 시작<input id="applyStart" type="date"></label>
         <label>신청 마지막 날<input id="applyEnd" type="date"></label>
       </div>
-      <label>브로셔 PDF<input id="brochureFile" type="file" accept="application/pdf,.pdf"></label>
+      <div class="file-drop" id="brochureDrop">브로셔 PDF를 이 칸에 끌어다 놓으세요.</div>
+      <input id="brochureFile" type="file" accept="application/pdf,.pdf" hidden>
       <p id="brochureNote"></p>
       <label>브로셔 파일 이름<input id="brochure" placeholder="95th CMEF Brochure"></label>
       <label>소개 글
@@ -469,13 +476,13 @@
       <p>오른쪽 방문자 화면의 참관객, 산업 분야, 동기간 전시, PSR 단추를 마우스로 끌어 순서를 바꿉니다. 아래 목록으로도 같은 순서를 바꿉니다.</p>
       <ul class="fold-order" id="foldOrder"></ul>
       <h2 style="margin-top:22px">PSR</h2>
-      <p>회차는 추가로 넣고, 빼기로 지웁니다. 보고서 PDF는 그 회차 위에 끌어다 놓습니다. 아래 칸에 놓으면 새 회차로 들어갑니다. 방문자 화면에는 회차와, 파일에서 읽힌 일정·장소·규모만 짧게 보입니다.</p>
+      <p>회차는 추가로 넣고, 빼기로 지웁니다. 보고서 PDF는 아래 칸에 끌어다 놓으면 새 회차가 생깁니다. 이미 있는 회차는 그 줄의 보고서 놓기에 놓습니다. 방문자 화면에는 회차와, 파일에서 읽힌 일정·장소·규모만 짧게 보입니다.</p>
       <div class="psr-tools">
         <button type="button" id="psrAdd">추가</button>
-        <label>파일로 새 회차<input id="psrFile" type="file" accept="application/pdf,.pdf"></label>
       </div>
       <p id="psrNote"></p>
-      <div class="psr-drop" id="psrDrop">보고서 PDF를 여기에 끌어다 놓으면 새 회차가 생깁니다.</div>
+      <div class="file-drop" id="psrDrop">보고서 PDF를 이 칸에 끌어다 놓으면 새 회차가 생깁니다.</div>
+      <input id="psrFile" type="file" accept="application/pdf,.pdf" hidden>
       <ul class="psr-edit" id="psrEdit"></ul>
       <h2 style="margin-top:22px">부스 <span class="tag">금액 · 종류</span></h2>
       <p>Raw space는 양탄자 그림입니다. Shell scheme 사진은 하나이고, Information을 Standard와 Upgrade 두 줄로 나눕니다. 금액이 달라서 셋 다 고를 수 있습니다. 화폐는 베트남과 같은 화면이라 여기서 고릅니다.</p>
@@ -1131,10 +1138,12 @@
           note: bits.length ? " " + bits.join(", ") + "도 넣었습니다." : " 참관객·산업 분야·동기간 전시는 브로셔에서 분명히 읽힌 항목이 적어 그대로 둡니다."
         };
       }
-      document.getElementById("brochureFile").addEventListener("change", function (event) {
-        var file = event.target.files && event.target.files[0];
+      function readBrochure(file) {
         var note = document.getElementById("brochureNote");
-        if (!file) return;
+        if (!file || (!/pdf$/i.test(file.type) && !/\.pdf$/i.test(file.name))) {
+          note.textContent = "브로셔 PDF를 끌어다 놓으세요.";
+          return;
+        }
         note.textContent = "브로셔를 읽고 있습니다.";
         var reader = new FileReader();
         reader.onload = function () {
@@ -1188,6 +1197,9 @@
           });
         };
         reader.readAsArrayBuffer(file);
+      }
+      document.getElementById("brochureFile").addEventListener("change", function (event) {
+        readBrochure(event.target.files && event.target.files[0]);
       });
       var foldNames = [
         { id: "visitor", label: "참관객" },
@@ -1348,16 +1360,22 @@
           blank.textContent = "시기";
           season.insertBefore(blank, season.firstChild);
           season.value = item.en === "Autumn" || item.en === "Spring" ? item.en : "";
-          var file = document.createElement("input");
-          file.type = "file";
-          file.accept = "application/pdf,.pdf";
-          file.setAttribute("aria-label", (item.no || "이 회차") + " 자료");
+          var file = document.createElement("button");
+          file.type = "button";
+          file.className = "row-drop";
+          file.textContent = item.file || "보고서 놓기";
+          var picker = document.createElement("input");
+          picker.type = "file";
+          picker.accept = "application/pdf,.pdf";
+          picker.hidden = true;
+          picker.setAttribute("aria-label", (item.no || "이 회차") + " 자료");
           var summary = document.createElement("textarea");
           summary.value = item.summary || "";
           summary.placeholder = "올린 자료의 짧은 요약";
           summary.setAttribute("aria-label", "요약");
           var remove = document.createElement("button");
           remove.type = "button";
+          remove.className = "remove";
           remove.textContent = "빼기";
           function keep() {
             item.year = year.value.trim();
@@ -1399,6 +1417,7 @@
               item.file = picked.name;
               item.summary = result.summary;
               summary.value = result.summary;
+              file.textContent = picked.name || "보고서 놓기";
               keep();
               note.textContent = result.summary
                 ? (item.no || "이 회차") + " 요약을 넣었습니다. 방문자 화면에는 이 몇 줄만 보입니다."
@@ -1407,8 +1426,13 @@
               note.textContent = "이 PDF에서 글자를 읽지 못했습니다.";
             });
           }
-          file.addEventListener("change", function () {
-            takeReport(file.files && file.files[0]);
+          var justDropped = false;
+          picker.addEventListener("change", function () {
+            takeReport(picker.files && picker.files[0]);
+          });
+          file.addEventListener("click", function () {
+            if (justDropped) { justDropped = false; return; }
+            picker.click();
           });
           row.addEventListener("dragover", function (event) {
             if (!event.dataTransfer || !event.dataTransfer.types || [].indexOf.call(event.dataTransfer.types, "Files") < 0) return;
@@ -1416,8 +1440,12 @@
             event.stopPropagation();
             row.classList.add("drop");
           });
-          row.addEventListener("dragleave", function () { row.classList.remove("drop"); });
+          row.addEventListener("dragleave", function (event) {
+            if (row.contains(event.relatedTarget)) return;
+            row.classList.remove("drop");
+          });
           row.addEventListener("drop", function (event) {
+            justDropped = true;
             event.preventDefault();
             event.stopPropagation();
             row.classList.remove("drop");
@@ -1438,6 +1466,7 @@
           row.appendChild(no);
           row.appendChild(season);
           row.appendChild(file);
+          row.appendChild(picker);
           row.appendChild(summary);
           row.appendChild(remove);
           psrList.appendChild(row);
@@ -1490,18 +1519,42 @@
         var file = event.target.files && event.target.files[0];
         if (file) addReport(file);
       });
-      var dropBox = document.getElementById("psrDrop");
-      dropBox.addEventListener("dragover", function (event) {
-        if (!event.dataTransfer || !event.dataTransfer.types || [].indexOf.call(event.dataTransfer.types, "Files") < 0) return;
-        event.preventDefault();
-        dropBox.classList.add("drop");
+      function hasFiles(event) {
+        return event.dataTransfer && event.dataTransfer.types && [].indexOf.call(event.dataTransfer.types, "Files") >= 0;
+      }
+      function bindFileDrop(box, onFile) {
+        var skipClick = false;
+        box.addEventListener("dragover", function (event) {
+          if (!hasFiles(event)) return;
+          event.preventDefault();
+          event.stopPropagation();
+          box.classList.add("drop");
+        });
+        box.addEventListener("dragleave", function (event) {
+          if (box.contains(event.relatedTarget)) return;
+          box.classList.remove("drop");
+        });
+        box.addEventListener("drop", function (event) {
+          skipClick = true;
+          event.preventDefault();
+          event.stopPropagation();
+          box.classList.remove("drop");
+          var picked = event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0];
+          onFile(picked);
+        });
+        box.addEventListener("click", function () {
+          if (skipClick) { skipClick = false; return; }
+          var input = box.nextElementSibling;
+          if (input && input.type === "file") input.click();
+        });
+      }
+      bindFileDrop(document.getElementById("brochureDrop"), readBrochure);
+      bindFileDrop(document.getElementById("psrDrop"), addReport);
+      window.addEventListener("dragover", function (event) {
+        if (hasFiles(event)) event.preventDefault();
       });
-      dropBox.addEventListener("dragleave", function () { dropBox.classList.remove("drop"); });
-      dropBox.addEventListener("drop", function (event) {
-        event.preventDefault();
-        dropBox.classList.remove("drop");
-        var file = event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0];
-        addReport(file);
+      window.addEventListener("drop", function (event) {
+        if (hasFiles(event)) event.preventDefault();
       });
     })();
     fill("hostName", "hostName");
