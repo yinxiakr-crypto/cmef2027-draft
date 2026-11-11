@@ -1469,9 +1469,24 @@ HQI light × 1</span></td>
       briefBox.hidden = false;
       psrBtn.setAttribute("aria-expanded", "true");
       psrBtn.querySelector(".chev").textContent = "–";
-      briefBox.innerHTML =
-        '<p class="en">' + fair.no + " " + fair.en + "</p>" +
-        '<p class="ko">' + (fair.ko || "") + "</p>";
+      briefBox.innerHTML = "";
+      var title = document.createElement("p");
+      title.className = "en";
+      title.textContent = ((fair.no || "") + " " + (fair.en || "")).trim();
+      var season = document.createElement("p");
+      season.className = "ko";
+      season.textContent = fair.ko || "";
+      briefBox.appendChild(title);
+      briefBox.appendChild(season);
+      var lines = String(fair.summary || "").split(/\n/).filter(function (line) { return line.trim(); });
+      if (!lines.length) return;
+      var list = document.createElement("ul");
+      lines.slice(0, 6).forEach(function (line) {
+        var item = document.createElement("li");
+        item.textContent = line.trim();
+        list.appendChild(item);
+      });
+      briefBox.appendChild(list);
     }
     function paintPsr(list) {
       menu.innerHTML = "";
