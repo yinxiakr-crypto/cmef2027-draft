@@ -1021,6 +1021,23 @@
     #map .venue-frame { position: relative !important; width: 100% !important; }
     #map img.venue,
     #map img.sheet { display: block !important; width: 100% !important; max-width: 100% !important; height: auto !important; }
+    .list-hide {
+      display: block;
+      margin: 10px 0 6px auto;
+      min-height: 28px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 680;
+      cursor: pointer;
+    }
+    .roster.is-closed > table,
+    .roster.is-closed > h3,
+    .roster.is-closed > .hall-hint { display: none !important; }
   </style>
 </head>
 <body>
@@ -1271,6 +1288,7 @@ HQI light × 1</span></td>
               <thead><tr><th>부스 번호</th><th>기업명</th><th>품목분류</th><th>전시 제품</th><th>등급</th></tr></thead>
               <tbody id="applyRosterBody"></tbody>
             </table>
+            <button type="button" class="list-hide">감추기</button>
           </div>
         </div>
       </div>
@@ -1288,6 +1306,7 @@ HQI light × 1</span></td>
             <thead><tr><th>부스 번호</th><th>기업명</th><th>품목분류</th><th>전시 제품</th><th>인허가</th></tr></thead>
             <tbody id="sectionRoster"></tbody>
           </table>
+          <button type="button" class="list-hide">감추기</button>
           </div>
         </div>
         </div>
@@ -1317,6 +1336,7 @@ HQI light × 1</span></td>
             </thead>
             <tbody id="rosterBody"></tbody>
           </table>
+          <button type="button" class="list-hide">감추기</button>
           </div>
         </div>
       </div>
@@ -2101,6 +2121,13 @@ HQI light × 1</span></td>
       mapNode.classList.remove("list-right", "list-closed");
       mapNode.classList.add("list-bottom");
     }
+    document.querySelectorAll("#map .list-hide").forEach(function (button) {
+      button.addEventListener("click", function () {
+        var roster = button.closest(".roster");
+        var closed = roster.classList.toggle("is-closed");
+        button.textContent = closed ? "보이기" : "감추기";
+      });
+    });
 
     var productCount = 0;
     function levelSelect(title) {
