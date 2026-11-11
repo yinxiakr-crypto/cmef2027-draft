@@ -383,6 +383,21 @@
     .list { margin: 14px 0 0; padding: 0; list-style: none; }
     .list li { padding: 12px 0; border-top: 1px solid var(--line); font-size: 14px; }
     .status { margin: 18px 0 0; font-size: 14px; }
+    .fold-order, .psr-edit { list-style: none; margin: 12px 0 0; padding: 0; }
+    .fold-order li, .psr-edit li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+      padding: 10px 12px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+    .fold-order li { cursor: grab; }
+    .fold-order li.drag { opacity: 0.45; }
+    .psr-edit input, .psr-edit select { width: auto; min-width: 0; }
+    .psr-edit button { margin-left: auto; }
     @media (max-width: 900px) {
       .editor-pair { grid-template-columns: 1fr; }
     }
@@ -418,7 +433,7 @@
         <button type="button" id="visitorRefresh">다시 보기</button>
         <button type="button" id="visitorFold" aria-expanded="true">접기</button>
       </div>
-      <iframe id="visitorFrame" title="방문자 화면" src="show2.html?preview=1#intro"></iframe>
+      <iframe id="visitorFrame" title="방문자 화면" src="show3.html?preview=1#intro"></iframe>
     </section>
   </div>
   <main class="wrap">
@@ -437,6 +452,14 @@
       <label>소개 글
         <div id="introNote" class="editor" contenteditable="true"></div>
       </label>
+      <h2 style="margin-top:22px">화면 순서</h2>
+      <p>참관객, 산업 분야, 동기간 전시, PSR의 순서를 끌어다 바꿉니다. 처음에는 PSR이 세 메뉴 아래에 있습니다.</p>
+      <ul class="fold-order" id="foldOrder"></ul>
+      <h2 style="margin-top:22px">PSR</h2>
+      <p>PDF를 올리면 95th Spring처럼 회차와 시기만 목록에 넣습니다. 본문은 방문자 화면에 펼치지 않습니다. 회차와 시기는 고칠 수 있고, 빼기로 지웁니다.</p>
+      <label>PSR PDF<input id="psrFile" type="file" accept="application/pdf,.pdf"></label>
+      <p id="psrNote"></p>
+      <ul class="psr-edit" id="psrEdit"></ul>
       <h2 style="margin-top:22px">부스 <span class="tag">금액 · 종류</span></h2>
       <p>Raw space는 양탄자 그림입니다. Shell scheme 사진은 하나이고, Information을 Standard와 Upgrade 두 줄로 나눕니다. 금액이 달라서 셋 다 고를 수 있습니다. 화폐는 베트남과 같은 화면이라 여기서 고릅니다.</p>
       <label>화폐
@@ -703,7 +726,13 @@
       sector: "",
       sectorNote: "",
       noticeTitle: "",
-      noticeBody: ""
+      noticeBody: "",
+      foldOrder: ["visitor", "chain", "shows", "psr"],
+      visitors: [],
+      reasons: [],
+      industries: [],
+      showIds: [],
+      psrList: null
     };
     try {
       var stored = JSON.parse(localStorage.getItem(key) || "null");
@@ -986,6 +1015,93 @@
           document.head.appendChild(script);
         });
       }
+      function percentOf(line) {
+        var match = line.match(/(\d{1,3}(?:\.\d+)?)\s*%/);
+        return match ? match[1] + "%" : "";
+      }
+      function readBrochureParts(text) {
+        var visitorWords = [
+          { en: "Distributors & Agents", ko: "유통·대리점", words: ["distributor"] },
+          { en: "Manufacturers", ko: "제조사", words: ["manufacturer"] },
+          { en: "Medical Institutions", ko: "의료기관", words: ["medical institution", "hospital"] },
+          { en: "Others", ko: "기타", words: ["others"] },
+          { en: "Associations", ko: "협회·기관", words: ["association"] },
+          { en: "Trade & Tender", ko: "무역·입찰", words: ["tender", "trade"] },
+          { en: "R&D", ko: "연구기관", words: ["r&d", "research"] }
+        ];
+        var reasonWords = [
+          { en: "Purchasing", words: ["purchas"] },
+          { en: "Partnership", words: ["partnership"] },
+          { en: "New Trends", words: ["trend"] }
+        ];
+        var industryWords = [
+          { en: "Medical Imaging", ko: "의료영상", words: ["imaging"] },
+          { en: "IVD", ko: "체외진단", words: ["ivd", "in vitro"] },
+          { en: "Operating Room", ko: "수술실", words: ["operating room"] },
+          { en: "Medical Electronics", ko: "의료전자", words: ["electronic"] },
+          { en: "Medical Optics", ko: "의료광학", words: ["optic"] },
+          { en: "Medical Robotics", ko: "의료용 로봇", words: ["robot"] },
+          { en: "Consumables", ko: "의료용 소모품", words: ["consumable"] },
+          { en: "Orthopedics", ko: "정형외과", words: ["orthop"] },
+          { en: "Hospital Build", ko: "병원 건설·시설", words: ["hospital build", "hospital construction"] },
+          { en: "Simulation", ko: "의료 시뮬레이션", words: ["simulation"] },
+          { en: "Infection Control", ko: "소독·감염관리", words: ["infection"] },
+          { en: "Aesthetics", ko: "미용 의료", words: ["aesthetic"] },
+          { en: "Asset Management", ko: "병원 자산 관리", words: ["asset management"] }
+        ];
+        var visitors = [];
+        var reasons = [];
+        var industries = [];
+        text.split(/\n/).forEach(function (line) {
+          var lower = line.toLowerCase();
+          var pct = percentOf(line);
+          visitorWords.forEach(function (item) {
+            if (visitors.some(function (row) { return row.en === item.en; })) return;
+            if (!pct) return;
+            if (item.words.some(function (word) { return lower.indexOf(word) >= 0; })) visitors.push({ en: item.en, ko: item.ko, pct: pct });
+          });
+          reasonWords.forEach(function (item) {
+            if (reasons.some(function (row) { return row.en === item.en; })) return;
+            if (!pct) return;
+            if (item.words.some(function (word) { return lower.indexOf(word) >= 0; })) reasons.push({ en: item.en, pct: pct });
+          });
+          industryWords.forEach(function (item) {
+            if (industries.some(function (row) { return row.en === item.en; })) return;
+            if (item.words.some(function (word) { return lower.indexOf(word) >= 0; })) industries.push({ en: item.en, ko: item.ko });
+          });
+        });
+        var showWords = [
+          { id: "icmd", words: ["component & design", "component and design", "icmd"] },
+          { id: "crs", words: ["rehabilitation", "crs"] },
+          { id: "cecn", words: ["elderly care", "cecn"] },
+          { id: "homecare", words: ["home care"] },
+          { id: "intelligent", words: ["intelligent health"] },
+          { id: "ahc", words: ["animal health", "ahc"] },
+          { id: "emergency", words: ["emergency rescue"] },
+          { id: "lifestyle", words: ["healthy lifestyle"] }
+        ];
+        var shows = [];
+        showWords.forEach(function (item) {
+          var hit = item.words.some(function (word) {
+            return new RegExp("\\b" + word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\b", "i").test(text);
+          });
+          if (hit) shows.push(item.id);
+        });
+        if (visitors.length < 3) visitors = [];
+        if (reasons.length < 2) reasons = [];
+        if (industries.length < 3) industries = [];
+        var bits = [];
+        if (visitors.length) bits.push("참관객 " + visitors.length + "항목");
+        if (industries.length) bits.push("산업 분야 " + industries.length + "항목");
+        if (shows.length) bits.push("동기간 전시 " + shows.length + "항목");
+        return {
+          visitors: visitors,
+          reasons: reasons,
+          industries: industries,
+          shows: shows,
+          note: bits.length ? " " + bits.join(", ") + "도 넣었습니다." : " 참관객·산업 분야·동기간 전시는 브로셔에서 분명히 읽힌 항목이 적어 그대로 둡니다."
+        };
+      }
       document.getElementById("brochureFile").addEventListener("change", function (event) {
         var file = event.target.files && event.target.files[0];
         var note = document.getElementById("brochureNote");
@@ -1016,6 +1132,14 @@
               });
             });
             data.dataStats = found;
+            var extra = readBrochureParts(pages.filter(function (text) {
+              var lower = text.toLowerCase();
+              return !(lower.indexOf("beijing") >= 0 && lower.indexOf("shanghai") < 0);
+            }).join("\n"));
+            if (extra.visitors.length) data.visitors = extra.visitors;
+            if (extra.reasons.length) data.reasons = extra.reasons;
+            if (extra.industries.length) data.industries = extra.industries;
+            if (extra.shows.length) data.showIds = extra.shows;
             data.brochure = file.name;
             document.getElementById("brochure").value = file.name;
             try { localStorage.setItem(key, JSON.stringify(data)); } catch (error) {}
@@ -1026,10 +1150,162 @@
               else missed.push(item.name);
             });
             note.textContent = wrote.length
-              ? "넣었습니다. " + wrote.join(" · ") + (missed.length ? ". 브로셔에서 찾지 못해 그대로 둔 항목: " + missed.join(", ") : "")
-              : "이 PDF에서 규모 숫자를 찾지 못했습니다. 있는 숫자는 그대로 둡니다.";
+              ? "넣었습니다. " + wrote.join(" · ") + (missed.length ? ". 브로셔에서 찾지 못해 그대로 둔 항목: " + missed.join(", ") : "") + extra.note
+              : "이 PDF에서 규모 숫자를 찾지 못했습니다. 있는 숫자는 그대로 둡니다." + extra.note;
             var frame = document.getElementById("visitorFrame");
-            if (frame) frame.src = "show2.html?preview=1#intro";
+            if (frame) frame.src = "show3.html?preview=1&t=" + Date.now() + "#intro";
+          }).catch(function () {
+            note.textContent = "이 PDF에서 글자를 읽지 못했습니다.";
+          });
+        };
+        reader.readAsArrayBuffer(file);
+      });
+      var foldNames = [
+        { id: "visitor", label: "참관객" },
+        { id: "chain", label: "산업 분야" },
+        { id: "shows", label: "동기간 전시" },
+        { id: "psr", label: "PSR" }
+      ];
+      var basePsr = [
+        { year: "2027", no: "95th", en: "Spring", ko: "봄" },
+        { year: "2026", no: "94th", en: "Autumn", ko: "가을" },
+        { year: "2026", no: "93rd", en: "Spring", ko: "봄" },
+        { year: "2025", no: "92nd", en: "Autumn", ko: "가을" },
+        { year: "2025", no: "91st", en: "Spring", ko: "봄" },
+        { year: "2024", no: "90th", en: "Autumn", ko: "가을" },
+        { year: "2024", no: "89th", en: "Spring", ko: "봄" },
+        { year: "2023", no: "88th", en: "Autumn", ko: "가을" },
+        { year: "2023", no: "87th", en: "Spring", ko: "봄" },
+        { year: "2022", no: "86th", en: "Spring", ko: "봄" },
+        { year: "2021", no: "85th", en: "Autumn", ko: "가을" },
+        { year: "2021", no: "84th", en: "Spring", ko: "봄" }
+      ];
+      if (!Array.isArray(data.foldOrder) || !data.foldOrder.length) data.foldOrder = ["visitor", "chain", "shows", "psr"];
+      if (!Array.isArray(data.psrList)) data.psrList = basePsr.map(function (item) { return { year: item.year, no: item.no, en: item.en, ko: item.ko }; });
+      function refreshIntro() {
+        try { localStorage.setItem(key, JSON.stringify(data)); } catch (error) {}
+        var frame = document.getElementById("visitorFrame");
+        if (frame) frame.src = "show3.html?preview=1&t=" + Date.now() + "#intro";
+      }
+      var orderList = document.getElementById("foldOrder");
+      var dragId = "";
+      function paintOrder() {
+        orderList.innerHTML = "";
+        data.foldOrder.forEach(function (id) {
+          var meta = foldNames.filter(function (item) { return item.id === id; })[0];
+          if (!meta) return;
+          var row = document.createElement("li");
+          row.draggable = true;
+          row.dataset.fold = id;
+          row.textContent = meta.label;
+          row.addEventListener("dragstart", function () {
+            dragId = id;
+            row.classList.add("drag");
+          });
+          row.addEventListener("dragend", function () { row.classList.remove("drag"); });
+          row.addEventListener("dragover", function (event) { event.preventDefault(); });
+          row.addEventListener("drop", function (event) {
+            event.preventDefault();
+            if (!dragId || dragId === id) return;
+            var from = data.foldOrder.indexOf(dragId);
+            var to = data.foldOrder.indexOf(id);
+            data.foldOrder.splice(from, 1);
+            data.foldOrder.splice(to, 0, dragId);
+            paintOrder();
+            refreshIntro();
+          });
+          orderList.appendChild(row);
+        });
+      }
+      paintOrder();
+      var seasonKo = { Spring: "봄", Autumn: "가을" };
+      var psrList = document.getElementById("psrEdit");
+      function paintPsrEdit() {
+        psrList.innerHTML = "";
+        data.psrList.forEach(function (item, index) {
+          var row = document.createElement("li");
+          var year = document.createElement("input");
+          year.value = item.year || "";
+          year.placeholder = "2027";
+          year.setAttribute("aria-label", "연도");
+          var no = document.createElement("input");
+          no.value = item.no || "";
+          no.placeholder = "95th";
+          no.setAttribute("aria-label", "회차");
+          var season = document.createElement("select");
+          season.setAttribute("aria-label", "시기");
+          ["Spring", "Autumn"].forEach(function (name) {
+            var option = document.createElement("option");
+            option.value = name;
+            option.textContent = name === "Spring" ? "Spring · 봄" : "Autumn · 가을";
+            season.appendChild(option);
+          });
+          var blank = document.createElement("option");
+          blank.value = "";
+          blank.textContent = "시기";
+          season.insertBefore(blank, season.firstChild);
+          season.value = item.en === "Autumn" || item.en === "Spring" ? item.en : "";
+          var remove = document.createElement("button");
+          remove.type = "button";
+          remove.textContent = "빼기";
+          function keep() {
+            item.year = year.value.trim();
+            item.no = no.value.trim();
+            item.en = season.value;
+            item.ko = seasonKo[item.en] || "";
+            refreshIntro();
+          }
+          year.addEventListener("change", keep);
+          no.addEventListener("change", keep);
+          season.addEventListener("change", keep);
+          remove.addEventListener("click", function () {
+            data.psrList.splice(index, 1);
+            paintPsrEdit();
+            refreshIntro();
+          });
+          row.appendChild(year);
+          row.appendChild(no);
+          row.appendChild(season);
+          row.appendChild(remove);
+          psrList.appendChild(row);
+        });
+      }
+      paintPsrEdit();
+      document.getElementById("psrFile").addEventListener("change", function (event) {
+        var file = event.target.files && event.target.files[0];
+        var note = document.getElementById("psrNote");
+        if (!file) return;
+        note.textContent = "PSR을 읽고 있습니다.";
+        var reader = new FileReader();
+        reader.onload = function () {
+          loadPdf().then(function (pdfjs) {
+            return pdfjs.getDocument({ data: reader.result }).promise;
+          }).then(function (pdf) {
+            var jobs = [];
+            for (var pageNo = 1; pageNo <= Math.min(pdf.numPages, 3); pageNo += 1) {
+              jobs.push(pdf.getPage(pageNo).then(function (page) {
+                return page.getTextContent().then(function (content) { return pageLines(content.items); });
+              }));
+            }
+            return Promise.all(jobs);
+          }).then(function (pages) {
+            var text = pages.join("\n");
+            var number = text.match(/\b(\d{2,3}(?:st|nd|rd|th))\b/i);
+            var year = text.match(/\b(20\d{2})\b/);
+            var springAt = text.search(/spring/i);
+            var autumnAt = text.search(/autumn|fall/i);
+            var season = "";
+            if (springAt >= 0 && (autumnAt < 0 || springAt < autumnAt)) season = "Spring";
+            else if (autumnAt >= 0) season = "Autumn";
+            data.psrList.unshift({
+              year: year ? year[1] : "",
+              no: number ? number[1] : "",
+              en: season,
+              ko: seasonKo[season] || ""
+            });
+            paintPsrEdit();
+            refreshIntro();
+            note.textContent = (number ? number[1] : "회차 미정") + (season ? " " + season : "") + " 을 목록 앞에 넣었습니다. 방문자 화면에는 회차와 시기만 보입니다.";
           }).catch(function () {
             note.textContent = "이 PDF에서 글자를 읽지 못했습니다.";
           });
@@ -1062,7 +1338,7 @@
         data.applyPeriod = from && to ? from + " – " + to : (from || to);
         try { localStorage.setItem(key, JSON.stringify(data)); } catch (error) {}
         var frame = document.getElementById("visitorFrame");
-        if (frame) frame.src = "show2.html?preview=1&t=" + Date.now() + "#intro";
+        if (frame) frame.src = "show3.html?preview=1&t=" + Date.now() + "#intro";
       }
       startInput.value = data.applyStart || "";
       endInput.value = data.applyEnd || "";
@@ -1313,7 +1589,7 @@
       }
       document.getElementById("status").textContent = zoneHall.value + " 구획을 확정했습니다. 업체 화면에서 그 구획을 누르면 이 관의 기업 위치로 이동합니다. 아래 시안 반영은 다른 정보를 다 적은 뒤에 누릅니다.";
       var frame = document.getElementById("visitorFrame");
-      if (frame) frame.src = "show2.html?preview=1#map";
+      if (frame) frame.src = "show3.html?preview=1#map";
     });
     document.getElementById("zoneCancel").addEventListener("click", function () {
       draftPoints.pop();
@@ -1949,7 +2225,7 @@
         var visitorLink = document.querySelector(".to-visitor");
         if (visitorLink) visitorLink.setAttribute("href", "fair.html#" + id);
         var frame = document.getElementById("visitorFrame");
-        if (frame) frame.src = "show2.html?preview=1#" + id;
+        if (frame) frame.src = "show3.html?preview=1#" + id;
         if (location.hash !== "#" + id) history.replaceState(null, "", "#" + id);
         window.scrollTo(0, 0);
       }
@@ -1976,7 +2252,7 @@
           var frame = document.getElementById("visitorFrame");
           if (!frame) return;
           var id = (location.hash || "#intro").replace("#", "");
-          frame.src = "show2.html?preview=1#" + id;
+          frame.src = "show3.html?preview=1#" + id;
         });
       }
     })();

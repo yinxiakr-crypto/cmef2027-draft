@@ -1081,24 +1081,15 @@
 
     </div>
 
-  <div class="wrap folds">
-    <section class="fold psr">
-      <button type="button" class="fold-btn" id="psrBtn" aria-expanded="false" aria-controls="psrMenu">
-        <span><span class="en">PSR</span><span class="ko">Post Show Report</span></span>
-        <span class="chev" aria-hidden="true">+</span>
-      </button>
-      <div class="psr-menu" id="psrMenu" hidden></div>
-      <div class="brief" id="historyBrief" hidden></div>
-    </section>
-
-    <section class="fold">
+  <div class="wrap folds" id="folds">
+    <section class="fold" data-fold="visitor">
       <button type="button" class="fold-btn" aria-expanded="false" aria-controls="visitorBody">
         <span><span class="en">Visitor Profile</span><span class="ko">참관객</span></span>
         <span class="chev" aria-hidden="true">+</span>
       </button>
       <div class="panel" id="visitorBody">
       <div class="split">
-      <div>
+      <div id="visitorRows">
         <div class="row"><div><span class="name">Distributors &amp; Agents</span><span class="ko">유통·대리점</span></div><strong>34%</strong><div class="track"><i style="width:34%"></i></div></div>
         <div class="row"><div><span class="name">Manufacturers</span><span class="ko">제조사</span></div><strong>24%</strong><div class="track"><i style="width:24%"></i></div></div>
         <div class="row"><div><span class="name">Medical Institutions</span><span class="ko">의료기관</span></div><strong>23%</strong><div class="track"><i style="width:23%"></i></div></div>
@@ -1109,7 +1100,7 @@
       </div>
       <div>
         <p class="side-title">Why They Visit</p>
-        <div class="reasons">
+        <div class="reasons" id="visitReasons">
           <div class="reason"><b>63.3%</b><span class="en">Purchasing</span></div>
           <div class="reason"><b>37.7%</b><span class="en">Partnership</span></div>
           <div class="reason"><b>37.7%</b><span class="en">New Trends</span></div>
@@ -1119,13 +1110,13 @@
       </div>
     </section>
 
-    <section class="fold">
+    <section class="fold" data-fold="chain">
       <button type="button" class="fold-btn" aria-expanded="false" aria-controls="chainBody">
         <span><span class="en">Industry Chain</span><span class="ko">산업 분야</span></span>
         <span class="chev" aria-hidden="true">+</span>
       </button>
       <div class="panel" id="chainBody">
-      <div class="fields">
+      <div class="fields" id="industryFields">
         <div><strong>Medical Imaging</strong><em>의료영상</em></div>
         <div><strong>IVD</strong><em>체외진단</em></div>
         <div><strong>Operating Room</strong><em>수술실</em></div>
@@ -1143,7 +1134,7 @@
       </div>
     </section>
 
-    <section class="fold">
+    <section class="fold" data-fold="shows">
       <button type="button" class="fold-btn" aria-expanded="false" aria-controls="showBody">
         <span><span class="en">Concurrent Shows</span><span class="ko">동기간 전시</span></span>
         <span class="chev" aria-hidden="true">+</span>
@@ -1160,6 +1151,15 @@
         <article class="show" data-show="lifestyle"><svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="16" fill="none" stroke="#1a1a1a" stroke-width="1.6"/><path d="M16 26c2-6 4-8 8-8s6 2 8 8" fill="none" stroke="#1a1a1a" stroke-width="1.6" stroke-linecap="round"/></svg><p class="en">Healthy Lifestyle</p><p class="ko">건강 생활</p><div class="slot"></div></article>
       </div>
       </div>
+    </section>
+
+    <section class="fold psr" data-fold="psr">
+      <button type="button" class="fold-btn" id="psrBtn" aria-expanded="false" aria-controls="psrMenu">
+        <span><span class="en">PSR</span><span class="ko">Post Show Report</span></span>
+        <span class="chev" aria-hidden="true">+</span>
+      </button>
+      <div class="psr-menu" id="psrMenu" hidden></div>
+      <div class="brief" id="historyBrief" hidden></div>
     </section>
   </div>
   </header>
@@ -1466,54 +1466,26 @@ HQI light × 1</span></td>
       briefBox.hidden = false;
       psrBtn.setAttribute("aria-expanded", "true");
       psrBtn.querySelector(".chev").textContent = "–";
-      var html =
+      briefBox.innerHTML =
         '<p class="en">' + fair.no + " " + fair.en + "</p>" +
-        '<p class="ko">' + fair.ko + " · " + fair.placeKo + "</p>" +
-        "<ul>" +
-        "<li>" + fair.date + "<span>일정</span></li>" +
-        "<li>" + fair.place + "<span>장소</span></li>" +
-        (fair.note ? "<li>" + fair.note + "<span>규모</span></li>" : "") +
-        "</ul>";
-      if (fair.report) {
-        html +=
-          '<div class="stats">' +
-          '<div class="stat"><b>320,000+</b><span class="en">sqm</span><span class="ko">전시면적</span></div>' +
-          '<div class="stat"><b>5,000</b><span class="en">Exhibitors</span><span class="ko">참가업체 · 약</span></div>' +
-          '<div class="stat"><b>19</b><span class="en">Countries</span><span class="ko">참가 국가·지역</span></div>' +
-          '<div class="stat"><b>150+</b><span class="en">Countries</span><span class="ko">참관 국가·지역</span></div>' +
-          '<div class="stat"><b>300,000+</b><span class="en">Professionals</span><span class="ko">전문 참관</span></div>' +
-          '<div class="stat"><b>1,000+</b><span class="en">Launches</span><span class="ko">신제품</span></div>' +
-          '<div class="stat"><b>100+</b><span class="en">Conferences</span><span class="ko">컨퍼런스</span></div>' +
-          '<div class="stat"><b>28%</b><span class="en">International Attendees</span><span class="ko">제91회 대비 증가</span></div>' +
-          '<div class="stat"><b>90.1%</b><span class="en">Exhibitor Satisfaction</span><span class="ko">참가업체 만족</span></div>' +
-          '<div class="stat"><b>91.5%</b><span class="en">Attendee Satisfaction</span><span class="ko">참관 만족</span></div>' +
-          '<div class="stat"><b>94.2%</b><span class="en">Return Exhibitors</span><span class="ko">다음 회 참가 의향</span></div>' +
-          '<div class="stat"><b>88.9%</b><span class="en">Return Visitors</span><span class="ko">다음 회 방문 의향</span></div>' +
-          "</div>" +
-          "<ul>" +
-          "<li>KMDA 한국 공동관<span>의료영상 · 수술기구 · 디지털 헬스</span></li>" +
-          "<li>WeTalk 19회 · 11개 국가·지역<span>한국 세션 포함</span></li>" +
-          "<li>러시아 인허가 기관 대표단<span>시장 진출 설명회</span></li>" +
-          "<li>현장 상담 200건 이상<span>혁신·프리미엄 제품 40종 이상</span></li>" +
-          "<li>iCMEF 연중 문의 10,000건 이상<span>혁신 제품 1,000종 이상</span></li>" +
-          "<li>CRS · CECN · Life Care<span>40,000㎡ 이상 · 참가 500곳 이상 · 신제품 2,000종 이상</span></li>" +
-          "<li>AHC, KMDA 단체 첫 참가<span>참가업체 약 30곳 · 900㎡</span></li>" +
-          "</ul>";
-      }
-      briefBox.innerHTML = html;
+        '<p class="ko">' + (fair.ko || "") + "</p>";
     }
-    yearOrder.forEach(function (year) {
-      byYear[year].slice().reverse().forEach(function (fair) {
+    function paintPsr(list) {
+      menu.innerHTML = "";
+      briefBox.hidden = true;
+      briefBox.innerHTML = "";
+      list.forEach(function (fair) {
         var button = document.createElement("button");
         button.type = "button";
-        button.innerHTML = '<span class="en">' + fair.year + " " + fair.no + "</span><span class=\"ko\">" + fair.en + " · " + fair.ko + "</span>";
+        button.innerHTML = '<span class="en">' + (fair.year ? fair.year + " " : "") + fair.no + "</span><span class=\"ko\">" + fair.en + (fair.ko ? " · " + fair.ko : "") + "</span>";
         button.addEventListener("click", function (event) {
           event.stopPropagation();
           showBrief(fair, button);
         });
         menu.appendChild(button);
       });
-    });
+    }
+    paintPsr(fairs);
     function markPsr(open) {
       psrBtn.setAttribute("aria-expanded", open ? "true" : "false");
       psrBtn.querySelector(".chev").textContent = open ? "–" : "+";
@@ -1967,6 +1939,55 @@ HQI light × 1</span></td>
             if (button && saved.dataStats[name]) button.querySelector("b").textContent = saved.dataStats[name];
           });
         }
+        var foldBox = document.getElementById("folds");
+        var foldOrder = saved.foldOrder && saved.foldOrder.length ? saved.foldOrder : ["visitor", "chain", "shows", "psr"];
+        foldOrder.forEach(function (name) {
+          var node = foldBox.querySelector('[data-fold="' + name + '"]');
+          if (node) foldBox.appendChild(node);
+        });
+        if (saved.visitors && saved.visitors.length) {
+          var rows = document.getElementById("visitorRows");
+          rows.innerHTML = "";
+          saved.visitors.forEach(function (item) {
+            var row = document.createElement("div");
+            row.className = "row";
+            row.innerHTML = '<div><span class="name"></span><span class="ko"></span></div><strong></strong><div class="track"><i></i></div>';
+            row.querySelector(".name").textContent = item.en || "";
+            row.querySelector(".ko").textContent = item.ko || "";
+            row.querySelector("strong").textContent = item.pct || "";
+            row.querySelector("i").style.width = item.pct || "0";
+            rows.appendChild(row);
+          });
+        }
+        if (saved.reasons && saved.reasons.length) {
+          var reasons = document.getElementById("visitReasons");
+          reasons.innerHTML = "";
+          saved.reasons.forEach(function (item) {
+            var node = document.createElement("div");
+            node.className = "reason";
+            node.innerHTML = "<b></b><span class=\"en\"></span>";
+            node.querySelector("b").textContent = item.pct || "";
+            node.querySelector(".en").textContent = item.en || "";
+            reasons.appendChild(node);
+          });
+        }
+        if (saved.industries && saved.industries.length) {
+          var fields = document.getElementById("industryFields");
+          fields.innerHTML = "";
+          saved.industries.forEach(function (item) {
+            var node = document.createElement("div");
+            node.innerHTML = "<strong></strong><em></em>";
+            node.querySelector("strong").textContent = item.en || "";
+            node.querySelector("em").textContent = item.ko || "";
+            fields.appendChild(node);
+          });
+        }
+        if (saved.showIds && saved.showIds.length) {
+          document.querySelectorAll("#showBody .show").forEach(function (card) {
+            card.hidden = saved.showIds.indexOf(card.getAttribute("data-show")) < 0;
+          });
+        }
+        if (Array.isArray(saved.psrList)) paintPsr(saved.psrList);
         if (saved.hostName) document.getElementById("hostName").textContent = saved.hostName;
         if (saved.applyPeriod) document.getElementById("applyPeriod").textContent = saved.applyPeriod;
         ["0", "1", "2"].forEach(function (n) {
