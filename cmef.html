@@ -994,7 +994,7 @@
         gap: 16px;
         align-items: start;
       }
-      #map.list-right .sheet-row:has(.roster.is-closed) {
+      #map.list-right .sheet-row:has(.company-list.is-closed) {
         grid-template-columns: minmax(0, 1fr) auto;
       }
       #map.list-bottom .sheet-row {
@@ -1029,9 +1029,15 @@
       font-weight: 680;
       cursor: pointer;
     }
-    .roster.is-closed > table,
-    .roster.is-closed > h3,
-    .roster.is-closed > .hall-hint { display: none !important; }
+    .company-list.is-closed .roster { display: none !important; }
+    .company-list.is-closed {
+      width: auto !important;
+      height: auto !important;
+      max-height: none !important;
+      overflow: visible !important;
+      align-self: start !important;
+      border: 0 !important;
+    }
   </style>
 </head>
 <body>
@@ -1290,8 +1296,8 @@ HQI light × 1</span></td>
               <thead><tr><th>부스 번호</th><th>기업명</th><th>품목분류</th><th>전시 제품</th><th>등급</th></tr></thead>
               <tbody id="applyRosterBody"></tbody>
             </table>
-            <button type="button" class="list-hide">감추기</button>
           </div>
+          <button type="button" class="list-hide">감추기</button>
         </div>
       </div>
       <div id="sectionMap" hidden>
@@ -1308,8 +1314,8 @@ HQI light × 1</span></td>
             <thead><tr><th>부스 번호</th><th>기업명</th><th>품목분류</th><th>전시 제품</th><th>인허가</th></tr></thead>
             <tbody id="sectionRoster"></tbody>
           </table>
-          <button type="button" class="list-hide">감추기</button>
           </div>
+          <button type="button" class="list-hide">감추기</button>
         </div>
         </div>
       </div>
@@ -1339,8 +1345,8 @@ HQI light × 1</span></td>
             </thead>
             <tbody id="rosterBody"></tbody>
           </table>
-          <button type="button" class="list-hide">감추기</button>
           </div>
+          <button type="button" class="list-hide">감추기</button>
         </div>
         </div>
       </div>
@@ -2145,9 +2151,13 @@ HQI light × 1</span></td>
     applyList();
     document.querySelectorAll("#map .list-hide").forEach(function (button) {
       button.addEventListener("click", function () {
-        var roster = button.closest(".roster");
-        var closed = roster.classList.toggle("is-closed");
+        var box = button.closest(".company-list");
+        var closed = box.classList.toggle("is-closed");
         button.textContent = closed ? "보이기" : "감추기";
+        document.querySelectorAll("#map p, #map div, #map span, #map td").forEach(function (el) {
+          if (el.children.length) return;
+          if ((el.textContent || "").indexOf("아직 놓은") >= 0) el.remove();
+        });
       });
     });
 
