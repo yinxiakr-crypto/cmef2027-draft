@@ -591,7 +591,7 @@
       padding: 0 0 28px;
       box-sizing: border-box;
       position: relative;
-      overflow-x: hidden;
+      overflow-x: visible;
     }
     .map-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
     .map-head h2 { margin-top: 0; }
@@ -986,33 +986,34 @@
       header .stat.on { background: #141210; color: #fff; }
       header .stat { cursor: pointer; pointer-events: auto; }
     }
-    #map.list-right .sheet-row {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: flex-start;
-      gap: 12px;
-    }
-    #map.list-right .sheet-row > :first-child {
-      flex: 1 1 360px;
-      min-width: 0;
-      max-width: 100%;
-    }
-    #map.list-right .company-list {
-      flex: 0 1 300px;
-      width: 300px;
-      max-width: 100%;
-      margin-top: 0;
-    }
-    #map.list-right .company-list:has(.roster.is-closed) {
-      flex: 0 0 auto;
-      width: auto;
-    }
-    #map.list-bottom .sheet-row { display: block; }
-    #map.list-bottom .company-list {
-      display: block;
-      width: 100%;
-      max-width: 100%;
-      margin-top: 12px;
+    @media (min-width: 861px) {
+      #map { overflow-x: visible; }
+      #map.list-right .sheet-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 16px;
+        align-items: start;
+      }
+      #map.list-right .sheet-row:has(.roster.is-closed) {
+        grid-template-columns: minmax(0, 1fr) auto;
+      }
+      #map.list-bottom .sheet-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+      }
+      #map.list-right .company-list,
+      #map.list-bottom .company-list {
+        width: auto;
+        max-width: none;
+        min-width: 0;
+        margin-top: 0;
+      }
+      #map .plan img.sheet,
+      #map img.venue {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+      }
     }
     .list-hide {
       display: block;
