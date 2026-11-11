@@ -1323,7 +1323,7 @@ HQI light × 1</span></td>
         <button type="button" class="back" id="backHall">전체 도면</button>
         <div class="sheet-row">
         <div class="plan" id="koreaPlan">
-          <img class="sheet" id="koreaPlanImg" alt="한국관 도면" src="halls/korea-plan.png">
+          <img class="sheet" id="koreaPlanImg" alt="한국관 도면" src="halls/korea-plan2.png">
         <div class="booths" id="booths" aria-label="한국관 부스">
           <div class="booth" data-c="1" data-r="1" style="--c:1;--r:1"><b>번호</b><span>3×3</span></div>
           <div class="booth" data-c="3" data-r="1" style="--c:3;--r:1"><b>번호</b><span>3×3</span></div>
@@ -1919,7 +1919,7 @@ HQI light × 1</span></td>
         if (saved.applyLink) window.cmefApplyLink = saved.applyLink;
         if (saved.planOff) {
           document.getElementById("koreaPlanImg").hidden = true;
-        } else if (saved.koreaPlan) {
+        } else if (saved.koreaPlan && saved.koreaPlan.indexOf("korea-plan.png") < 0 && saved.koreaPlan.indexOf("korea-plan2.png") < 0) {
           showKoreaImage(saved.koreaPlan);
         }
         if (saved.venueOff) {
@@ -2023,7 +2023,7 @@ HQI light × 1</span></td>
     });
     var koreaSheet = document.getElementById("koreaPlanImg");
     if (koreaSheet && !koreaSheet.hidden && (!koreaSheet.getAttribute("src") || koreaSheet.getAttribute("src").indexOf("korea-plan") >= 0)) {
-      showKoreaImage(koreaSheet.getAttribute("src") || "halls/korea-plan.png");
+      showKoreaImage(koreaSheet.getAttribute("src") || "halls/korea-plan2.png");
     }
     paintApplicantList();
     (function () {
