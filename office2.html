@@ -1,0 +1,2012 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>전시회 관리</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <style>
+    :root {
+      --ink: #1c1a17;
+      --muted: #8a817a;
+      --line: #e4ddd2;
+      --paper: #faf7f2;
+      --red: #9b1b30;
+      --deep: #141210;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Pretendard, "Malgun Gothic", sans-serif;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .wrap { width: min(1360px, calc(100% - 24px)); margin: 0 auto; }
+    header { padding: 28px 0 4px; }
+    h1 { margin: 0; font-size: clamp(28px, 5vw, 36px); letter-spacing: -0.04em; font-weight: 680; }
+    .who { margin: 10px 0 0; color: var(--muted); font-size: 14px; line-height: 1.6; }
+    .bar {
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      background: rgba(250, 247, 242, 0.94);
+      border-bottom: 1px solid var(--line);
+      margin-top: 18px;
+    }
+    nav { display: flex; gap: 8px; overflow-x: auto; padding: 12px 0; }
+    nav a {
+      flex: 0 0 auto;
+      color: var(--ink);
+      text-decoration: none;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 14px;
+    }
+    nav a.to-visitor {
+      background: var(--deep);
+      color: #fff;
+      border-color: var(--deep);
+      font-weight: 680;
+    }
+    nav a.on {
+      background: var(--deep);
+      color: #fff;
+      border-color: var(--deep);
+    }
+    [hidden] { display: none !important; }
+    .visitor-check { margin-top: 14px; background: #fff; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+    .visitor-check-bar { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+    .visitor-check-bar b { margin-right: auto; font-size: 15px; }
+    .visitor-check-bar button {
+      width: auto;
+      margin: 0;
+      min-height: 36px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 680;
+      cursor: pointer;
+    }
+    .visitor-check iframe { display: block; width: 100%; height: 70vh; border: 0; background: var(--paper); }
+    .visitor-check.folded iframe,
+    .visitor-check.folded .visitor-check-bar { border-bottom: 0; }
+    .visitor-check.folded iframe { display: none; }
+    main { padding-bottom: 48px; }
+    article {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 20px;
+      margin-top: 14px;
+    }
+    .see { margin: 0 0 8px; font-size: 12px; color: var(--red); font-weight: 680; letter-spacing: 0.04em; }
+    .see a { color: inherit; }
+    h2 { margin: 0; font-size: 22px; letter-spacing: -0.03em; }
+    .tag {
+      display: inline-block;
+      margin-left: 8px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--deep);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 680;
+      vertical-align: 3px;
+    }
+    p { margin: 8px 0 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
+    label { display: block; margin-top: 14px; font-size: 13px; font-weight: 680; }
+    input[type="color"] {
+      width: 44px;
+      height: 32px;
+      padding: 2px;
+    }
+    input, textarea, select {
+      width: 100%;
+      margin-top: 6px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      font: inherit;
+      background: var(--paper);
+    }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .pick-block h3 { margin: 18px 0 0; font-size: 15px; }
+    .pick-block p { margin-top: 4px; }
+    .picks { display: block; margin-top: 8px; }
+    .chosen { list-style: none; margin: 8px 0 0; padding: 0; }
+    .chosen li { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 6px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: #fff; font-size: 13px; font-weight: 550; }
+    .picks label, label.tick {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      width: auto;
+      margin: 0;
+      padding: 6px 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 550;
+      background: #fff;
+    }
+    label.tick { margin-top: 8px; }
+    .picks input, label.tick input { width: auto; margin: 0; }
+    .kr-row, .product-row { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+    .kr-row input, .product-row input { margin-top: 0; }
+    button.add.slim { min-height: 32px; margin-top: 0; padding: 0 12px; border-radius: 8px; font-size: 13px; }
+    .booths {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-auto-rows: minmax(92px, auto);
+      gap: 10px;
+      margin-top: 12px;
+      padding: 10px;
+      background: var(--paper);
+      border: 1px dashed var(--line);
+    }
+    .booths .spot {
+      grid-column: var(--c);
+      grid-row: var(--r);
+      background: #fff;
+      border: 1px solid var(--line);
+      padding: 6px;
+      cursor: grab;
+    }
+    .booths .spot input { margin-top: 4px; padding: 6px; width: 100%; }
+    .booths .spot button {
+      margin-top: 4px;
+      min-height: 28px;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .editor-tools {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: end;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .editor-tools label { margin-top: 0; min-width: 180px; }
+    .editor-tools .tools { margin-left: auto; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .editor-tools button.tool,
+    .editor-tools input.hall-new {
+      height: 34px;
+      margin: 0;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      font: inherit;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .editor-tools input.hall-new { width: 88px; cursor: text; }
+    .editor-tools button.tool.danger { background: #fdecef; }
+    .editor-tools button.tool.primary { background: var(--deep); color: #fff; border-color: var(--deep); }
+    .editor-side h3 { margin: 0; padding: 12px; font-size: 16px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .editor-side h3 span { float: none; color: var(--muted); font-size: 12px; font-weight: 680; }
+    .editor-pair {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      align-items: start;
+      margin-top: 12px;
+    }
+    .editor-pair > * { min-width: 0; }
+    .editor-side {
+      min-width: 0;
+      max-height: 70vh;
+      overflow: auto;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+    .editor-side .entry {
+      display: block;
+      width: 100%;
+      padding: 10px 12px;
+      border: 0;
+      border-bottom: 1px solid var(--line);
+      background: #fff;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+    .editor-side .dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      margin-right: 8px;
+      border-radius: 50%;
+      vertical-align: middle;
+    }
+    .editor-side .entry b { display: inline; margin-right: 8px; }
+    .editor-side .entry span { color: var(--muted); font-size: 12px; }
+    .editor-side .entry .drop {
+      float: right;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .pin-note { min-height: 1.4em; margin: 12px 0 0; color: var(--ink); }
+    .form-end { display: flex; justify-content: flex-end; gap: 8px; }
+    .form-end button.add { width: 160px; margin-top: 8px; }
+    .form-end button[hidden] { display: none; }
+    .editor-side .entry.on,
+    .plan-board .booth-box.on { background: #d7f3ea; }
+    .plan-board {
+      position: relative;
+      margin-top: 0;
+      min-width: 0;
+      min-height: 420px;
+      background: #efece6;
+      border: 1px solid var(--line);
+      cursor: crosshair;
+      overflow: hidden;
+    }
+    .plan-board img { display: block; width: 100%; max-width: 100%; min-width: 0; height: auto; background: #fff; }
+    .plan-board p { margin: 0; padding: 16px; }
+    #sectionBoard { aspect-ratio: 16 / 9; min-height: 0; }
+    .plan-board .booth-box {
+      position: absolute;
+      z-index: 1;
+      box-sizing: border-box;
+      border: 2px solid #1f8f72;
+      background: rgba(31, 143, 114, 0.16);
+    }
+    .plan-board .booth-box.on { background: rgba(31, 143, 114, 0.4); }
+    .plan-board .pin {
+      position: absolute;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: auto;
+      height: auto;
+      padding: 3px 6px;
+      border: 0;
+      border-radius: 4px;
+      background: #3c4450;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 720;
+      line-height: 1.25;
+      text-align: center;
+      white-space: nowrap;
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+    }
+    .plan-board .pin span { font-size: 10px; font-weight: 650; }
+    .plan-board .pin.on { outline: 3px solid #1c1a17; box-shadow: 0 0 0 3px #fff; z-index: 4; }
+    .plan-board .pin.idle, .plan-board .booth-box.idle { opacity: 0; }
+    .use { margin: 8px 0 0; padding-left: 18px; font-size: 13px; line-height: 1.6; }
+    .editor-side h3 button.release {
+      margin-left: 8px;
+      padding: 2px 8px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 12px;
+      font-weight: 650;
+      cursor: pointer;
+    }
+    .venue-board { position: relative; margin-top: 12px; cursor: crosshair; }
+    .venue-board img { display: block; width: 100%; height: auto; }
+    .zone-draw {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .zone-draw polygon { fill: rgba(155, 27, 48, 0.16); stroke: #9b1b30; stroke-width: 0.35; pointer-events: none; }
+    .zone-draw polyline { fill: none; stroke: #9b1b30; stroke-width: 0.28; pointer-events: none; }
+    .zone-dot {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      margin: -4px 0 0 -4px;
+      border: 0;
+      border-radius: 50%;
+      background: #9b1b30;
+      padding: 0;
+      cursor: pointer;
+      z-index: 2;
+    }
+    .zone-actions {
+      display: grid;
+      grid-template-columns: repeat(3, 112px);
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .zone-actions button.add {
+      width: 112px;
+      min-height: 28px;
+      margin-top: 0;
+      padding: 0 6px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 640;
+    }
+    #map { width: auto; margin-left: 0; transform: none; }
+    button.save, button.add {
+      margin-top: 16px;
+      min-height: 48px;
+      border: 0;
+      border-radius: 12px;
+      background: var(--deep);
+      color: #fff;
+      font: inherit;
+      font-weight: 680;
+      padding: 0 18px;
+      cursor: pointer;
+    }
+    .frame {
+      display: grid;
+      place-items: center;
+      min-height: 140px;
+      margin-top: 8px;
+      border: 1px dashed var(--line);
+      border-radius: 12px;
+      background: var(--paper);
+      color: var(--muted);
+      font-size: 13px;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    .frame img { width: 100%; height: 180px; object-fit: contain; background: #fff; }
+    @media (max-width: 640px) {
+      .booths { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    .editor {
+      min-height: 88px;
+      margin-top: 6px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      line-height: 1.5;
+    }
+    .list { margin: 14px 0 0; padding: 0; list-style: none; }
+    .list li { padding: 12px 0; border-top: 1px solid var(--line); font-size: 14px; }
+    .status { margin: 18px 0 0; font-size: 14px; }
+    @media (max-width: 900px) {
+      .editor-pair { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 720px) {
+      .row, .booths { grid-template-columns: 1fr 1fr; }
+      h1 { font-size: 28px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>전시회 관리</h1>
+      <p class="who">같은 메뉴에서 내용을 넣고 고칩니다. 저장은 이 브라우저의 시안에만 반영됩니다.</p>
+    </div>
+  </header>
+  <div class="bar">
+    <div class="wrap">
+      <nav>
+        <a href="#intro">전시 소개</a>
+        <a href="#apply">참가 신청</a>
+        <a href="#map">전시 도면</a>
+        <a href="#match">바이어 매칭</a>
+        <a href="#notice">공지</a>
+        <a class="to-visitor" href="fair.html">방문자로 보기</a>
+      </nav>
+    </div>
+  </div>
+  <div class="wrap">
+    <section class="visitor-check" id="visitorCheck">
+      <div class="visitor-check-bar">
+        <b>방문자 화면</b>
+        <button type="button" id="visitorRefresh">다시 보기</button>
+        <button type="button" id="visitorFold" aria-expanded="true">접기</button>
+      </div>
+      <iframe id="visitorFrame" title="방문자 화면" src="show2.html?preview=1#intro"></iframe>
+    </section>
+  </div>
+  <main class="wrap">
+    <article id="intro">
+      <p class="see">방문자 화면 · <a href="fair.html#intro">전시 소개</a></p>
+      <h2>전시 소개</h2>
+      <p>기본 정보와 부스 종류는 여기 있습니다. 브로셔 PDF를 올리면 규모 숫자를 읽어서 방문자 화면의 Data에 넣습니다. 파일에 없는 숫자는 바꾸지 않습니다.</p>
+      <label>주최<input id="hostName" placeholder="주최"></label>
+      <div class="row">
+        <label>신청 시작<input id="applyStart" type="date"></label>
+        <label>신청 마지막 날<input id="applyEnd" type="date"></label>
+      </div>
+      <label>브로셔 PDF<input id="brochureFile" type="file" accept="application/pdf,.pdf"></label>
+      <p id="brochureNote"></p>
+      <label>브로셔 파일 이름<input id="brochure" placeholder="95th CMEF Brochure"></label>
+      <label>소개 글
+        <div id="introNote" class="editor" contenteditable="true"></div>
+      </label>
+      <h2 style="margin-top:22px">부스 <span class="tag">금액 · 종류</span></h2>
+      <p>Raw space는 양탄자 그림입니다. Shell scheme 사진은 하나이고, Information을 Standard와 Upgrade 두 줄로 나눕니다. 금액이 달라서 셋 다 고를 수 있습니다. 화폐는 베트남과 같은 화면이라 여기서 고릅니다.</p>
+      <label>화폐
+        <select id="currency">
+          <option value="USD">USD</option>
+          <option value="KRW">KRW</option>
+          <option value="VND">VND</option>
+          <option value="CNY">CNY</option>
+        </select>
+      </label>
+      <label>1. Raw space<input id="typeName0"></label>
+      <label>Information<input id="typeInfo0"></label>
+      <div class="row">
+        <label>크기<input id="typeArea0"></label>
+        <label>금액 <span class="money-name">USD</span> · 9㎡<input id="typePrice0"></label>
+      </div>
+      <label>비품<input id="typeKit0"></label>
+      <label class="pic">그림
+        <input id="pic0" type="file" accept="image/*" hidden>
+        <span class="frame" id="frame0"><img src="booths/raw.png" alt="Raw space"></span>
+      </label>
+      <label class="pic">Shell scheme 그림
+        <input id="pic1" type="file" accept="image/*" hidden>
+        <span class="frame" id="frame1"><img src="booths/standard.png" alt="Shell scheme"></span>
+      </label>
+      <label>2. Standard<input id="typeName1"></label>
+      <label>Information<input id="typeInfo1"></label>
+      <div class="row">
+        <label>크기<input id="typeArea1"></label>
+        <label>금액 <span class="money-name">USD</span> · 9㎡<input id="typePrice1"></label>
+      </div>
+      <label>비품<input id="typeKit1"></label>
+      <label>3. Upgrade<input id="typeName2"></label>
+      <label>Information<input id="typeInfo2"></label>
+      <div class="row">
+        <label>크기<input id="typeArea2"></label>
+        <label>금액 <span class="money-name">USD</span> · 9㎡<input id="typePrice2" placeholder="이 타입 금액"></label>
+      </div>
+      <label>비품<input id="typeKit2"></label>
+    </article>
+
+    <article id="apply">
+      <p class="see">방문자 화면 · <a href="fair.html#apply">참가 신청</a></p>
+      <h2>참가 신청</h2>
+      <p>기본 정보는 방문자 화면에서 받습니다. 전시회 신청을 누르면 아래 주소의 CMEF 신청서로 연결됩니다. 부스 번호는 여기서 나중에 넣습니다.</p>
+      <label>CMEF 신청서 주소<input id="applyLink" placeholder="https://sinoseoul.co.kr/marketing/information/application/48"></label>
+      <div class="row">
+        <label>부스 번호<input id="appBooth" placeholder="확정 후 부여"></label>
+        <label>기업명<input id="appCompany" placeholder="기업명"></label>
+      </div>
+      <div class="pick-block">
+        <h3>한국 품목분류</h3>
+        <p>드롭다운을 열면 품목분류가 나옵니다. 여러 개면 하나씩 더 고릅니다. 없으면 기타, 모르면 모름.</p>
+        <div class="picks" id="krPicks"></div>
+      </div>
+      <div class="pick-block">
+        <h3>중국 분류번호 · 일반의료기기</h3>
+        <p>한국 품목분류를 고른 뒤에 적습니다. 여러 개면 하나씩 더 고릅니다. 목록에 없으면 기타, 모르면 모름.</p>
+        <div class="picks" id="cnDevicePicks"></div>
+      </div>
+      <div class="pick-block">
+        <h3>중국 분류번호 · 체외진단제</h3>
+        <p>한국 품목분류를 고른 뒤에 적습니다. 여러 개면 하나씩 더 고릅니다. 목록에 없으면 기타, 모르면 모름.</p>
+        <div class="picks" id="cnIvdPicks"></div>
+      </div>
+      <div class="pick-block">
+        <h3>전시 제품</h3>
+        <p>하나일 수도 있고 여러 개일 수도 있습니다.</p>
+        <div id="productRows"></div>
+        <button class="add slim" type="button" id="addProduct">제품 추가</button>
+      </div>
+      <div class="pick-block">
+        <h3>인허가</h3>
+        <p>드롭다운에서 한국, 중국, 기타를 고릅니다. 여러 곳이면 하나씩 더 고릅니다. 도면의 그 기업에 같이 표시됩니다.</p>
+        <div class="picks" id="authPicks"></div>
+      </div>
+      <div class="row">
+        <div class="pick-block">
+          <h3>중국 등급</h3>
+          <p>드롭다운에서 1–3등급을 고릅니다. 모르면 모름. 여러 등급이면 하나씩 더 고릅니다.</p>
+          <div class="picks" id="cnGradePicks"></div>
+        </div>
+        <div class="pick-block">
+          <h3>한국 등급</h3>
+          <p>드롭다운에서 1–4등급을 고릅니다. 모르면 모름. 여러 등급이면 하나씩 더 고릅니다.</p>
+          <div class="picks" id="krGradePicks"></div>
+        </div>
+      </div>
+      <button class="add" type="button" id="addApp">이 신청을 목록에 넣기</button>
+      <p class="status" id="applyStatus"></p>
+      <ul class="list" id="appList"></ul>
+    </article>
+
+    <article id="map">
+      <p class="see">방문자 화면 · <a href="fair.html#map">전시 도면</a></p>
+      <h2>전시 도면 <span class="tag">CMEF</span></h2>
+      <p>도면 위를 눌러 점을 차례로 찍습니다. 그리는 동안에는 점과 점만 이어지고, 처음과 끝을 잇는 선은 구획 확정 뒤에 닫힙니다. 잘못 찍은 빨간 점을 누르면 그 점만 빠집니다. 구획 확정만으로 그 관을 누르면 그 관의 기업 위치로 이동합니다. 아래 시안 반영은 다른 정보를 다 적은 뒤에 누릅니다.</p>
+      <label>이 구획의 관<select id="zoneHall"></select></label>
+      <div class="venue-board" id="venueBoard" hidden>
+        <img id="venuePreview" alt="">
+        <svg class="zone-draw" id="zoneDraw" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+        <div id="zoneDots"></div>
+      </div>
+      <div class="zone-actions">
+        <button class="add" type="button" id="zoneCancel">마지막 점 취소</button>
+        <button class="add" type="button" id="zoneDone">구획 확정</button>
+        <button class="add" type="button" id="venueDelete">도면 삭제</button>
+      </div>
+      <h2 style="margin-top:22px">한국관 도면</h2>
+      <ol class="use">
+        <li><b>등록</b> 적은 기업을 새 줄로 목록에 추가합니다. 버튼 글자가 수정으로 바뀌지 않습니다.</li>
+        <li><b>수정</b> 오른쪽 목록의 기업을 누르면 그 기업을 고칠 수 있습니다. 고친 뒤 아래 수정을 누르면 그 기업만 저장됩니다.</li>
+        <li><b>도면의 칸</b> 방금 등록한 기업의 칸을 한 번 누르면 번호와 기업 이름이 놓입니다. 같은 자리를 다시 누르면 그 표시가 꺼집니다. 이미 기업이 있는 칸에는 겹쳐서 놓을 수 없습니다.</li>
+        <li><b>오른쪽 목록</b> 기업을 누르면 왼쪽 도면의 자리도 같이 표시됩니다.</li>
+        <li><b>선택 해제</b> 도면의 표시만 끕니다. 기업은 목록에 남고, 여기서 선택에서 빠져나옵니다.</li>
+        <li><b>빼기</b> 그 기업을 목록에서 뺍니다.</li>
+        <li><b>이미지 변경</b> 이 관의 도면 그림을 바꿉니다. <b>삭제</b>는 그림만 빼고 기업 목록은 남깁니다.</li>
+      </ol>
+      <div class="editor-tools">
+        <label>관<select id="pinHall"></select></label>
+        <div class="tools">
+          <button class="tool" type="button" id="boothCount">부스 개수 <b id="boothTotal">0</b></button>
+          <button class="tool" type="button" id="planPick">이미지 변경</button>
+          <button class="tool danger" type="button" id="planDelete">삭제</button>
+          <input class="hall-new" id="newHall" placeholder="관 번호">
+          <button class="tool primary" type="button" id="addHall">+ 전시관 추가</button>
+        </div>
+      </div>
+      <input id="planFile" type="file" accept="image/jpeg,image/png,.jpg,.jpeg,.png" hidden>
+      <div class="row">
+        <label>기업 이름<input id="pinCompany" placeholder="기업 이름"></label>
+        <label>위치<input id="pinBooth" placeholder="예: 5.2F38"></label>
+      </div>
+      <label>색상<input id="pinColor" type="color" value="#2ec4b6"></label>
+      <div class="row">
+        <label>전시 제품<input id="pinProduct" placeholder="공개할 제품"></label>
+        <label>인허가<input id="pinAuth" placeholder="한국 · 중국 · 기타"></label>
+      </div>
+      <p class="pin-note" id="pinNote"></p>
+      <div class="form-end">
+        <button class="add" type="button" id="updateBooth" hidden>수정</button>
+        <button class="add" type="button" id="registerBooth">등록</button>
+      </div>
+      <div class="editor-pair">
+        <div>
+          <div class="plan-board" id="planBoard">
+            <img id="planImg" alt="" hidden>
+            <p id="planEmpty">도면에서 그 부스가 있는 칸을 한 번 누르면 번호가 놓입니다.</p>
+          </div>
+          <p class="pin-note" id="planClickNote"></p>
+          <div class="plan-board" id="sectionBoard" hidden>
+            <p>이 관의 섹션입니다. 누르면 기업 위치가 놓입니다.</p>
+          </div>
+        </div>
+        <aside class="editor-side">
+          <h3>기업 <button class="release" type="button" id="releasePick">선택 해제</button> <span id="listTotal">TOTAL : 0</span></h3>
+          <div id="editorList"></div>
+        </aside>
+      </div>
+      <div class="row">
+        <label>관 번호<input id="hall0" placeholder="8.2"></label>
+        <label>관 번호<input id="hall1" placeholder="7.2"></label>
+      </div>
+      <div class="row">
+        <label>관 번호<input id="hall2" placeholder="6.2"></label>
+        <label>관 번호<input id="hall3" placeholder="5.2"></label>
+      </div>
+      <label>관 번호<input id="hall4" placeholder="4.2"></label>
+      <label>국제관이 있는 관<input id="koreaHall" placeholder="5.2"></label>
+      <div class="row">
+        <label>관 이름<input id="hallName0" placeholder="이름"></label>
+        <label>관 이름<input id="hallName1" placeholder="Imaging"></label>
+      </div>
+      <div class="row">
+        <label>관 이름<input id="hallName2" placeholder="이름"></label>
+        <label>관 이름<input id="hallName3" placeholder="국제관"></label>
+      </div>
+      <label>관 이름<input id="hallName4" placeholder="이름"></label>
+    </article>
+
+    <article id="match">
+      <p class="see">방문자 화면 · <a href="fair.html#match">바이어 매칭</a></p>
+      <h2>바이어 매칭</h2>
+      <p>인허가 여부에 따라 바이어 소개가 달라집니다. 소개 방식은 다음 설명에서 넣습니다.</p>
+    </article>
+
+    <article id="shows">
+      <p class="see">방문자 화면 · <a href="fair.html">동기간 전시</a></p>
+      <h2>동기간 전시</h2>
+      <p>담당하는 섹터만 내용을 넣습니다. 나머지 카드는 로고와 이름만 둡니다.</p>
+      <label>섹터
+        <select id="sector">
+          <option value="">선택</option>
+          <option value="icmd">Component &amp; Design</option>
+          <option value="crs">Rehabilitation</option>
+          <option value="cecn">Elderly Care</option>
+          <option value="homecare">Home Care</option>
+          <option value="intelligent">Intelligent Health</option>
+          <option value="ahc">Animal Health</option>
+          <option value="emergency">Emergency Rescue</option>
+          <option value="lifestyle">Healthy Lifestyle</option>
+        </select>
+      </label>
+      <label>넣을 내용<textarea id="sectorNote" rows="3" placeholder="나중에 채울 안내"></textarea></label>
+    </article>
+
+    <article id="notice">
+      <p class="see">방문자 화면 · <a href="fair.html#notice">공지</a></p>
+      <h2>공지</h2>
+      <label>제목<input id="noticeTitle" placeholder="공지 제목"></label>
+      <label>내용<textarea id="noticeBody" rows="3"></textarea></label>
+    </article>
+
+    <button class="save" type="button" id="save">이 브라우저 시안에 반영</button>
+    <p class="status" id="status"></p>
+  </main>
+  <script>
+    var key = "cmef2027-draft";
+    var data = {
+      brochure: "",
+      hostName: "Reed Sinopharm Exhibitions",
+      applyPeriod: "",
+      applyStart: "",
+      applyEnd: "",
+      typeName0: "Raw space",
+      typeInfo0: "면적만 제공",
+      typeArea0: "가로 3m × 세로 3m",
+      typePrice0: "4,230",
+      typeKit0: "비품 없음",
+      typeName1: "Standard Shell Scheme",
+      typeInfo1: "기본조립부스",
+      typeArea1: "가로 3m × 세로 3m × 높이 4m",
+      typePrice1: "4,770",
+      typeKit1: "비품 없음",
+      typeName2: "Upgraded Shell Scheme",
+      typeInfo2: "기본 조립부스 + 라이트박스(간판, 국가관 이미지) + HQI light(×1)",
+      typeArea2: "가로 3m × 세로 3m × 높이 4m",
+      typePrice2: "",
+      typeKit2: "비품 Luminous International image · Luminous fascia board · HQI light × 1",
+      currency: "USD",
+      typePic0: "",
+      typePic1: "",
+      typePic2: "",
+      introNote: "",
+      halls: ["8.2", "7.2", "6.2", "5.2", "4.2"],
+      hallNames: ["", "Imaging", "", "국제관", ""],
+      koreaHall: "5.2",
+      koreaPlan: "",
+      venuePic: "",
+      venueOff: false,
+      zones: [],
+      booths: [
+        { n: "", c: 1, r: 1 },
+        { n: "", c: 3, r: 1 },
+        { n: "", c: 2, r: 2 },
+        { n: "", c: 4, r: 2 },
+        { n: "", c: 1, r: 4 },
+        { n: "", c: 4, r: 4 },
+        { n: "", c: 2, r: 5 },
+        { n: "", c: 3, r: 6 }
+      ],
+      applyLink: "",
+      apps: [],
+      sector: "",
+      sectorNote: "",
+      noticeTitle: "",
+      noticeBody: ""
+    };
+    try {
+      var stored = JSON.parse(localStorage.getItem(key) || "null");
+      if (stored) data = Object.assign(data, stored);
+    } catch (error) {}
+    var koreaSamples = [
+      { hall: "5.2", booth: "5.2F37", company: "비나셀", category: "의료기기", product: "매일착용소프트콘택트렌즈", auth: "미취득", grade: "", x: 29.8, y: 47.5 },
+      { hall: "5.2", booth: "5.2F38", company: "시노서울", category: "의료기기", product: "RF", auth: "미취득", grade: "", x: 21.8, y: 52.5 },
+      { hall: "5.2", booth: "5.2F39", company: "가나다", category: "의료기기", product: "test", auth: "미취득", grade: "", x: 39.9, y: 67.2 }
+    ];
+    if (!Array.isArray(data.apps)) data.apps = [];
+    koreaSamples.forEach(function (sample) {
+      var found = null;
+      data.apps.forEach(function (item) {
+        if (item.booth === sample.booth && item.company === sample.company) found = item;
+      });
+      if (!found) data.apps.push(sample);
+      else if (found.x == null || found.y == null) {
+        found.x = sample.x;
+        found.y = sample.y;
+      }
+    });
+    try { localStorage.setItem(key, JSON.stringify(data)); } catch (error) {}
+
+    var seeds = [
+      { c: 1, r: 1 }, { c: 3, r: 1 }, { c: 2, r: 2 }, { c: 4, r: 2 },
+      { c: 1, r: 4 }, { c: 4, r: 4 }, { c: 2, r: 5 }, { c: 3, r: 6 }
+    ];
+    data.booths = (Array.isArray(data.booths) ? data.booths : []).map(function (item, index) {
+      var name = typeof item === "string" ? item : (item && item.n) || "";
+      if (item && item.c) return { n: name, c: item.c, r: item.r };
+      var seed = seeds[index] || { c: (index % 4) + 1, r: Math.floor(index / 4) + 1 };
+      return { n: name, c: seed.c, r: seed.r };
+    });
+    if (!data.booths.length) {
+      data.booths = seeds.map(function (item) { return { n: "", c: item.c, r: item.r }; });
+    }
+    function nextCell(list) {
+      var used = {};
+      var maxRow = 1;
+      list.forEach(function (item) {
+        used[item.c + "," + item.r] = true;
+        if (item.r > maxRow) maxRow = item.r;
+      });
+      for (var row = 1; row <= maxRow + 1; row++) {
+        for (var col = 1; col <= 4; col++) {
+          if (!used[col + "," + row]) return { c: col, r: row };
+        }
+      }
+      return { c: 1, r: maxRow + 1 };
+    }
+    function place(item) {
+      if (window.innerWidth >= 640) return { c: item.c, r: item.r, cols: 4 };
+      return {
+        c: ((item.c - 1) % 2) + 1,
+        r: (item.r - 1) * 2 + Math.floor((item.c - 1) / 2) + 1,
+        cols: 2
+      };
+    }
+    var boothBox = document.getElementById("boothInputs");
+    function drawBooths() {
+      if (!boothBox) return;
+      boothBox.innerHTML = "";
+      data.booths.forEach(function (item, index) {
+        var at = place(item);
+        var spot = document.createElement("div");
+        spot.className = "spot";
+        spot.style.setProperty("--c", String(at.c));
+        spot.style.setProperty("--r", String(at.r));
+        var input = document.createElement("input");
+        input.value = item.n || "";
+        input.placeholder = "번호";
+        input.addEventListener("pointerdown", function (event) { event.stopPropagation(); });
+        input.addEventListener("input", function () { item.n = input.value; });
+        var remove = document.createElement("button");
+        remove.type = "button";
+        remove.textContent = "빼기";
+        remove.addEventListener("click", function () {
+          data.booths.splice(index, 1);
+          drawBooths();
+        });
+        spot.appendChild(input);
+        spot.appendChild(remove);
+        spot.addEventListener("pointerdown", function (event) {
+          if (event.target !== spot) return;
+          function move(ev) {
+            var rect = boothBox.getBoundingClientRect();
+            var cols = window.innerWidth < 640 ? 2 : 4;
+            var col = Math.min(cols, Math.max(1, Math.floor((ev.clientX - rect.left) / (rect.width / cols)) + 1));
+            var rowHeight = spot.getBoundingClientRect().height + 10;
+            var row = Math.max(1, Math.floor((ev.clientY - rect.top) / rowHeight) + 1);
+            var logicalC = cols === 2 ? (row % 2 === 0 ? col + 2 : col) : col;
+            var logicalR = cols === 2 ? Math.ceil(row / 2) : row;
+            logicalC = Math.min(4, Math.max(1, logicalC));
+            var taken = data.booths.some(function (other, otherIndex) {
+              return otherIndex !== index && other.c === logicalC && other.r === logicalR;
+            });
+            if (!taken) {
+              item.c = logicalC;
+              item.r = logicalR;
+              var at = place(item);
+              spot.style.setProperty("--c", String(at.c));
+              spot.style.setProperty("--r", String(at.r));
+            }
+          }
+          function up() {
+            spot.removeEventListener("pointermove", move);
+            spot.removeEventListener("pointerup", up);
+          }
+          spot.addEventListener("pointermove", move);
+          spot.addEventListener("pointerup", up);
+        });
+        boothBox.appendChild(spot);
+      });
+    }
+    drawBooths();
+    window.addEventListener("resize", drawBooths);
+    var pendingSpot = null;
+    var selectedIndex = null;
+    var placingIndex = null;
+    var lockedIndex = null;
+    function markColor(hex, alpha) {
+      var n = (hex || "#3c4450").replace("#", "");
+      if (n.length === 3) n = n[0] + n[0] + n[1] + n[1] + n[2] + n[2];
+      var r = parseInt(n.slice(0, 2), 16);
+      var g = parseInt(n.slice(2, 4), 16);
+      var b = parseInt(n.slice(4, 6), 16);
+      if (isNaN(r) || isNaN(g) || isNaN(b)) return "rgba(60,68,80," + alpha + ")";
+      return "rgba(" + r + "," + g + "," + b + "," + alpha + ")";
+    }
+    function loadEdit(index) {
+      var item = data.apps[index];
+      if (!item) return;
+      selectedIndex = index;
+      placingIndex = index;
+      document.getElementById("pinCompany").value = item.company || "";
+      document.getElementById("pinBooth").value = item.booth || "";
+      document.getElementById("pinProduct").value = item.product || "";
+      document.getElementById("pinAuth").value = item.auth || "";
+      document.getElementById("pinColor").value = item.color || "#2ec4b6";
+      document.getElementById("updateBooth").hidden = false;
+      document.getElementById("registerBooth").textContent = "등록";
+    }
+    function paintLock() {
+      document.querySelectorAll("#editorList .entry, .plan-board .booth-box, .plan-board .pin").forEach(function (node) {
+        node.classList.remove("on");
+        if (node.classList.contains("pin") || node.classList.contains("booth-box")) node.classList.add("idle");
+      });
+      if (lockedIndex == null || !data.apps[lockedIndex]) return;
+      var row = document.querySelector('#editorList .entry[data-index="' + lockedIndex + '"]');
+      if (row) row.classList.add("on");
+      document.querySelectorAll('.plan-board [data-index="' + lockedIndex + '"]').forEach(function (node) {
+        node.classList.add("on");
+        node.classList.remove("idle");
+      });
+    }
+    function toggleShown(index) {
+      if (lockedIndex === index) {
+        lockedIndex = null;
+        paintLock();
+        setPinNote("도면 표시를 껐습니다. 기업은 목록에 남아 있습니다.");
+        return;
+      }
+      lockPlace(index);
+    }
+    function lockPlace(index) {
+      var item = data.apps[index];
+      if (!item) return;
+      lockedIndex = index;
+      paintLock();
+      if (item.x == null || item.y == null) {
+        setPinNote(item.booth + " " + item.company + " 를 골랐습니다. 도면에서 그 칸을 한 번 누르면 번호와 기업 이름이 놓입니다. 선택 해제로 빠져나옵니다.");
+      } else {
+        setPinNote(item.booth + " " + item.company + " 자리가 도면에 표시됩니다. 같은 자리를 다시 누르면 꺼집니다.");
+      }
+    }
+    function releasePick() {
+      lockedIndex = null;
+      placingIndex = null;
+      clearBoothForm();
+      paintLock();
+      setPinNote("선택에서 빠져나왔습니다. 기업은 목록에 남아 있습니다.");
+    }
+    document.getElementById("releasePick").addEventListener("click", releasePick);
+    function setPinNote(text) {
+      document.getElementById("pinNote").textContent = text;
+      var here = document.getElementById("planClickNote");
+      if (here) here.textContent = text;
+      document.getElementById("status").textContent = text;
+    }
+    function clearBoothForm() {
+      ["pinCompany", "pinBooth", "pinProduct", "pinAuth"].forEach(function (id) {
+        document.getElementById(id).value = "";
+      });
+      document.getElementById("pinColor").value = "#2ec4b6";
+      selectedIndex = null;
+      document.getElementById("updateBooth").hidden = true;
+      document.getElementById("registerBooth").textContent = "등록";
+    }
+    function removeApp(index) {
+      var removed = data.apps[index];
+      if (!removed) return;
+      data.apps.splice(index, 1);
+      if (selectedIndex === index) clearBoothForm();
+      else if (selectedIndex != null && selectedIndex > index) selectedIndex -= 1;
+      if (placingIndex === index) placingIndex = null;
+      else if (placingIndex != null && placingIndex > index) placingIndex -= 1;
+      if (lockedIndex === index) lockedIndex = null;
+      else if (lockedIndex != null && lockedIndex > index) lockedIndex -= 1;
+      drawApps();
+      try { localStorage.setItem(key, JSON.stringify(data)); } catch (error) {}
+      setPinNote((removed.booth || "") + " " + (removed.company || "") + " 를 목록에서 뺐습니다.");
+    }
+
+    function fill(id, field) {
+      var node = document.getElementById(id);
+      node.value = data[field] || "";
+      node.addEventListener("input", function () { data[field] = node.value; });
+    }
+    fill("brochure", "brochure");
+    (function () {
+      var stats = [
+        { key: "sqm", name: "전시면적", words: ["sqm", "sq.m", "㎡"] },
+        { key: "exhibitors", name: "참가업체", words: ["exhibitor"] },
+        { key: "countries", name: "국가", words: ["countr"] },
+        { key: "innovations", name: "혁신제품", words: ["innovation"] },
+        { key: "visits", name: "방문", words: ["visit"], avoid: ["professional"] },
+        { key: "buyers", name: "바이어", words: ["buyer"] },
+        { key: "conferences", name: "컨퍼런스", words: ["conference", "forum"] }
+      ];
+      function readLine(line, words, avoid) {
+        var lower = line.toLowerCase();
+        var hit = words.some(function (word) { return lower.indexOf(word) >= 0; });
+        if (!hit) return "";
+        if (avoid && avoid.some(function (word) { return lower.indexOf(word) >= 0; })) return "";
+        var match = line.match(/(\d{1,3}(?:,\d{3})+|\d+)\s*\+/);
+        if (!match) match = line.match(/(\d{1,3}(?:,\d{3})+|\d+)/);
+        if (!match) return "";
+        var plus = /\d\s*\+/.test(line);
+        if (!plus && /^(19|20)\d{2}$/.test(match[1])) return "";
+        return match[1] + (plus ? "+" : "");
+      }
+      function readStats(text) {
+        var found = {};
+        text.split(/\n/).forEach(function (line) {
+          stats.forEach(function (item) {
+            if (found[item.key]) return;
+            var value = readLine(line, item.words, item.avoid);
+            if (value) found[item.key] = value;
+          });
+        });
+        return found;
+      }
+      function pageLines(items) {
+        var lines = [];
+        var line = [];
+        var y = null;
+        items.forEach(function (item) {
+          var top = item.transform ? item.transform[5] : 0;
+          if (y != null && Math.abs(top - y) > 3) {
+            lines.push(line.join(" "));
+            line = [];
+          }
+          y = top;
+          line.push(item.str);
+        });
+        if (line.length) lines.push(line.join(" "));
+        return lines.join("\n");
+      }
+      function loadPdf() {
+        if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+        return new Promise(function (resolve, reject) {
+          var script = document.createElement("script");
+          script.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+          script.onload = function () {
+            window.pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+            resolve(window.pdfjsLib);
+          };
+          script.onerror = function () { reject(new Error("pdf")); };
+          document.head.appendChild(script);
+        });
+      }
+      document.getElementById("brochureFile").addEventListener("change", function (event) {
+        var file = event.target.files && event.target.files[0];
+        var note = document.getElementById("brochureNote");
+        if (!file) return;
+        note.textContent = "브로셔를 읽고 있습니다.";
+        var reader = new FileReader();
+        reader.onload = function () {
+          loadPdf().then(function (pdfjs) {
+            return pdfjs.getDocument({ data: reader.result }).promise;
+          }).then(function (pdf) {
+            var jobs = [];
+            for (var pageNo = 1; pageNo <= pdf.numPages; pageNo += 1) {
+              jobs.push(pdf.getPage(pageNo).then(function (page) {
+                return page.getTextContent().then(function (content) {
+                  return pageLines(content.items);
+                });
+              }));
+            }
+            return Promise.all(jobs);
+          }).then(function (pages) {
+            var found = {};
+            pages.forEach(function (text) {
+              var lower = text.toLowerCase();
+              if (lower.indexOf("beijing") >= 0 && lower.indexOf("shanghai") < 0) return;
+              var pageFound = readStats(text);
+              stats.forEach(function (item) {
+                if (!found[item.key] && pageFound[item.key]) found[item.key] = pageFound[item.key];
+              });
+            });
+            data.dataStats = found;
+            data.brochure = file.name;
+            document.getElementById("brochure").value = file.name;
+            try { localStorage.setItem(key, JSON.stringify(data)); } catch (error) {}
+            var wrote = [];
+            var missed = [];
+            stats.forEach(function (item) {
+              if (found[item.key]) wrote.push(item.name + " " + found[item.key]);
+              else missed.push(item.name);
+            });
+            note.textContent = wrote.length
+              ? "넣었습니다. " + wrote.join(" · ") + (missed.length ? ". 브로셔에서 찾지 못해 그대로 둔 항목: " + missed.join(", ") : "")
+              : "이 PDF에서 규모 숫자를 찾지 못했습니다. 있는 숫자는 그대로 둡니다.";
+            var frame = document.getElementById("visitorFrame");
+            if (frame) frame.src = "show2.html?preview=1#intro";
+          }).catch(function () {
+            note.textContent = "이 PDF에서 글자를 읽지 못했습니다.";
+          });
+        };
+        reader.readAsArrayBuffer(file);
+      });
+    })();
+    fill("hostName", "hostName");
+    (function () {
+      var startInput = document.getElementById("applyStart");
+      var endInput = document.getElementById("applyEnd");
+      function dayText(iso) {
+        var parts = String(iso || "").split("-");
+        if (parts.length < 3 || !parts[0]) return "";
+        return Number(parts[0]) + "." + Number(parts[1]) + "." + Number(parts[2]);
+      }
+      function writePeriod() {
+        var start = startInput.value;
+        var end = endInput.value;
+        if (start && end && end < start) {
+          startInput.value = data.applyStart || "";
+          endInput.value = data.applyEnd || "";
+          document.getElementById("status").textContent = "마지막 날은 시작일 이후로 고르세요.";
+          return;
+        }
+        data.applyStart = start;
+        data.applyEnd = end;
+        var from = dayText(start);
+        var to = dayText(end);
+        data.applyPeriod = from && to ? from + " – " + to : (from || to);
+        try { localStorage.setItem(key, JSON.stringify(data)); } catch (error) {}
+        var frame = document.getElementById("visitorFrame");
+        if (frame) frame.src = "show2.html?preview=1&t=" + Date.now() + "#intro";
+      }
+      startInput.value = data.applyStart || "";
+      endInput.value = data.applyEnd || "";
+      startInput.addEventListener("change", writePeriod);
+      endInput.addEventListener("change", writePeriod);
+    })();
+    fill("typeName0", "typeName0");
+    fill("typeInfo0", "typeInfo0");
+    fill("typeArea0", "typeArea0");
+    fill("typePrice0", "typePrice0");
+    fill("typeKit0", "typeKit0");
+    fill("typeName1", "typeName1");
+    fill("typeInfo1", "typeInfo1");
+    fill("typeArea1", "typeArea1");
+    fill("typePrice1", "typePrice1");
+    fill("typeKit1", "typeKit1");
+    fill("typeName2", "typeName2");
+    fill("typeInfo2", "typeInfo2");
+    fill("typeArea2", "typeArea2");
+    fill("typePrice2", "typePrice2");
+    fill("typeKit2", "typeKit2");
+    var currency = document.getElementById("currency");
+    currency.value = data.currency || "USD";
+    function showCurrency() {
+      document.querySelectorAll(".money-name").forEach(function (node) {
+        node.textContent = data.currency || "USD";
+      });
+    }
+    showCurrency();
+    currency.addEventListener("change", function () {
+      data.currency = currency.value;
+      showCurrency();
+    });
+    var editor = document.getElementById("introNote");
+    editor.textContent = data.introNote || "";
+    editor.addEventListener("input", function () { data.introNote = editor.textContent; });
+    function bindPic(inputId, frameId, field) {
+      var input = document.getElementById(inputId);
+      var frame = document.getElementById(frameId);
+      function show(src) {
+        frame.textContent = "";
+        var img = document.createElement("img");
+        img.src = src;
+        img.alt = "";
+        frame.appendChild(img);
+      }
+      if (data[field]) show(data[field]);
+      input.addEventListener("change", function () {
+        var file = input.files && input.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function () {
+          var image = new Image();
+          image.onload = function () {
+            var canvas = document.createElement("canvas");
+            var scale = Math.min(1, 640 / image.width);
+            canvas.width = Math.max(1, Math.round(image.width * scale));
+            canvas.height = Math.max(1, Math.round(image.height * scale));
+            canvas.getContext("2d").drawImage(image, 0, 0, canvas.width, canvas.height);
+            data[field] = canvas.toDataURL("image/jpeg", 0.8);
+            show(data[field]);
+          };
+          image.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+    bindPic("pic0", "frame0", "typePic0");
+    bindPic("pic1", "frame1", "typePic1");
+    fill("applyLink", "applyLink");
+    fill("sector", "sector");
+    fill("sectorNote", "sectorNote");
+    fill("noticeTitle", "noticeTitle");
+    fill("noticeBody", "noticeBody");
+    if (!Array.isArray(data.hallNames)) data.hallNames = ["", "Imaging", "", "국제관", ""];
+    var pinHall = document.getElementById("pinHall");
+    var planBoard = document.getElementById("planBoard");
+    var sectionBoard = document.getElementById("sectionBoard");
+    function hallOptions() {
+      var current = pinHall.value;
+      pinHall.innerHTML = "";
+      (data.halls || []).forEach(function (hall, index) {
+        if (!hall) return;
+        var opt = document.createElement("option");
+        opt.value = hall;
+        var name = data.hallNames[index] || "";
+        opt.textContent = name ? hall + " " + name : hall;
+        pinHall.appendChild(opt);
+      });
+      var values = Array.prototype.map.call(pinHall.options, function (opt) { return opt.value; });
+      pinHall.value = values.indexOf(current) >= 0 ? current : (data.koreaHall || values[0] || "");
+      showBoard();
+    }
+    function showBoard() {
+      planBoard.hidden = false;
+      sectionBoard.hidden = true;
+      showPlan(planFor(pinHall.value));
+      drawPins();
+    }
+    ["hall0", "hall1", "hall2", "hall3", "hall4"].forEach(function (id, index) {
+      var node = document.getElementById(id);
+      node.value = (data.halls && data.halls[index]) || "";
+      node.addEventListener("input", function () {
+        data.halls[index] = node.value;
+        hallOptions();
+      });
+    });
+    ["hallName0", "hallName1", "hallName2", "hallName3", "hallName4"].forEach(function (id, index) {
+      var node = document.getElementById(id);
+      node.value = data.hallNames[index] || "";
+      node.addEventListener("input", function () {
+        data.hallNames[index] = node.value;
+        hallOptions();
+      });
+    });
+    var koreaHall = document.getElementById("koreaHall");
+    koreaHall.value = data.koreaHall || "";
+    koreaHall.addEventListener("input", function () {
+      data.koreaHall = koreaHall.value;
+      showBoard();
+    });
+    pinHall.addEventListener("change", function () {
+      showBoard();
+      drawApps();
+    });
+
+    var planImg = document.getElementById("planImg");
+    var planEmpty = document.getElementById("planEmpty");
+    if (!data.hallPlans) data.hallPlans = {};
+    if (!data.hallPlanOff) data.hallPlanOff = {};
+    var cleanPlan = "halls/korea-plan5.png";
+    function useClean(src) {
+      if (!src) return cleanPlan;
+      if (src.indexOf("data:") === 0) return src;
+      if (src.indexOf("korea-plan") >= 0) return cleanPlan;
+      return src;
+    }
+    function planFor(hall) {
+      if (data.hallPlanOff[hall]) return "";
+      if (data.hallPlans[hall]) return useClean(data.hallPlans[hall]);
+      if (hall && hall === (data.koreaHall || "5.2")) {
+        if (data.planOff) return "";
+        return useClean(data.koreaPlan);
+      }
+      return "";
+    }
+    function showPlan(src) {
+      if (!src) {
+        planImg.hidden = true;
+        planEmpty.hidden = false;
+        return;
+      }
+      planImg.src = src;
+      planImg.hidden = false;
+      planEmpty.hidden = true;
+    }
+
+    var venueBoard = document.getElementById("venueBoard");
+    var venuePreview = document.getElementById("venuePreview");
+    var zoneDraw = document.getElementById("zoneDraw");
+    var zoneDots = document.getElementById("zoneDots");
+    var zoneHall = document.getElementById("zoneHall");
+    var draftPoints = [];
+    if (!Array.isArray(data.zones)) data.zones = [];
+    data.halls.forEach(function (hall) {
+      var option = document.createElement("option");
+      option.value = hall;
+      option.textContent = hall;
+      if (hall === (data.koreaHall || "5.2")) option.selected = true;
+      zoneHall.appendChild(option);
+    });
+    function svgEl(name) {
+      return document.createElementNS("http://www.w3.org/2000/svg", name);
+    }
+    function drawZones() {
+      zoneDraw.innerHTML = "";
+      data.zones.forEach(function (zone) {
+        if (!zone.points || zone.points.length < 3) return;
+        var poly = svgEl("polygon");
+        poly.setAttribute("points", zone.points.map(function (p) { return p[0] + "," + p[1]; }).join(" "));
+        zoneDraw.appendChild(poly);
+      });
+      zoneDots.innerHTML = "";
+      if (draftPoints.length) {
+        var line = svgEl("polyline");
+        line.setAttribute("points", draftPoints.map(function (p) { return p[0] + "," + p[1]; }).join(" "));
+        zoneDraw.appendChild(line);
+        draftPoints.forEach(function (p, index) {
+          var dot = document.createElement("button");
+          dot.type = "button";
+          dot.className = "zone-dot";
+          dot.style.left = p[0] + "%";
+          dot.style.top = p[1] + "%";
+          dot.title = "이 점 지우기";
+          dot.addEventListener("click", function (event) {
+            event.stopPropagation();
+            draftPoints.splice(index, 1);
+            drawZones();
+          });
+          zoneDots.appendChild(dot);
+        });
+      }
+    }
+    function showVenue(src) {
+      var picture = src || (data.venueOff ? "" : "halls/venue.jpg?v=2");
+      if (!picture) {
+        venueBoard.hidden = true;
+        venuePreview.removeAttribute("src");
+        return;
+      }
+      venuePreview.src = picture;
+      venueBoard.hidden = false;
+      drawZones();
+    }
+    showVenue(data.venuePic || "");
+    function zoneAt(event) {
+      var rect = venueBoard.getBoundingClientRect();
+      return [
+        Math.round(Math.min(100, Math.max(0, (event.clientX - rect.left) / rect.width * 100)) * 10) / 10,
+        Math.round(Math.min(100, Math.max(0, (event.clientY - rect.top) / rect.height * 100)) * 10) / 10
+      ];
+    }
+    function commitZone() {
+      if (draftPoints.length < 3) return false;
+      var hall = zoneHall.value || data.koreaHall || "5.2";
+      data.zones = data.zones.filter(function (zone) { return zone.hall !== hall; });
+      data.zones.push({ hall: hall, points: draftPoints.slice() });
+      draftPoints = [];
+      drawZones();
+      return true;
+    }
+    venueBoard.addEventListener("click", function (event) {
+      if (venueBoard.hidden || event.target.closest("button")) return;
+      draftPoints.push(zoneAt(event));
+      drawZones();
+    });
+    document.getElementById("zoneDone").addEventListener("click", function (event) {
+      event.stopPropagation();
+      if (!commitZone()) {
+        document.getElementById("status").textContent = "점을 세 곳 이상 찍은 뒤 구획 확정을 누르세요.";
+        return;
+      }
+      try {
+        localStorage.setItem(key, JSON.stringify(data));
+      } catch (error) {
+        document.getElementById("status").textContent = "구획을 확정하지 못했습니다.";
+        return;
+      }
+      document.getElementById("status").textContent = zoneHall.value + " 구획을 확정했습니다. 업체 화면에서 그 구획을 누르면 이 관의 기업 위치로 이동합니다. 아래 시안 반영은 다른 정보를 다 적은 뒤에 누릅니다.";
+      var frame = document.getElementById("visitorFrame");
+      if (frame) frame.src = "show2.html?preview=1#map";
+    });
+    document.getElementById("zoneCancel").addEventListener("click", function () {
+      draftPoints.pop();
+      drawZones();
+    });
+    document.getElementById("venueDelete").addEventListener("click", function () {
+      data.venuePic = "";
+      data.venueOff = true;
+      data.zones = [];
+      draftPoints = [];
+      venuePreview.removeAttribute("src");
+      showVenue("");
+      localStorage.setItem(key, JSON.stringify(data));
+      document.getElementById("status").textContent = "도면과 구획을 뺐습니다. 업체 화면에서도 빠집니다.";
+    });
+
+    document.getElementById("planPick").addEventListener("click", function () {
+      document.getElementById("planFile").click();
+    });
+    document.getElementById("planDelete").addEventListener("click", function () {
+      var hall = pinHall.value;
+      data.hallPlanOff[hall] = true;
+      delete data.hallPlans[hall];
+      if (hall === (data.koreaHall || "5.2")) {
+        data.koreaPlan = "";
+        data.planOff = true;
+      }
+      showPlan("");
+      try { localStorage.setItem(key, JSON.stringify(data)); } catch (error) {}
+      document.getElementById("status").textContent = hall + " 도면 이미지를 뺐습니다.";
+    });
+    document.getElementById("boothCount").addEventListener("click", function () {
+      document.getElementById("status").textContent = pinHall.value + " 에 놓은 부스는 " + document.getElementById("boothTotal").textContent + "개입니다.";
+    });
+    document.getElementById("addHall").addEventListener("click", function () {
+      var name = document.getElementById("newHall").value.trim();
+      if (!name) {
+        document.getElementById("status").textContent = "추가할 관 번호를 적으세요.";
+        return;
+      }
+      if ((data.halls || []).indexOf(name) < 0) {
+        var slot = data.halls.indexOf("");
+        if (slot >= 0) {
+          data.halls[slot] = name;
+          var field = document.getElementById("hall" + slot);
+          if (field) field.value = name;
+        } else {
+          data.halls.push(name);
+          data.hallNames.push("");
+        }
+      }
+      document.getElementById("newHall").value = "";
+      hallOptions();
+      pinHall.value = name;
+      showBoard();
+      drawApps();
+      try { localStorage.setItem(key, JSON.stringify(data)); } catch (error) {}
+      document.getElementById("status").textContent = name + " 관을 추가했습니다. 이미지 변경으로 그 관의 도면을 넣습니다.";
+    });
+    document.getElementById("planFile").addEventListener("change", function (event) {
+      var file = event.target.files && event.target.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function () {
+        var image = new Image();
+        image.onload = function () {
+          var canvas = document.createElement("canvas");
+          var scale = Math.min(1, 1400 / image.width);
+          canvas.width = Math.max(1, Math.round(image.width * scale));
+          canvas.height = Math.max(1, Math.round(image.height * scale));
+          canvas.getContext("2d").drawImage(image, 0, 0, canvas.width, canvas.height);
+          var picture = canvas.toDataURL("image/jpeg", 0.82);
+          data.hallPlans[pinHall.value] = picture;
+          data.hallPlanOff[pinHall.value] = false;
+          if (pinHall.value === (data.koreaHall || "5.2")) {
+            data.koreaPlan = picture;
+            data.planOff = false;
+          }
+          showPlan(picture);
+          try { localStorage.setItem(key, JSON.stringify(data)); } catch (error) {}
+          document.getElementById("status").textContent = pinHall.value + " 도면 이미지를 바꿨습니다.";
+        };
+        image.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function pointOn(board, event) {
+      var rect = board.getBoundingClientRect();
+      return {
+        x: Math.min(99, Math.max(1, (event.clientX - rect.left) / rect.width * 100)),
+        y: Math.min(99, Math.max(1, (event.clientY - rect.top) / rect.height * 100))
+      };
+    }
+    function drawDraft(board) {
+      board.querySelectorAll(".pin.wait, .booth-box.wait").forEach(function (node) { node.remove(); });
+      if (!pendingSpot) return;
+      if (pendingSpot.w) {
+        var box = document.createElement("div");
+        box.className = "booth-box wait";
+        box.style.left = (pendingSpot.x - pendingSpot.w / 2) + "%";
+        box.style.top = (pendingSpot.y - pendingSpot.h / 2) + "%";
+        box.style.width = pendingSpot.w + "%";
+        box.style.height = pendingSpot.h + "%";
+        board.appendChild(box);
+      }
+      var dot = document.createElement("div");
+      dot.className = "pin wait";
+      dot.style.left = (pendingSpot.x2 || pendingSpot.x1) + "%";
+      dot.style.top = (pendingSpot.y2 || pendingSpot.y1) + "%";
+      board.appendChild(dot);
+    }
+    function waitingIndex() {
+      var index = selectedIndex != null ? selectedIndex : placingIndex;
+      if (index != null && data.apps[index] && (!data.apps[index].hall || data.apps[index].hall === pinHall.value)) return index;
+      return null;
+    }
+    function spotDistance(a, b) {
+      var dx = a.x - b.x;
+      var dy = a.y - b.y;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+    function nearestPlaced(x, y) {
+      var found = null;
+      var best = 3;
+      data.apps.forEach(function (other, i) {
+        if (other.hall !== pinHall.value || other.x == null || other.y == null) return;
+        var dist = spotDistance(other, { x: x, y: y });
+        if (dist < best) {
+          best = dist;
+          found = i;
+        }
+      });
+      return found;
+    }
+    function spotTaken(index, x, y) {
+      return data.apps.some(function (other, i) {
+        if (i === index || other.hall !== pinHall.value || other.x == null || other.y == null) return false;
+        return spotDistance(other, { x: x, y: y }) < 3;
+      });
+    }
+    function placeOn(board, event) {
+      if (event.target.closest(".pin") || event.target.closest(".booth-box")) return;
+      if (board === planBoard && planImg.hidden) {
+        setPinNote("도면이 이 칸에 보여야 그 위를 누를 수 있습니다.");
+        return;
+      }
+      var point = pointOn(board, event);
+      var index = waitingIndex();
+      var placingNew = index != null && data.apps[index] && data.apps[index].x == null;
+      var movingEdit = selectedIndex != null && index === selectedIndex;
+      if (!placingNew && !movingEdit) {
+        var near = nearestPlaced(point.x, point.y);
+        if (near != null) toggleShown(near);
+        else {
+          lockedIndex = null;
+          paintLock();
+          setPinNote("도면 표시를 껐습니다. 기업은 목록에 남아 있습니다.");
+        }
+        return;
+      }
+      if (spotTaken(index, point.x, point.y)) {
+        setPinNote("이 칸에는 이미 기업이 있습니다. 부스위치는 겹칠 수 없습니다. 다른 칸을 누르세요.");
+        return;
+      }
+      var item = data.apps[index];
+      item.x = point.x;
+      item.y = point.y;
+      pendingSpot = null;
+      lockedIndex = index;
+      if (placingNew) placingIndex = null;
+      drawApps();
+      try { localStorage.setItem(key, JSON.stringify(data)); } catch (error) {}
+      setPinNote(item.booth + " " + item.company + " 를 그 자리에 놓았습니다. 같은 자리를 다시 누르면 표시가 꺼집니다.");
+    }
+    function readBoothFields() {
+      return {
+        company: document.getElementById("pinCompany").value.trim(),
+        booth: document.getElementById("pinBooth").value.trim(),
+        color: document.getElementById("pinColor").value || "#2ec4b6",
+        product: document.getElementById("pinProduct").value.trim(),
+        auth: document.getElementById("pinAuth").value.trim()
+      };
+    }
+    function blurField(button) {
+      var active = document.activeElement;
+      if (active && active !== button && active.blur) active.blur();
+    }
+    var registerBtn = document.getElementById("registerBooth");
+    var updateBtn = document.getElementById("updateBooth");
+    registerBtn.addEventListener("mousedown", function () { blurField(registerBtn); });
+    updateBtn.addEventListener("mousedown", function () { blurField(updateBtn); });
+    registerBtn.addEventListener("click", function () {
+      var fields = readBoothFields();
+      if (!fields.company || !fields.booth) {
+        setPinNote(!fields.company && !fields.booth ? "기업 이름과 위치를 적으세요." : (!fields.company ? "기업 이름을 적으세요." : "위치를 적으세요. 칸 안의 예시는 아직 입력된 번호가 아닙니다."));
+        return;
+      }
+      var item = { hall: pinHall.value, category: "", x: null, y: null };
+      item.booth = fields.booth;
+      item.company = fields.company;
+      item.product = fields.product;
+      item.auth = fields.auth;
+      item.color = fields.color;
+      data.apps.push(item);
+      clearBoothForm();
+      placingIndex = data.apps.indexOf(item);
+      lockedIndex = placingIndex;
+      pendingSpot = null;
+      setPinNote(fields.booth + " " + fields.company + " 를 목록에 추가했습니다. 도면의 빈 칸을 한 번 누르면 놓입니다.");
+      drawApps();
+      try { localStorage.setItem(key, JSON.stringify(data)); } catch (error) {}
+    });
+    updateBtn.addEventListener("click", function () {
+      var fields = readBoothFields();
+      var item = selectedIndex != null ? data.apps[selectedIndex] : null;
+      if (!item) {
+        setPinNote("수정은 오른쪽 목록에서 수정을 누른 기업만 바꿉니다. 새 기업은 등록입니다.");
+        return;
+      }
+      if (!fields.company || !fields.booth) {
+        setPinNote(!fields.company && !fields.booth ? "기업 이름과 위치를 적으세요." : (!fields.company ? "기업 이름을 적으세요." : "위치를 적으세요."));
+        return;
+      }
+      item.hall = pinHall.value;
+      item.booth = fields.booth;
+      item.company = fields.company;
+      item.product = fields.product;
+      item.auth = fields.auth;
+      item.color = fields.color;
+      lockedIndex = selectedIndex;
+      clearBoothForm();
+      setPinNote(fields.booth + " " + fields.company + " 정보를 수정했습니다. 목록의 다른 기업은 그대로입니다.");
+      drawApps();
+      try { localStorage.setItem(key, JSON.stringify(data)); } catch (error) {}
+    });
+    planBoard.addEventListener("click", function (event) { placeOn(planBoard, event); });
+    sectionBoard.addEventListener("click", function (event) { placeOn(sectionBoard, event); });
+
+    function drawPins() {
+      [planBoard, sectionBoard].forEach(function (board) {
+        board.querySelectorAll(".pin, .booth-box").forEach(function (node) { node.remove(); });
+      });
+      var board = planBoard.hidden ? sectionBoard : planBoard;
+      var hall = pinHall.value;
+      data.apps.forEach(function (item, index) {
+        if (item.hall !== hall || item.x == null || item.y == null) return;
+        var box = null;
+        if (item.w && item.h) {
+          box = document.createElement("div");
+          box.className = "booth-box";
+          box.dataset.index = String(index);
+          box.style.left = (item.x - item.w / 2) + "%";
+          box.style.top = (item.y - item.h / 2) + "%";
+          box.style.width = item.w + "%";
+          box.style.height = item.h + "%";
+          box.style.borderColor = item.color || "#1f8f72";
+          box.style.background = markColor(item.color || "#1f8f72", 0.22);
+          box.addEventListener("click", function (event) {
+            event.stopPropagation();
+            toggleShown(index);
+          });
+          board.appendChild(box);
+        }
+        var pin = document.createElement("div");
+        pin.className = "pin";
+        pin.dataset.index = String(index);
+        pin.style.left = item.x + "%";
+        pin.style.top = item.y + "%";
+        pin.style.background = item.color || "#3c4450";
+        var pinNo = document.createElement("b");
+        pinNo.textContent = item.booth || "번호";
+        var pinName = document.createElement("span");
+        pinName.textContent = item.company || "";
+        pin.appendChild(pinNo);
+        pin.appendChild(pinName);
+        pin.addEventListener("pointerdown", function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          var waiting = waitingIndex();
+          if (waiting != null && waiting !== index && data.apps[waiting] && (data.apps[waiting].x == null || selectedIndex === waiting)) {
+            setPinNote("이 칸에는 이미 기업이 있습니다. 부스위치는 겹칠 수 없습니다. 다른 칸을 누르세요.");
+            return;
+          }
+          var startX = event.clientX;
+          var startY = event.clientY;
+          var originX = item.x;
+          var originY = item.y;
+          var moved = false;
+          pin.setPointerCapture(event.pointerId);
+          function move(ev) {
+            if (Math.abs(ev.clientX - startX) + Math.abs(ev.clientY - startY) < 6) return;
+            moved = true;
+            var rect = board.getBoundingClientRect();
+            item.x = Math.min(98, Math.max(2, (ev.clientX - rect.left) / rect.width * 100));
+            item.y = Math.min(98, Math.max(2, (ev.clientY - rect.top) / rect.height * 100));
+            pin.style.left = item.x + "%";
+            pin.style.top = item.y + "%";
+            if (box && item.w && item.h) {
+              box.style.left = (item.x - item.w / 2) + "%";
+              box.style.top = (item.y - item.h / 2) + "%";
+            }
+          }
+          function up() {
+            pin.removeEventListener("pointermove", move);
+            pin.removeEventListener("pointerup", up);
+            if (!moved) {
+              toggleShown(index);
+              return;
+            }
+            if (spotTaken(index, item.x, item.y)) {
+              item.x = originX;
+              item.y = originY;
+              pin.style.left = item.x + "%";
+              pin.style.top = item.y + "%";
+              if (box && item.w && item.h) {
+                box.style.left = (item.x - item.w / 2) + "%";
+                box.style.top = (item.y - item.h / 2) + "%";
+              }
+              setPinNote("부스위치가 겹칩니다. 다른 칸으로 옮기세요.");
+            }
+            try { localStorage.setItem(key, JSON.stringify(data)); } catch (error) {}
+          }
+          pin.addEventListener("pointermove", move);
+          pin.addEventListener("pointerup", up);
+        });
+        board.appendChild(pin);
+      });
+      drawDraft(board);
+    }
+
+    var list = document.getElementById("appList");
+    var editorList = document.getElementById("editorList");
+    function drawApps() {
+      if (editorList) {
+        editorList.innerHTML = "";
+        var hall = pinHall.value;
+        var korea = data.koreaHall || "5.2";
+        var selectedText = pinHall.selectedOptions && pinHall.selectedOptions[0] ? pinHall.selectedOptions[0].textContent : hall;
+        var viewingKorea = hall === korea || String(hall).indexOf(korea) === 0 || String(selectedText).indexOf(korea) === 0;
+        var any = false;
+        data.apps.forEach(function (item, index) {
+          var itemHall = item.hall || "";
+          var onThisHall = !itemHall || itemHall === hall || String(hall).indexOf(itemHall) === 0 || String(itemHall).indexOf(hall) === 0;
+          var onKorea = viewingKorea && (itemHall === korea || itemHall === "5.2");
+          if (!onThisHall && !onKorea) return;
+          any = true;
+          var row = document.createElement("div");
+          row.className = "entry";
+          row.dataset.index = String(index);
+          var dot = document.createElement("i");
+          dot.className = "dot";
+          dot.style.background = item.color || "#3c4450";
+          var booth = document.createElement("b");
+          booth.textContent = item.booth || "미정";
+          var company = document.createElement("span");
+          company.textContent = item.company || "";
+          row.appendChild(dot);
+          row.appendChild(booth);
+          row.appendChild(company);
+          row.addEventListener("click", function () {
+            loadEdit(index);
+            lockPlace(index);
+            setPinNote(item.booth + " " + item.company + " 를 고칠 수 있습니다. 내용을 바꾼 뒤 수정을 누르세요. 새 기업은 등록입니다.");
+          });
+          var drop = document.createElement("button");
+          drop.type = "button";
+          drop.className = "drop";
+          drop.textContent = "빼기";
+          drop.addEventListener("click", function (event) {
+            event.stopPropagation();
+            removeApp(index);
+          });
+          row.appendChild(drop);
+          editorList.appendChild(row);
+        });
+        var count = editorList.querySelectorAll(".entry").length;
+        var total = document.getElementById("boothTotal");
+        var listTotal = document.getElementById("listTotal");
+        if (total) total.textContent = String(count);
+        if (listTotal) listTotal.textContent = "TOTAL : " + count;
+      }
+      list.innerHTML = "";
+      data.apps.forEach(function (item, index) {
+        var li = document.createElement("li");
+        li.textContent = [item.booth || "미정", item.company, item.category, item.product, item.auth, item.grade].filter(Boolean).join(" · ");
+        var remove = document.createElement("button");
+        remove.type = "button";
+        remove.textContent = "빼기";
+        remove.style.marginLeft = "10px";
+        remove.addEventListener("click", function () {
+          removeApp(index);
+        });
+        li.appendChild(remove);
+        list.appendChild(li);
+      });
+      drawPins();
+      paintLock();
+    }
+    hallOptions();
+    drawApps();
+
+    var cnDevices = [
+      "01 유원수술기기", "02 무원수술기기", "03 신경 및 심혈관용 수술기기", "04 정형외과(골과) 수술기기",
+      "05 방사선 치료기기", "06 의료용 영상기기", "07 의료용 진찰 및 감시기기", "08 호흡, 마취 및 응급기기",
+      "09 물리치료기기", "10 수혈, 투석, 체외순환기기", "11 의료기기 소독멸균기기", "12 유원삽입기기",
+      "13 무원삽입기기", "14 관류, 처치 및 보호기기", "15 환자 지지 기기", "16 안과기기",
+      "17 구강과 기기", "18 산부인과, 보조생식 및 피임기구", "19 의료용 재활기기", "20 중의(中医)기기",
+      "21 의료용 소프트웨어", "22 임상분석장비", "기타", "모름"
+    ];
+    var cnIvd = [
+      "6840 Ⅲ-01 질환성 병원체 항원, 항체 및 핵산 등 검측과 관련된 시약",
+      "6840 Ⅲ-02 혈액형, 조직 적합성 검측시약",
+      "6840 Ⅲ-03 인간 유전자 검측시약",
+      "6840 Ⅲ-04 유전성 질환 검측시약",
+      "6840 Ⅲ-05 마취 의약품, 향정신성 의약품, 의료용 독성 약품 검측 관련 시약",
+      "6840 Ⅲ-06 치료 의약품 타겟 수치 측정 관련 시약, 동반 검측시약",
+      "6840 Ⅲ-07 종양선별, 보조진단, 종양 병기 관련 검측 시약",
+      "6840 Ⅱ-08 단백질 검측시약",
+      "6840 Ⅱ-09 당류 검측 시약",
+      "6840 Ⅱ-10 호르몬 검측",
+      "6840 Ⅱ-11 효소 검측 시약",
+      "6840 Ⅱ-12 지질 검측",
+      "6840 Ⅱ-13 비타민 검측",
+      "6840 Ⅱ-14 무기 이온 검측 시약",
+      "6840 Ⅱ-15 약물 및 약품 대사물질 검측 시약",
+      "6840 Ⅱ-16 자가 항체 검측시약",
+      "6840 Ⅱ-17 미생물 감별 혹은 약제 감수성 검측 시약, 세포 선택, 유도, 분화에 사용하는 세포배지",
+      "6840 Ⅱ-18 과민반응 검측시약",
+      "6840 Ⅱ-19 기타 생리, 생화학 혹은 면역 기능 지표 검측시약",
+      "6840 Ⅰ-20 미생물 배지 및 세포 증식 배지",
+      "6840 Ⅰ-21 표본 처리용 제품",
+      "6840 Ⅰ-22 반응 시스템용 범용 시약",
+      "6840 Ⅰ-23 유세포 분석장비용 항체 시약 및 동형 대조항체",
+      "6840 Ⅰ-24 면역조직화학용 단일 항체 시약",
+      "6840 Ⅰ-25 제자리부합법 단일 탐침시약",
+      "기타", "모름"
+    ];
+    function chosenOf(id) {
+      var values = [];
+      Array.prototype.forEach.call(document.querySelectorAll("#" + id + " .chosen span"), function (span) {
+        values.push(span.textContent);
+      });
+      return values;
+    }
+    function addChosen(list, value) {
+      var li = document.createElement("li");
+      var span = document.createElement("span");
+      span.textContent = value;
+      var drop = document.createElement("button");
+      drop.type = "button";
+      drop.className = "add slim";
+      drop.textContent = "빼기";
+      drop.addEventListener("click", function () { li.remove(); });
+      li.appendChild(span);
+      li.appendChild(drop);
+      list.appendChild(li);
+    }
+    function fillPicks(id, items) {
+      var box = document.getElementById(id);
+      var select = document.createElement("select");
+      var placeholder = document.createElement("option");
+      placeholder.value = "";
+      placeholder.textContent = "선택";
+      select.appendChild(placeholder);
+      items.forEach(function (item) {
+        var option = document.createElement("option");
+        option.value = item;
+        option.textContent = item;
+        select.appendChild(option);
+      });
+      var list = document.createElement("ul");
+      list.className = "chosen";
+      box.appendChild(select);
+      box.appendChild(list);
+      select.addEventListener("change", function () {
+        var value = select.value;
+        select.value = "";
+        if (!value) return;
+        if (value === "모름") list.innerHTML = "";
+        else if (chosenOf(id).indexOf("모름") !== -1) list.innerHTML = "";
+        if (chosenOf(id).indexOf(value) !== -1) return;
+        addChosen(list, value);
+      });
+    }
+    function clearChosen(id) {
+      var list = document.querySelector("#" + id + " .chosen");
+      if (list) list.innerHTML = "";
+      var select = document.querySelector("#" + id + " select");
+      if (select) select.value = "";
+    }
+    function addLine(boxId, placeholder, kind) {
+      var row = document.createElement("div");
+      row.className = kind === "code" ? "kr-row" : "product-row";
+      var input = document.createElement("input");
+      input.placeholder = placeholder;
+      var drop = document.createElement("button");
+      drop.type = "button";
+      drop.className = "add slim";
+      drop.textContent = "빼기";
+      drop.addEventListener("click", function () {
+        if (document.querySelectorAll("#" + boxId + " input").length < 2) {
+          input.value = "";
+          return;
+        }
+        row.remove();
+      });
+      row.appendChild(input);
+      row.appendChild(drop);
+      document.getElementById(boxId).appendChild(row);
+    }
+    function linesOf(boxId) {
+      var values = [];
+      Array.prototype.forEach.call(document.querySelectorAll("#" + boxId + " input"), function (input) {
+        var text = input.value.trim();
+        if (text) values.push(text);
+      });
+      return values;
+    }
+    function clearLines(boxId, placeholder, kind) {
+      document.getElementById(boxId).innerHTML = "";
+      addLine(boxId, placeholder, kind);
+    }
+    var krClasses = [
+      "[04] 의료용 챔버",
+      "[05] 생명유지 장치",
+      "[06] 내장기능 대용기(I)",
+      "[07] 내장기능 대용기(II)",
+      "[08] 진단용 장치(I)",
+      "[09] 진단용 장치(II)",
+      "[10] 이학 진료용 기구(I)",
+      "[11] 이학 진료용 기구(II)",
+      "[12] 의료용 자극발생 기계기구",
+      "[13] 심혈관용 기계 기구(I)",
+      "[14] 심혈관용 기계 기구(II)",
+      "[15] 비뇨기과용 기계 기구(I)",
+      "[16] 비뇨기과용 기계 기구(II)",
+      "[17] 조직처리기구",
+      "[18] 결찰기 및 봉합기(I)",
+      "[19] 결찰기 및 봉합기(II)",
+      "기타",
+      "모름"
+    ];
+    fillPicks("krPicks", krClasses);
+    fillPicks("cnDevicePicks", cnDevices);
+    fillPicks("cnIvdPicks", cnIvd);
+    fillPicks("authPicks", ["한국", "중국", "기타"]);
+    fillPicks("cnGradePicks", ["1등급", "2등급", "3등급", "모름"]);
+    fillPicks("krGradePicks", ["1등급", "2등급", "3등급", "4등급", "모름"]);
+    addLine("productRows", "전시 제품", "product");
+    document.getElementById("addProduct").addEventListener("click", function () {
+      addLine("productRows", "전시 제품", "product");
+    });
+    function gradeLine(label, values) {
+      if (!values.length) return "";
+      if (values.indexOf("모름") !== -1) return label + " 모름";
+      return label + " " + values.join(" · ");
+    }
+    document.getElementById("addApp").addEventListener("click", function () {
+      var company = document.getElementById("appCompany").value.trim();
+      var status = document.getElementById("applyStatus");
+      if (!company) {
+        if (status) status.textContent = "기업명을 적으세요.";
+        return;
+      }
+      var devices = chosenOf("cnDevicePicks");
+      var ivd = chosenOf("cnIvdPicks");
+      var krCodes = chosenOf("krPicks");
+      var products = linesOf("productRows");
+      var auth = chosenOf("authPicks");
+      var cnGrade = chosenOf("cnGradePicks");
+      var krGrade = chosenOf("krGradePicks");
+      var categoryParts = [];
+      if (krCodes.length) categoryParts.push("한국 " + krCodes.join(", "));
+      if (devices.length) categoryParts.push("일반의료기기 " + devices.join(", "));
+      if (ivd.length) categoryParts.push("체외진단제 " + ivd.join(", "));
+      var item = {
+        hall: data.koreaHall || "",
+        booth: document.getElementById("appBooth").value.trim(),
+        company: company,
+        category: categoryParts.join(" · "),
+        product: products.join(", "),
+        auth: auth.join(" · "),
+        grade: [gradeLine("중국", cnGrade), gradeLine("한국", krGrade)].filter(Boolean).join(" · "),
+        x: null,
+        y: null
+      };
+      data.apps.push(item);
+      document.getElementById("appBooth").value = "";
+      document.getElementById("appCompany").value = "";
+      ["krPicks", "cnDevicePicks", "cnIvdPicks", "authPicks", "cnGradePicks", "krGradePicks"].forEach(function (id) {
+        clearChosen(id);
+      });
+      clearLines("productRows", "전시 제품", "product");
+      if (item.booth) {
+        placingIndex = data.apps.indexOf(item);
+        lockedIndex = placingIndex;
+        pendingSpot = null;
+      }
+      drawApps();
+      try { localStorage.setItem(key, JSON.stringify(data)); } catch (error) {}
+      if (status) {
+        status.textContent = item.booth
+          ? "신청을 넣었습니다. 전시 도면에서 그 칸을 누르면 " + item.booth + " 가 연결됩니다."
+          : "신청을 넣었습니다. 부스 번호는 확정된 뒤에 넣으면 도면과 연결됩니다.";
+      }
+    });
+
+    document.getElementById("save").addEventListener("click", function () {
+      try {
+        localStorage.setItem(key, JSON.stringify(data));
+      } catch (error) {
+        document.getElementById("status").textContent = "반영하지 못했습니다.";
+        return;
+      }
+      document.getElementById("status").textContent = "다른 정보까지 이 브라우저 시안에 반영했습니다.";
+    });
+  </script>
+  <script>
+    (function () {
+      var menuIds = ["intro", "apply", "map", "match", "notice"];
+      function showMenu(id) {
+        if (menuIds.indexOf(id) < 0) id = "intro";
+        menuIds.forEach(function (name) {
+          var node = document.getElementById(name);
+          if (node) node.hidden = name !== id;
+        });
+        var shows = document.getElementById("shows");
+        if (shows) shows.hidden = id !== "intro";
+        document.querySelectorAll(".bar nav a[href^='#']").forEach(function (link) {
+          link.classList.toggle("on", link.getAttribute("href") === "#" + id);
+        });
+        var visitorLink = document.querySelector(".to-visitor");
+        if (visitorLink) visitorLink.setAttribute("href", "fair.html#" + id);
+        var frame = document.getElementById("visitorFrame");
+        if (frame) frame.src = "show2.html?preview=1#" + id;
+        if (location.hash !== "#" + id) history.replaceState(null, "", "#" + id);
+        window.scrollTo(0, 0);
+      }
+      document.querySelectorAll(".bar nav a[href^='#']").forEach(function (link) {
+        link.addEventListener("click", function (event) {
+          event.preventDefault();
+          showMenu((link.getAttribute("href") || "").replace("#", ""));
+        });
+      });
+      showMenu((location.hash || "#intro").replace("#", ""));
+      var fold = document.getElementById("visitorFold");
+      var box = document.getElementById("visitorCheck");
+      if (fold && box) {
+        fold.addEventListener("click", function () {
+          var open = fold.getAttribute("aria-expanded") === "true";
+          fold.setAttribute("aria-expanded", open ? "false" : "true");
+          fold.textContent = open ? "방문자 화면 보기" : "접기";
+          box.classList.toggle("folded", open);
+        });
+      }
+      var refresh = document.getElementById("visitorRefresh");
+      if (refresh) {
+        refresh.addEventListener("click", function () {
+          var frame = document.getElementById("visitorFrame");
+          if (!frame) return;
+          var id = (location.hash || "#intro").replace("#", "");
+          frame.src = "show2.html?preview=1#" + id;
+        });
+      }
+    })();
+  </script>
+  <script>
+    (function () {
+      var box = document.getElementById("editorList");
+      if (!box || box.querySelector(".entry")) return;
+      var samples = [
+        ["5.2F37", "비나셀"],
+        ["5.2F38", "시노서울"],
+        ["5.2F39", "가나다"]
+      ];
+      box.textContent = "";
+      samples.forEach(function (item) {
+        var row = document.createElement("div");
+        row.className = "entry";
+        var booth = document.createElement("b");
+        booth.textContent = item[0];
+        var company = document.createElement("span");
+        company.textContent = item[1];
+        row.appendChild(booth);
+        row.appendChild(company);
+        box.appendChild(row);
+      });
+      var total = document.getElementById("listTotal");
+      var count = document.getElementById("boothTotal");
+      if (total) total.textContent = "TOTAL : 3";
+      if (count) count.textContent = "3";
+    })();
+  </script>
+</body>
+</html>

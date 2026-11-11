@@ -426,9 +426,10 @@
       <p class="see">방문자 화면 · <a href="fair.html#intro">전시 소개</a></p>
       <h2>전시 소개</h2>
       <p>기본 정보와 부스 종류는 여기 있습니다. 브로셔 PDF를 올리면 규모 숫자를 읽어서 방문자 화면의 Data에 넣습니다. 파일에 없는 숫자는 바꾸지 않습니다.</p>
+      <label>주최<input id="hostName" placeholder="주최"></label>
       <div class="row">
-        <label>주최<input id="hostName" placeholder="주최"></label>
-        <label>신청 기간<input id="applyPeriod" placeholder="신청 기간"></label>
+        <label>신청 시작<input id="applyStart" type="date"></label>
+        <label>신청 마지막 날<input id="applyEnd" type="date"></label>
       </div>
       <label>브로셔 PDF<input id="brochureFile" type="file" accept="application/pdf,.pdf"></label>
       <p id="brochureNote"></p>
@@ -658,6 +659,8 @@
       brochure: "",
       hostName: "Reed Sinopharm Exhibitions",
       applyPeriod: "",
+      applyStart: "",
+      applyEnd: "",
       typeName0: "Raw space",
       typeInfo0: "면적만 제공",
       typeArea0: "가로 3m × 세로 3m",
@@ -1035,7 +1038,37 @@
       });
     })();
     fill("hostName", "hostName");
-    fill("applyPeriod", "applyPeriod");
+    (function () {
+      var startInput = document.getElementById("applyStart");
+      var endInput = document.getElementById("applyEnd");
+      function dayText(iso) {
+        var parts = String(iso || "").split("-");
+        if (parts.length < 3 || !parts[0]) return "";
+        return Number(parts[0]) + "." + Number(parts[1]) + "." + Number(parts[2]);
+      }
+      function writePeriod() {
+        var start = startInput.value;
+        var end = endInput.value;
+        if (start && end && end < start) {
+          startInput.value = data.applyStart || "";
+          endInput.value = data.applyEnd || "";
+          document.getElementById("status").textContent = "마지막 날은 시작일 이후로 고르세요.";
+          return;
+        }
+        data.applyStart = start;
+        data.applyEnd = end;
+        var from = dayText(start);
+        var to = dayText(end);
+        data.applyPeriod = from && to ? from + " – " + to : (from || to);
+        try { localStorage.setItem(key, JSON.stringify(data)); } catch (error) {}
+        var frame = document.getElementById("visitorFrame");
+        if (frame) frame.src = "show2.html?preview=1&t=" + Date.now() + "#intro";
+      }
+      startInput.value = data.applyStart || "";
+      endInput.value = data.applyEnd || "";
+      startInput.addEventListener("change", writePeriod);
+      endInput.addEventListener("change", writePeriod);
+    })();
     fill("typeName0", "typeName0");
     fill("typeInfo0", "typeInfo0");
     fill("typeArea0", "typeArea0");
