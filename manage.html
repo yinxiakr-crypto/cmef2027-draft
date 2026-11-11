@@ -398,6 +398,7 @@
     .fold-order li.drag { opacity: 0.45; }
     .psr-edit input, .psr-edit select, .psr-edit textarea { width: auto; min-width: 0; }
     .psr-edit textarea { width: 220px; min-height: 72px; }
+    .psr-edit .clear-report { flex: none; white-space: nowrap; }
     .psr-edit .remove { margin-left: auto; }
     .psr-tools { display: flex; gap: 8px; align-items: center; margin-top: 12px; }
     .file-drop, .psr-edit .row-drop {
@@ -476,7 +477,7 @@
       <p>오른쪽 방문자 화면의 참관객, 산업 분야, 동기간 전시, PSR 단추를 마우스로 끌어 순서를 바꿉니다. 아래 목록으로도 같은 순서를 바꿉니다.</p>
       <ul class="fold-order" id="foldOrder"></ul>
       <h2 style="margin-top:22px">PSR</h2>
-      <p>회차는 추가로 넣고, 빼기로 지웁니다. 보고서 PDF는 아래 칸에 끌어다 놓으면 새 회차가 생깁니다. 이미 있는 회차는 그 줄의 보고서 놓기에 놓습니다. 방문자 화면에는 일정·장소와, 파일에 있는 주요 수치가 보입니다.</p>
+      <p>회차는 추가로 넣고, 빼기로 지웁니다. 보고서 PDF는 아래 칸에 끌어다 놓으면 새 회차가 생깁니다. 이미 있는 회차는 그 줄의 보고서 놓기에 놓습니다. 보고서 지우기는 그 줄의 파일과 요약만 지우고 회차는 남깁니다. 방문자 화면에는 일정·장소와, 파일에 있는 주요 수치가 보입니다.</p>
       <div class="psr-tools">
         <button type="button" id="psrAdd">추가</button>
       </div>
@@ -1449,6 +1450,10 @@
           summary.value = item.summary || "";
           summary.placeholder = "올린 자료의 짧은 요약";
           summary.setAttribute("aria-label", "요약");
+          var clearReport = document.createElement("button");
+          clearReport.type = "button";
+          clearReport.className = "clear-report";
+          clearReport.textContent = "보고서 지우기";
           var remove = document.createElement("button");
           remove.type = "button";
           remove.className = "remove";
@@ -1536,6 +1541,16 @@
             }
             takeReport(dropped);
           });
+          clearReport.addEventListener("mousedown", function (event) { event.preventDefault(); });
+          clearReport.addEventListener("click", function () {
+            item.file = "";
+            item.summary = "";
+            file.textContent = "보고서 놓기";
+            summary.value = "";
+            picker.value = "";
+            refreshIntro();
+            document.getElementById("psrNote").textContent = (item.no || "이 회차") + " 보고서와 요약을 지웠습니다. 파일을 다시 놓으면 주요 수치가 들어갑니다.";
+          });
           remove.addEventListener("mousedown", function (event) { event.preventDefault(); });
           remove.addEventListener("click", function () {
             data.psrList.splice(index, 1);
@@ -1548,6 +1563,7 @@
           row.appendChild(file);
           row.appendChild(picker);
           row.appendChild(summary);
+          row.appendChild(clearReport);
           row.appendChild(remove);
           psrList.appendChild(row);
         });
