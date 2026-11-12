@@ -453,7 +453,7 @@
         <button type="button" id="visitorRefresh">다시 보기</button>
         <button type="button" id="visitorFold" aria-expanded="true">접기</button>
       </div>
-      <iframe id="visitorFrame" title="방문자 화면" src="show7.html?preview=1#intro"></iframe>
+      <iframe id="visitorFrame" title="방문자 화면" src="show8.html?preview=1#intro"></iframe>
     </section>
   </div>
   <main class="wrap">
@@ -477,7 +477,7 @@
       <p>오른쪽 방문자 화면의 참관객, 산업 분야, 동기간 전시, PSR 단추를 마우스로 끌어 순서를 바꿉니다. 아래 목록으로도 같은 순서를 바꿉니다.</p>
       <ul class="fold-order" id="foldOrder"></ul>
       <h2 style="margin-top:22px">PSR</h2>
-      <p>회차는 추가로 넣고, 빼기로 지웁니다. 보고서 PDF는 아래 칸이나 그 회차의 보고서 놓기에 끌어다 놓습니다. 보고서 지우기는 그 줄의 파일과 요약만 지우고 회차는 남깁니다. 글자가 그림인 파일도 이름은 남고, 수치는 요약칸에 직접 적습니다. 글자가 있는 파일은 주요 수치가 채워집니다.</p>
+      <p>회차는 추가로 넣고, 빼기로 지웁니다. 보고서 PDF는 아래 칸이나 그 회차의 보고서 놓기에 끌어다 놓습니다. 보고서 지우기는 그 줄의 파일만 지우고 회차는 남깁니다. 방문자 화면에서 그 회차를 누르면 보고서를 받을 수 있습니다. 파일은 이 브라우저에만 있습니다.</p>
       <div class="psr-tools">
         <button type="button" id="psrAdd">추가</button>
       </div>
@@ -1209,7 +1209,7 @@
               ? "넣었습니다. " + wrote.join(" · ") + (missed.length ? ". 브로셔에서 찾지 못해 그대로 둔 항목: " + missed.join(", ") : "") + extra.note
               : "이 PDF에서 규모 숫자를 찾지 못했습니다. 있는 숫자는 그대로 둡니다." + extra.note;
             var frame = document.getElementById("visitorFrame");
-            if (frame) stayHere(function () { frame.src = "show7.html?preview=1&t=" + Date.now(); });
+            if (frame) stayHere(function () { frame.src = "show8.html?preview=1&t=" + Date.now(); });
           }).catch(function () {
             note.textContent = "이 PDF에서 글자를 읽지 못했습니다.";
           });
@@ -1245,7 +1245,7 @@
         stayHere(function () {
           try { localStorage.setItem(key, JSON.stringify(data)); } catch (error) {}
           var frame = document.getElementById("visitorFrame");
-          if (frame) frame.src = "show7.html?preview=1&t=" + Date.now();
+          if (frame) frame.src = "show8.html?preview=1&t=" + Date.now();
         });
       }
       var orderList = document.getElementById("foldOrder");
@@ -1412,6 +1412,38 @@
           reader.readAsArrayBuffer(file);
         });
       }
+      var reportDb;
+      function openReports() {
+        return new Promise(function (resolve, reject) {
+          if (reportDb) { resolve(reportDb); return; }
+          var req = indexedDB.open("cmef2027-reports", 1);
+          req.onupgradeneeded = function () {
+            if (!req.result.objectStoreNames.contains("files")) req.result.createObjectStore("files");
+          };
+          req.onsuccess = function () { reportDb = req.result; resolve(reportDb); };
+          req.onerror = function () { reject(req.error); };
+        });
+      }
+      function reportStore(mode, work) {
+        return openReports().then(function (db) {
+          return new Promise(function (resolve, reject) {
+            var tx = db.transaction("files", mode);
+            var result = work(tx.objectStore("files"));
+            tx.oncomplete = function () { resolve(result); };
+            tx.onerror = function () { reject(tx.error); };
+          });
+        });
+      }
+      function saveReport(item, picked) {
+        if (!item.id) item.id = "r" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+        return reportStore("readwrite", function (store) {
+          store.put({ name: picked.name, blob: picked }, item.id);
+        });
+      }
+      function removeReport(item) {
+        if (!item.id) return Promise.resolve();
+        return reportStore("readwrite", function (store) { store.delete(item.id); });
+      }
       function paintPsrEdit() {
         psrList.innerHTML = "";
         data.psrList.forEach(function (item, index) {
@@ -1447,10 +1479,6 @@
           picker.accept = "application/pdf,.pdf";
           picker.hidden = true;
           picker.setAttribute("aria-label", (item.no || "이 회차") + " 자료");
-          var summary = document.createElement("textarea");
-          summary.value = item.summary || "";
-          summary.placeholder = "올린 자료의 짧은 요약";
-          summary.setAttribute("aria-label", "요약");
           var clearReport = document.createElement("button");
           clearReport.type = "button";
           clearReport.className = "clear-report";
@@ -1464,13 +1492,11 @@
             item.no = no.value.trim();
             item.en = season.value;
             item.ko = seasonKo[item.en] || "";
-            item.summary = summary.value.trim();
             refreshIntro();
           }
           year.addEventListener("change", keep);
           no.addEventListener("change", keep);
           season.addEventListener("change", keep);
-          summary.addEventListener("change", keep);
           function takeReport(picked) {
             var note = document.getElementById("psrNote");
             if (!picked) return;
@@ -1478,47 +1504,18 @@
               note.textContent = "보고서 PDF를 끌어다 놓으세요.";
               return;
             }
+            var previous = item.file || "";
             item.file = picked.name;
             file.textContent = picked.name || "보고서 놓기";
-            keep();
-            note.textContent = (item.no || "이 회차") + " 파일을 올렸습니다. 수치를 읽고 있습니다.";
-            readPsrFile(picked).then(function (result) {
-              if (!result.text) {
-                item.summary = "";
-                summary.value = "";
-                keep();
-                note.textContent = result.reason === "beijing"
-                  ? "파일은 올렸습니다. Beijing 내용만 있어 수치는 넣지 않았습니다. 요약칸에 직접 적을 수 있습니다."
-                  : "파일은 올렸습니다. 글자가 그림이라 수치는 읽지 못했습니다. 요약칸에 직접 적을 수 있습니다.";
-                return;
-              }
-              if (!item.year && !item.no) {
-                var number = result.text.match(/\b(\d{2,3}(?:st|nd|rd|th))\b/i);
-                var foundYear = result.text.match(/\b(20\d{2})\b/);
-                var springAt = result.text.search(/spring/i);
-                var autumnAt = result.text.search(/autumn|fall/i);
-                var seasonName = "";
-                if (springAt >= 0 && (autumnAt < 0 || springAt < autumnAt)) seasonName = "Spring";
-                else if (autumnAt >= 0) seasonName = "Autumn";
-                item.year = foundYear ? foundYear[1] : "";
-                item.no = number ? number[1] : "";
-                item.en = seasonName;
-                item.ko = seasonKo[seasonName] || "";
-                year.value = item.year;
-                no.value = item.no;
-                season.value = item.en;
-              }
-              item.file = picked.name;
-              item.summary = result.summary;
-              summary.value = result.summary;
-              file.textContent = picked.name || "보고서 놓기";
+            note.textContent = (item.no || "이 회차") + " 보고서를 올리고 있습니다.";
+            saveReport(item, picked).then(function () {
+              item.summary = "";
               keep();
-              note.textContent = result.summary
-                ? (item.no || "이 회차") + " 주요 수치를 넣었습니다."
-                : "일정과 규모를 짧게 추리지 못했습니다. 요약칸에 직접 적을 수 있습니다.";
+              note.textContent = (item.no || "이 회차") + " 보고서를 올렸습니다. 방문자 화면에서 받을 수 있습니다.";
             }).catch(function () {
-              keep();
-              note.textContent = "파일은 올렸습니다. 글자는 읽지 못했습니다. 요약칸에 직접 적을 수 있습니다.";
+              item.file = previous;
+              file.textContent = previous || "보고서 놓기";
+              note.textContent = "이 브라우저에 파일을 넣지 못했습니다.";
             });
           }
           var justDropped = false;
@@ -1562,16 +1559,17 @@
           }, true);
           clearReport.addEventListener("mousedown", function (event) { event.preventDefault(); });
           clearReport.addEventListener("click", function () {
+            removeReport(item);
             item.file = "";
             item.summary = "";
             file.textContent = "보고서 놓기";
-            summary.value = "";
             picker.value = "";
             refreshIntro();
-            document.getElementById("psrNote").textContent = (item.no || "이 회차") + " 보고서와 요약을 지웠습니다. 파일을 다시 놓으면 주요 수치가 들어갑니다.";
+            document.getElementById("psrNote").textContent = (item.no || "이 회차") + " 보고서를 지웠습니다.";
           });
           remove.addEventListener("mousedown", function (event) { event.preventDefault(); });
           remove.addEventListener("click", function () {
+            removeReport(item);
             data.psrList.splice(index, 1);
             paintPsrEdit();
             refreshIntro();
@@ -1581,7 +1579,6 @@
           row.appendChild(season);
           row.appendChild(file);
           row.appendChild(picker);
-          row.appendChild(summary);
           row.appendChild(clearReport);
           row.appendChild(remove);
           psrList.appendChild(row);
@@ -1594,37 +1591,15 @@
           note.textContent = "보고서 PDF를 끌어다 놓으세요.";
           return;
         }
-        var placed = { year: "", no: "", en: "", ko: "", summary: "", file: file.name };
-        data.psrList.unshift(placed);
-        paintPsrEdit();
-        refreshIntro();
-        note.textContent = "파일을 올렸습니다. 수치를 읽고 있습니다.";
-        readPsrFile(file).then(function (result) {
-          if (!result.text) {
-            note.textContent = result.reason === "beijing"
-              ? "파일은 올렸습니다. Beijing 내용만 있어 수치는 넣지 않았습니다. 요약칸에 직접 적을 수 있습니다."
-              : "파일은 올렸습니다. 글자가 그림이라 수치는 읽지 못했습니다. 요약칸에 직접 적을 수 있습니다.";
-            return;
-          }
-          var text = result.text;
-          var number = text.match(/\b(\d{2,3}(?:st|nd|rd|th))\b/i);
-          var year = text.match(/\b(20\d{2})\b/);
-          var springAt = text.search(/spring/i);
-          var autumnAt = text.search(/autumn|fall/i);
-          var season = "";
-          if (springAt >= 0 && (autumnAt < 0 || springAt < autumnAt)) season = "Spring";
-          else if (autumnAt >= 0) season = "Autumn";
-          placed.year = year ? year[1] : "";
-          placed.no = number ? number[1] : "";
-          placed.en = season;
-          placed.ko = seasonKo[season] || "";
-          placed.summary = result.summary;
-          placed.file = file.name;
+        var placed = { id: "r" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7), year: "", no: "", en: "", ko: "", summary: "", file: file.name };
+        note.textContent = "보고서를 올리고 있습니다.";
+        saveReport(placed, file).then(function () {
+          data.psrList.unshift(placed);
           paintPsrEdit();
           refreshIntro();
-          note.textContent = (number ? number[1] : "회차 미정") + (season ? " " + season : "") + " 을 목록 앞에 넣었습니다." + (result.summary ? " 주요 수치가 보입니다." : " 요약은 비어 있어 회차만 보입니다.");
+          note.textContent = "보고서를 올렸습니다. 방문자 화면에서 받을 수 있습니다.";
         }).catch(function () {
-          note.textContent = "파일은 올렸습니다. 글자는 읽지 못했습니다. 요약칸에 직접 적을 수 있습니다.";
+          note.textContent = "이 브라우저에 파일을 넣지 못했습니다.";
         });
       }
       document.getElementById("psrAdd").addEventListener("mousedown", function (event) { event.preventDefault(); });
@@ -1706,7 +1681,7 @@
         data.applyPeriod = from && to ? from + " – " + to : (from || to);
         try { localStorage.setItem(key, JSON.stringify(data)); } catch (error) {}
         var frame = document.getElementById("visitorFrame");
-        if (frame) stayHere(function () { frame.src = "show7.html?preview=1&t=" + Date.now(); });
+        if (frame) stayHere(function () { frame.src = "show8.html?preview=1&t=" + Date.now(); });
       }
       startInput.value = data.applyStart || "";
       endInput.value = data.applyEnd || "";
@@ -1957,7 +1932,7 @@
       }
       document.getElementById("status").textContent = zoneHall.value + " 구획을 확정했습니다. 업체 화면에서 그 구획을 누르면 이 관의 기업 위치로 이동합니다. 아래 시안 반영은 다른 정보를 다 적은 뒤에 누릅니다.";
       var frame = document.getElementById("visitorFrame");
-      if (frame) frame.src = "show7.html?preview=1#map";
+      if (frame) frame.src = "show8.html?preview=1#map";
     });
     document.getElementById("zoneCancel").addEventListener("click", function () {
       draftPoints.pop();
@@ -2593,7 +2568,7 @@
         var visitorLink = document.querySelector(".to-visitor");
         if (visitorLink) visitorLink.setAttribute("href", "fair.html#" + id);
         var frame = document.getElementById("visitorFrame");
-        if (frame) frame.src = "show7.html?preview=1#" + id;
+        if (frame) frame.src = "show8.html?preview=1#" + id;
         if (location.hash !== "#" + id) history.replaceState(null, "", "#" + id);
         window.scrollTo(0, 0);
       }
@@ -2620,7 +2595,7 @@
           var frame = document.getElementById("visitorFrame");
           if (!frame) return;
           var id = (location.hash || "#intro").replace("#", "");
-          frame.src = "show7.html?preview=1#" + id;
+          frame.src = "show8.html?preview=1#" + id;
         });
       }
     })();
