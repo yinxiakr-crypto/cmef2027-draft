@@ -132,22 +132,42 @@
       overflow: auto;
     }
     .psr-menu[hidden] { display: none; }
-    .psr-menu button {
-      width: 100%;
+    .psr-menu .row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--line);
+      background: #fff;
+    }
+    .psr-menu button.pick {
+      flex: 1;
+      min-width: 0;
       display: flex;
       align-items: baseline;
       justify-content: space-between;
       gap: 16px;
       border: 0;
-      border-bottom: 1px solid var(--line);
-      background: #fff;
+      background: transparent;
       font: inherit;
       text-align: left;
       padding: 12px 16px;
       cursor: pointer;
     }
-    .psr-menu button:hover,
-    .psr-menu button.on { background: #f6f4ef; }
+    .psr-menu .row:hover,
+    .psr-menu button.pick.on { background: #f6f4ef; }
+    .psr-menu .get,
+    .brief .get {
+      flex: none;
+      margin: 0 12px 0 0;
+      min-height: 36px;
+      padding: 0 14px;
+      border: 0;
+      border-radius: 8px;
+      background: #141414;
+      color: #fff;
+      font: inherit;
+      cursor: pointer;
+    }
     .psr-menu .en { font-size: 16px; font-weight: 720; }
     .psr-menu .ko { font-size: 12px; color: var(--muted); }
     .brief {
@@ -162,17 +182,11 @@
     .brief li { padding: 8px 0; border-top: 1px solid var(--line); font-size: 16px; }
     .brief li span { display: block; margin-top: 2px; color: var(--muted); font-size: 12px; }
     .brief { cursor: pointer; }
-    .brief .get {
-      display: inline-block;
-      margin-top: 16px;
-      min-height: 44px;
-      padding: 0 16px;
-      border: 0;
-      border-radius: 10px;
-      background: #141414;
-      color: #fff;
-      font: inherit;
-      cursor: pointer;
+    .brief .head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
     }
     .brief .stats {
       display: grid;
@@ -1503,47 +1517,48 @@ HQI light × 1</span></td>
         });
       });
     }
+    function downloadReport(fair, button) {
+      loadReport(fair).then(function (saved) {
+        if (!saved || !saved.blob) {
+          button.textContent = "download";
+          return;
+        }
+        var url = URL.createObjectURL(saved.blob);
+        var link = document.createElement("a");
+        link.href = url;
+        link.download = saved.name || fair.file || "report.pdf";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+      }).catch(function () {
+        button.textContent = "download";
+      });
+    }
     function showBrief(fair, button) {
-      menu.querySelectorAll("button").forEach(function (item) { item.classList.remove("on"); });
-      button.classList.add("on");
+      menu.querySelectorAll("button.pick").forEach(function (item) { item.classList.remove("on"); });
+      if (button) button.classList.add("on");
       menu.hidden = true;
       briefBox.hidden = false;
       psrBtn.setAttribute("aria-expanded", "true");
       psrBtn.querySelector(".chev").textContent = "–";
       briefBox.innerHTML = "";
+      var head = document.createElement("div");
+      head.className = "head";
       var title = document.createElement("p");
       title.className = "en";
       title.textContent = ((fair.no || "") + " " + (fair.en || "")).trim();
-      var season = document.createElement("p");
-      season.className = "ko";
-      season.textContent = fair.ko || "";
-      briefBox.appendChild(title);
-      briefBox.appendChild(season);
       var down = document.createElement("button");
       down.type = "button";
       down.className = "get";
-      down.textContent = fair.file ? "보고서 받기" : "아직 보고서가 없습니다";
-      if (!fair.file) down.disabled = true;
+      down.textContent = "download";
       down.addEventListener("click", function (event) {
         event.stopPropagation();
-        loadReport(fair).then(function (saved) {
-          if (!saved || !saved.blob) {
-            down.textContent = "이 브라우저에 파일이 없습니다";
-            return;
-          }
-          var url = URL.createObjectURL(saved.blob);
-          var link = document.createElement("a");
-          link.href = url;
-          link.download = saved.name || fair.file || "report.pdf";
-          document.body.appendChild(link);
-          link.click();
-          link.remove();
-          setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
-        }).catch(function () {
-          down.textContent = "이 브라우저에 파일이 없습니다";
-        });
+        downloadReport(fair, down);
       });
-      briefBox.appendChild(down);
+      head.appendChild(title);
+      head.appendChild(down);
+      briefBox.appendChild(head);
     }
     function paintPsr(list) {
       menu.innerHTML = "";
@@ -1551,14 +1566,27 @@ HQI light × 1</span></td>
       briefBox.innerHTML = "";
       list.forEach(function (fair) {
         if (!fair.year && !fair.no && !fair.file) return;
+        var row = document.createElement("div");
+        row.className = "row";
         var button = document.createElement("button");
         button.type = "button";
-        button.innerHTML = '<span class="en">' + (fair.year ? fair.year + " " : "") + fair.no + "</span><span class=\"ko\">" + fair.en + (fair.ko ? " · " + fair.ko : "") + "</span>";
+        button.className = "pick";
+        button.innerHTML = '<span class="en">' + (fair.year ? fair.year + " " : "") + fair.no + "</span><span class=\"ko\">" + (fair.en || "") + "</span>";
         button.addEventListener("click", function (event) {
           event.stopPropagation();
           showBrief(fair, button);
         });
-        menu.appendChild(button);
+        var down = document.createElement("button");
+        down.type = "button";
+        down.className = "get";
+        down.textContent = "download";
+        down.addEventListener("click", function (event) {
+          event.stopPropagation();
+          downloadReport(fair, down);
+        });
+        row.appendChild(button);
+        row.appendChild(down);
+        menu.appendChild(row);
       });
     }
     paintPsr(fairs);
