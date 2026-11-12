@@ -306,6 +306,8 @@
       cursor: pointer;
     }
     .money-pick button.on { background: var(--deep); color: #fff; border-color: var(--deep); }
+    .fx-line { margin: 0 0 10px; color: var(--muted); font-size: 13px; }
+    .fx-line a { color: inherit; }
     #boothTypes.usd .rmb, #boothTypes.rmb .usd { display: none; }
     .fee .total-line b { font-size: 20px; }
     .booth-table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--line); }
@@ -1220,9 +1222,10 @@
           </div>
           <div class="money-pick" role="group" aria-label="화폐">
             <button type="button" data-money="usd" class="on">USD</button>
-            <button type="button" data-money="rmb">RMB</button>
+            <button type="button" data-money="cny">CNY</button>
           </div>
         </div>
+        <p class="fx-line" id="fxLine">네이버 환율을 불러오는 중입니다.</p>
         <p id="introNoteView" hidden></p>
         <table class="booth-table">
           <thead>
@@ -1265,6 +1268,7 @@ HQI light × 1</span></td>
             <div><span>Catalogue fee · 필수</span><b id="totalCat"></b></div>
             <div><span>Online promotion fee</span><b id="totalPromo"></b></div>
             <div class="total-line"><span>합계</span><b id="totalSum"></b></div>
+            <div><span>원화</span><b id="totalKrw"></b></div>
           </div>
           <div class="fee-actions"><button type="button" id="pickType">이 타입으로 신청</button></div>
         </div>
@@ -1910,15 +1914,77 @@ HQI light × 1</span></td>
     var boothMoneyNow = "usd";
     var pickedKind = "";
     var siteCount = 1;
-    var boothQuote = {
-      raw: { name: "Raw space", usd: 4230, rmb: 26100, ids: ["typeName0", "typeInfo0", "typeArea0", "typePrice0"] },
-      standard: { name: "Basic Shell Scheme", usd: 4770, rmb: 28800, ids: ["typeName1", "typeInfo1", "typeArea1", "typePrice1"] },
-      upgrade: { name: "Upgraded Shell Scheme", usd: 5058, rmb: 30798, ids: ["typeName2", "typeInfo2", "typeArea2", "typePrice2"] }
+    var fx = { usd: null, cny: null };
+    var fxState = "loading";
+    var fxPage = {
+      usd: "https://m.stock.naver.com/marketindex/exchange/FX_USDKRW",
+      cny: "https://m.stock.naver.com/marketindex/exchange/FX_CNYKRW"
     };
-    var feeQuote = { usd: { cat: 61, promo: 600 }, rmb: { cat: 371, promo: 4000 } };
+    var boothQuote = {
+      raw: { name: "Raw space", usd: 4230, cny: 26100, ids: ["typeName0", "typeInfo0", "typeArea0", "typePrice0"] },
+      standard: { name: "Basic Shell Scheme", usd: 4770, cny: 28800, ids: ["typeName1", "typeInfo1", "typeArea1", "typePrice1"] },
+      upgrade: { name: "Upgraded Shell Scheme", usd: 5058, cny: 30798, ids: ["typeName2", "typeInfo2", "typeArea2", "typePrice2"] }
+    };
+    var feeQuote = { usd: { cat: 61, promo: 600 }, cny: { cat: 371, promo: 4000 } };
+    function groupDigits(text) {
+      return text.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
     function moneyText(amount) {
-      var unit = boothMoneyNow === "usd" ? "USD " : "RMB ";
-      return unit + String(amount).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      var unit = boothMoneyNow === "cny" ? "CNY " : "USD ";
+      return unit + groupDigits(String(amount));
+    }
+    function rateText(rate) {
+      var parts = rate.toFixed(2).split(".");
+      return groupDigits(parts[0]) + "." + parts[1];
+    }
+    function showFx() {
+      var line = document.getElementById("fxLine");
+      if (!line) return;
+      var item = fx[boothMoneyNow];
+      line.textContent = "";
+      if (fxState === "loading" || !item) {
+        line.textContent = fxState === "loading" ? "네이버 환율을 불러오는 중입니다." : "네이버 환율을 가져오지 못했습니다.";
+        return;
+      }
+      var name = boothMoneyNow === "cny" ? "CNY" : "USD";
+      line.append("1 " + name + " = " + rateText(item.rate) + " KRW · ");
+      var link = document.createElement("a");
+      link.href = fxPage[boothMoneyNow];
+      link.target = "_blank";
+      link.rel = "noopener";
+      link.textContent = "네이버";
+      line.appendChild(link);
+      line.append(" · " + item.date);
+    }
+    function krwText(amount) {
+      var item = fx[boothMoneyNow];
+      if (!item) return "환율 없음";
+      return "KRW " + groupDigits(String(Math.round(amount * item.rate)));
+    }
+    function readFxNode(node) {
+      var rate = Number(node && node.rate);
+      var date = node && String(node.date || "");
+      if (!isFinite(rate) || rate <= 0 || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
+      return { rate: rate, date: date };
+    }
+    function loadFx() {
+      fetch("rate.json", { cache: "no-store" }).then(function (res) {
+        if (!res.ok) throw new Error("rate");
+        return res.json();
+      }).then(function (data) {
+        var usd = readFxNode(data && data.usd);
+        var cny = readFxNode(data && data.cny);
+        if (!usd || !cny) throw new Error("rate");
+        fx.usd = usd;
+        fx.cny = cny;
+        fxState = "ready";
+        showFx();
+        if (pickedKind) showPicked(pickedKind);
+      }).catch(function () {
+        fxState = "error";
+        showFx();
+        if (pickedKind) showPicked(pickedKind);
+      });
     }
     function showPicked(kind) {
       pickedKind = kind || "";
@@ -1942,7 +2008,9 @@ HQI light × 1</span></td>
       document.getElementById("totalBooth").textContent = moneyText(booth);
       document.getElementById("totalCat").textContent = moneyText(extra.cat);
       document.getElementById("totalPromo").textContent = moneyText(extra.promo);
-      document.getElementById("totalSum").textContent = moneyText(booth + extra.cat + extra.promo);
+      var sum = booth + extra.cat + extra.promo;
+      document.getElementById("totalSum").textContent = moneyText(sum);
+      document.getElementById("totalKrw").textContent = krwText(sum);
     }
     function changeSites(step) {
       siteCount = Math.min(20, Math.max(1, siteCount + step));
@@ -1952,18 +2020,23 @@ HQI light × 1</span></td>
     }
     document.getElementById("siteMinus").addEventListener("click", function () { changeSites(-1); });
     document.getElementById("sitePlus").addEventListener("click", function () { changeSites(1); });
+    function chooseMoney(code) {
+      boothMoneyNow = code === "cny" ? "cny" : "usd";
+      var box = document.getElementById("boothTypes");
+      box.classList.toggle("usd", boothMoneyNow === "usd");
+      box.classList.toggle("cny", boothMoneyNow === "cny");
+      document.querySelectorAll(".money-pick button").forEach(function (node) {
+        node.classList.toggle("on", node.dataset.money === boothMoneyNow);
+      });
+      showFx();
+      if (pickedKind) showPicked(pickedKind);
+    }
     document.querySelectorAll(".money-pick button").forEach(function (button) {
       button.addEventListener("click", function () {
-        boothMoneyNow = button.dataset.money === "rmb" ? "rmb" : "usd";
-        var box = document.getElementById("boothTypes");
-        box.classList.toggle("usd", boothMoneyNow === "usd");
-        box.classList.toggle("rmb", boothMoneyNow === "rmb");
-        document.querySelectorAll(".money-pick button").forEach(function (node) {
-          node.classList.toggle("on", node === button);
-        });
-        if (pickedKind) showPicked(pickedKind);
+        chooseMoney(button.dataset.money);
       });
     });
+    loadFx();
     document.querySelectorAll(".booth-table tr.pick").forEach(function (row) {
       row.addEventListener("click", function () {
         showPicked(row.dataset.kind === pickedKind ? "" : row.dataset.kind);
@@ -2040,10 +2113,11 @@ HQI light × 1</span></td>
           layer.appendChild(poly);
         });
         if (saved.currency) {
-          boothMoney = saved.currency;
+          boothMoney = saved.currency === "CNY" ? "CNY" : "USD";
           document.querySelectorAll(".unit").forEach(function (node) {
             node.textContent = boothMoney + " · 9㎡";
           });
+          if (saved.currency === "CNY") chooseMoney("cny");
         }
         if (saved.dataStats) {
           Object.keys(saved.dataStats).forEach(function (name) {

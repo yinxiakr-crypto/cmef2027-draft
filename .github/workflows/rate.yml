@@ -1,0 +1,44 @@
+name: Naver rate
+
+on:
+  schedule:
+    - cron: "30 0 * * *"
+    - cron: "30 6 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read the Naver rate
+        run: |
+          python3 - << 'PY'
+          import json
+          import urllib.request
+
+          def one(code):
+              url = "https://api.stock.naver.com/marketindex/exchange/%s/prices?page=1&pageSize=1" % code
+              req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+              with urllib.request.urlopen(req, timeout=20) as res:
+                  row = json.load(res)[0]
+              rate = float(str(row["closePrice"]).replace(",", ""))
+              date = str(row["localTradedAt"])
+              if rate <= 0 or len(date) != 10:
+                  raise SystemExit("unexpected rate")
+              return {"date": date, "rate": rate}
+
+          data = {"source": "네이버", "usd": one("FX_USDKRW"), "cny": one("FX_CNYKRW")}
+          with open("rate.json", "w", encoding="utf-8") as handle:
+              json.dump(data, handle, ensure_ascii=False, indent=2)
+              handle.write("\n")
+          PY
+      - name: Save the rate
+        run: |
+          git add rate.json
+          git diff --cached --quiet && exit 0
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "Update the Naver won rate shown on the booth price."
+          git push

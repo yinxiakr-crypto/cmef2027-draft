@@ -453,7 +453,7 @@
         <button type="button" id="visitorRefresh">다시 보기</button>
         <button type="button" id="visitorFold" aria-expanded="true">접기</button>
       </div>
-      <iframe id="visitorFrame" title="방문자 화면" src="show9.html?preview=1#intro"></iframe>
+      <iframe id="visitorFrame" title="방문자 화면" src="show10.html?preview=1#intro"></iframe>
     </section>
   </div>
   <main class="wrap">
@@ -486,12 +486,10 @@
       <input id="psrFile" type="file" accept="application/pdf,.pdf" hidden>
       <ul class="psr-edit" id="psrEdit"></ul>
       <h2 style="margin-top:22px">부스 <span class="tag">금액 · 종류</span></h2>
-      <p>Raw space는 양탄자 그림입니다. Shell scheme 사진은 하나이고, Information을 Standard와 Upgrade 두 줄로 나눕니다. 금액이 달라서 셋 다 고를 수 있습니다. 화폐는 베트남과 같은 화면이라 여기서 고릅니다.</p>
+      <p>Raw space는 양탄자 그림입니다. Shell scheme 사진은 하나이고, Information을 Standard와 Upgrade 두 줄로 나눕니다. 금액이 달라서 셋 다 고를 수 있습니다. 화폐는 USD와 CNY입니다. 방문자 화면에서 고른 금액은 네이버 당일 환율로 원화가 나옵니다.</p>
       <label>화폐
         <select id="currency">
           <option value="USD">USD</option>
-          <option value="KRW">KRW</option>
-          <option value="VND">VND</option>
           <option value="CNY">CNY</option>
         </select>
       </label>
@@ -1209,7 +1207,7 @@
               ? "넣었습니다. " + wrote.join(" · ") + (missed.length ? ". 브로셔에서 찾지 못해 그대로 둔 항목: " + missed.join(", ") : "") + extra.note
               : "이 PDF에서 규모 숫자를 찾지 못했습니다. 있는 숫자는 그대로 둡니다." + extra.note;
             var frame = document.getElementById("visitorFrame");
-            if (frame) stayHere(function () { frame.src = "show9.html?preview=1&t=" + Date.now(); });
+            if (frame) stayHere(function () { frame.src = "show10.html?preview=1&t=" + Date.now(); });
           }).catch(function () {
             note.textContent = "이 PDF에서 글자를 읽지 못했습니다.";
           });
@@ -1245,7 +1243,7 @@
         stayHere(function () {
           try { localStorage.setItem(key, JSON.stringify(data)); } catch (error) {}
           var frame = document.getElementById("visitorFrame");
-          if (frame) frame.src = "show9.html?preview=1&t=" + Date.now();
+          if (frame) frame.src = "show10.html?preview=1&t=" + Date.now();
         });
       }
       var orderList = document.getElementById("foldOrder");
@@ -1681,7 +1679,7 @@
         data.applyPeriod = from && to ? from + " – " + to : (from || to);
         try { localStorage.setItem(key, JSON.stringify(data)); } catch (error) {}
         var frame = document.getElementById("visitorFrame");
-        if (frame) stayHere(function () { frame.src = "show9.html?preview=1&t=" + Date.now(); });
+        if (frame) stayHere(function () { frame.src = "show10.html?preview=1&t=" + Date.now(); });
       }
       startInput.value = data.applyStart || "";
       endInput.value = data.applyEnd || "";
@@ -1704,7 +1702,8 @@
     fill("typePrice2", "typePrice2");
     fill("typeKit2", "typeKit2");
     var currency = document.getElementById("currency");
-    currency.value = data.currency || "USD";
+    if (data.currency !== "USD" && data.currency !== "CNY") data.currency = "USD";
+    currency.value = data.currency;
     function showCurrency() {
       document.querySelectorAll(".money-name").forEach(function (node) {
         node.textContent = data.currency || "USD";
@@ -1932,7 +1931,7 @@
       }
       document.getElementById("status").textContent = zoneHall.value + " 구획을 확정했습니다. 업체 화면에서 그 구획을 누르면 이 관의 기업 위치로 이동합니다. 아래 시안 반영은 다른 정보를 다 적은 뒤에 누릅니다.";
       var frame = document.getElementById("visitorFrame");
-      if (frame) frame.src = "show9.html?preview=1#map";
+      if (frame) frame.src = "show10.html?preview=1#map";
     });
     document.getElementById("zoneCancel").addEventListener("click", function () {
       draftPoints.pop();
@@ -2568,7 +2567,7 @@
         var visitorLink = document.querySelector(".to-visitor");
         if (visitorLink) visitorLink.setAttribute("href", "fair.html#" + id);
         var frame = document.getElementById("visitorFrame");
-        if (frame) frame.src = "show9.html?preview=1#" + id;
+        if (frame) frame.src = "show10.html?preview=1#" + id;
         if (location.hash !== "#" + id) history.replaceState(null, "", "#" + id);
         window.scrollTo(0, 0);
       }
@@ -2595,7 +2594,7 @@
           var frame = document.getElementById("visitorFrame");
           if (!frame) return;
           var id = (location.hash || "#intro").replace("#", "");
-          frame.src = "show9.html?preview=1#" + id;
+          frame.src = "show10.html?preview=1#" + id;
         });
       }
     })();
