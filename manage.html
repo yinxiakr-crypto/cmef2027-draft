@@ -477,7 +477,7 @@
       <p>오른쪽 방문자 화면의 참관객, 산업 분야, 동기간 전시, PSR 단추를 마우스로 끌어 순서를 바꿉니다. 아래 목록으로도 같은 순서를 바꿉니다.</p>
       <ul class="fold-order" id="foldOrder"></ul>
       <h2 style="margin-top:22px">PSR</h2>
-      <p>회차는 추가로 넣고, 빼기로 지웁니다. 보고서 PDF는 아래 칸에 끌어다 놓으면 새 회차가 생깁니다. 이미 있는 회차는 그 줄의 보고서 놓기에 놓습니다. 보고서 지우기는 그 줄의 파일과 요약만 지우고 회차는 남깁니다. 방문자 화면에는 일정·장소와, 파일에 있는 주요 수치가 보입니다.</p>
+      <p>회차는 추가로 넣고, 빼기로 지웁니다. 보고서 PDF는 아래 칸이나 그 회차의 보고서 놓기에 끌어다 놓습니다. 보고서 지우기는 그 줄의 파일과 요약만 지우고 회차는 남깁니다. 글자가 그림인 파일도 이름은 남고, 수치는 요약칸에 직접 적습니다. 글자가 있는 파일은 주요 수치가 채워집니다.</p>
       <div class="psr-tools">
         <button type="button" id="psrAdd">추가</button>
       </div>
@@ -1437,9 +1437,10 @@
           blank.textContent = "시기";
           season.insertBefore(blank, season.firstChild);
           season.value = item.en === "Autumn" || item.en === "Spring" ? item.en : "";
-          var file = document.createElement("button");
-          file.type = "button";
+          var file = document.createElement("div");
           file.className = "row-drop";
+          file.setAttribute("role", "button");
+          file.tabIndex = 0;
           file.textContent = item.file || "보고서 놓기";
           var picker = document.createElement("input");
           picker.type = "file";
@@ -1473,12 +1474,22 @@
           function takeReport(picked) {
             var note = document.getElementById("psrNote");
             if (!picked) return;
-            note.textContent = (item.no || "이 회차") + " 자료를 읽고 있습니다.";
+            if (!/pdf$/i.test(picked.type) && !/\.pdf$/i.test(picked.name)) {
+              note.textContent = "보고서 PDF를 끌어다 놓으세요.";
+              return;
+            }
+            item.file = picked.name;
+            file.textContent = picked.name || "보고서 놓기";
+            keep();
+            note.textContent = (item.no || "이 회차") + " 파일을 올렸습니다. 수치를 읽고 있습니다.";
             readPsrFile(picked).then(function (result) {
               if (!result.text) {
+                item.summary = "";
+                summary.value = "";
+                keep();
                 note.textContent = result.reason === "beijing"
-                  ? "이 파일은 Beijing 내용만 있어 넣지 않았습니다."
-                  : "이 파일은 글자가 그림으로만 있어 수치를 읽지 못했습니다.";
+                  ? "파일은 올렸습니다. Beijing 내용만 있어 수치는 넣지 않았습니다. 요약칸에 직접 적을 수 있습니다."
+                  : "파일은 올렸습니다. 글자가 그림이라 수치는 읽지 못했습니다. 요약칸에 직접 적을 수 있습니다.";
                 return;
               }
               if (!item.year && !item.no) {
@@ -1506,7 +1517,8 @@
                 ? (item.no || "이 회차") + " 주요 수치를 넣었습니다."
                 : "일정과 규모를 짧게 추리지 못했습니다. 요약칸에 직접 적을 수 있습니다.";
             }).catch(function () {
-              note.textContent = "이 PDF에서 글자를 읽지 못했습니다.";
+              keep();
+              note.textContent = "파일은 올렸습니다. 글자는 읽지 못했습니다. 요약칸에 직접 적을 수 있습니다.";
             });
           }
           var justDropped = false;
@@ -1519,12 +1531,19 @@
             if (justDropped) { justDropped = false; return; }
             picker.click();
           });
-          row.addEventListener("dragover", function (event) {
+          file.addEventListener("keydown", function (event) {
+            if (event.key !== "Enter" && event.key !== " ") return;
+            event.preventDefault();
+            picker.click();
+          });
+          function overRow(event) {
             if (!event.dataTransfer || !event.dataTransfer.types || [].indexOf.call(event.dataTransfer.types, "Files") < 0) return;
             event.preventDefault();
             event.stopPropagation();
             row.classList.add("drop");
-          });
+          }
+          row.addEventListener("dragenter", overRow, true);
+          row.addEventListener("dragover", overRow, true);
           row.addEventListener("dragleave", function (event) {
             if (row.contains(event.relatedTarget)) return;
             row.classList.remove("drop");
@@ -1540,7 +1559,7 @@
               return;
             }
             takeReport(dropped);
-          });
+          }, true);
           clearReport.addEventListener("mousedown", function (event) { event.preventDefault(); });
           clearReport.addEventListener("click", function () {
             item.file = "";
@@ -1575,12 +1594,16 @@
           note.textContent = "보고서 PDF를 끌어다 놓으세요.";
           return;
         }
-        note.textContent = "PSR을 읽고 있습니다.";
+        var placed = { year: "", no: "", en: "", ko: "", summary: "", file: file.name };
+        data.psrList.unshift(placed);
+        paintPsrEdit();
+        refreshIntro();
+        note.textContent = "파일을 올렸습니다. 수치를 읽고 있습니다.";
         readPsrFile(file).then(function (result) {
           if (!result.text) {
             note.textContent = result.reason === "beijing"
-              ? "이 파일은 Beijing 내용만 있어 넣지 않았습니다."
-              : "이 파일은 글자가 그림으로만 있어 수치를 읽지 못했습니다.";
+              ? "파일은 올렸습니다. Beijing 내용만 있어 수치는 넣지 않았습니다. 요약칸에 직접 적을 수 있습니다."
+              : "파일은 올렸습니다. 글자가 그림이라 수치는 읽지 못했습니다. 요약칸에 직접 적을 수 있습니다.";
             return;
           }
           var text = result.text;
@@ -1591,19 +1614,17 @@
           var season = "";
           if (springAt >= 0 && (autumnAt < 0 || springAt < autumnAt)) season = "Spring";
           else if (autumnAt >= 0) season = "Autumn";
-          data.psrList.unshift({
-            year: year ? year[1] : "",
-            no: number ? number[1] : "",
-            en: season,
-            ko: seasonKo[season] || "",
-            summary: result.summary,
-            file: file.name
-          });
+          placed.year = year ? year[1] : "";
+          placed.no = number ? number[1] : "";
+          placed.en = season;
+          placed.ko = seasonKo[season] || "";
+          placed.summary = result.summary;
+          placed.file = file.name;
           paintPsrEdit();
           refreshIntro();
           note.textContent = (number ? number[1] : "회차 미정") + (season ? " " + season : "") + " 을 목록 앞에 넣었습니다." + (result.summary ? " 주요 수치가 보입니다." : " 요약은 비어 있어 회차만 보입니다.");
         }).catch(function () {
-          note.textContent = "이 PDF에서 글자를 읽지 못했습니다.";
+          note.textContent = "파일은 올렸습니다. 글자는 읽지 못했습니다. 요약칸에 직접 적을 수 있습니다.";
         });
       }
       document.getElementById("psrAdd").addEventListener("mousedown", function (event) { event.preventDefault(); });
@@ -1622,12 +1643,14 @@
       }
       function bindFileDrop(box, onFile) {
         var skipClick = false;
-        box.addEventListener("dragover", function (event) {
+        function overBox(event) {
           if (!hasFiles(event)) return;
           event.preventDefault();
           event.stopPropagation();
           box.classList.add("drop");
-        });
+        }
+        box.addEventListener("dragenter", overBox);
+        box.addEventListener("dragover", overBox);
         box.addEventListener("dragleave", function (event) {
           if (box.contains(event.relatedTarget)) return;
           box.classList.remove("drop");
@@ -1648,6 +1671,9 @@
       }
       bindFileDrop(document.getElementById("brochureDrop"), readBrochure);
       bindFileDrop(document.getElementById("psrDrop"), addReport);
+      window.addEventListener("dragenter", function (event) {
+        if (hasFiles(event)) event.preventDefault();
+      });
       window.addEventListener("dragover", function (event) {
         if (hasFiles(event)) event.preventDefault();
       });
