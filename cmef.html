@@ -445,6 +445,25 @@
     .lock-card, .plain-card { margin-top: 18px; background: #fff; border: 1px solid var(--line); padding: 22px 22px 20px; }
     .lock-card b, .plain-card b { display: block; font-size: 22px; font-weight: 720; }
     .plain-card strong { display: block; margin-top: 12px; font-size: 28px; font-weight: 680; }
+    .map-lang { display: flex; gap: 6px; margin-top: 14px; }
+    .map-lang button {
+      min-height: 32px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 720;
+      cursor: pointer;
+    }
+    .map-lang button.on { background: var(--deep); color: #fff; border-color: var(--deep); }
+    .map-lang button:disabled { opacity: 0.4; cursor: default; }
+    .map-addr, .map-empty { display: block; margin-top: 12px; font-size: 15px; line-height: 1.5; }
+    .map-empty { color: var(--muted); }
+    #venueMap { width: 100%; height: 360px; margin-top: 12px; border: 0; }
+    #mapOpen { display: inline-block; margin-top: 10px; color: var(--red); font-size: 14px; font-weight: 680; }
     .match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 18px; }
     .match-card { background: #fff; border: 1px solid var(--line); padding: 22px; }
     .match-card h3 { margin: 0; font-size: 18px; font-weight: 720; }
@@ -1464,7 +1483,14 @@ HQI light × 1</span></td>
       <h2>공지</h2>
       <div class="plain-card" id="noticeCard">
         <b id="noticeTitle">전시장 맵</b>
-        <span id="noticeBody"></span>
+        <div class="map-lang" id="mapLang">
+          <button type="button" data-lang="en">영문</button>
+          <button type="button" data-lang="zh">중국어</button>
+        </div>
+        <span class="map-addr" id="mapAddr"></span>
+        <iframe id="venueMap" title="전시장 지도" hidden></iframe>
+        <a id="mapOpen" hidden target="_blank" rel="noopener">구글 지도에서 열기</a>
+        <span class="map-empty" id="mapEmpty">주소나 전시장 명칭을 넣으면 지도가 열립니다.</span>
       </div>
       <div class="plain-card">
         <b>입장 방법</b>
@@ -2068,6 +2094,49 @@ HQI light × 1</span></td>
     document.getElementById("backHall").addEventListener("click", showHall);
     document.getElementById("backSection").addEventListener("click", showHall);
 
+    var venueMapLang = "en";
+    var venueMapEn = "";
+    var venueMapZh = "";
+    function paintVenueMap() {
+      var enBtn = document.querySelector("#mapLang [data-lang='en']");
+      var zhBtn = document.querySelector("#mapLang [data-lang='zh']");
+      var frame = document.getElementById("venueMap");
+      var open = document.getElementById("mapOpen");
+      var addr = document.getElementById("mapAddr");
+      var empty = document.getElementById("mapEmpty");
+      enBtn.disabled = !venueMapEn;
+      zhBtn.disabled = !venueMapZh;
+      if (!venueMapEn && !venueMapZh) {
+        frame.hidden = true;
+        frame.removeAttribute("src");
+        open.hidden = true;
+        addr.textContent = "";
+        empty.hidden = false;
+        enBtn.classList.remove("on");
+        zhBtn.classList.remove("on");
+        return;
+      }
+      if (venueMapLang === "en" && !venueMapEn) venueMapLang = "zh";
+      if (venueMapLang === "zh" && !venueMapZh) venueMapLang = "en";
+      enBtn.classList.toggle("on", venueMapLang === "en");
+      zhBtn.classList.toggle("on", venueMapLang === "zh");
+      var query = venueMapLang === "zh" ? venueMapZh : venueMapEn;
+      var hl = venueMapLang === "zh" ? "zh-CN" : "en";
+      frame.hidden = false;
+      frame.src = "https://maps.google.com/maps?q=" + encodeURIComponent(query) + "&hl=" + hl + "&z=15&output=embed";
+      open.hidden = false;
+      open.href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(query) + "&hl=" + hl;
+      addr.textContent = query;
+      empty.hidden = true;
+    }
+    document.querySelectorAll("#mapLang button").forEach(function (button) {
+      button.addEventListener("click", function () {
+        if (button.disabled) return;
+        venueMapLang = button.getAttribute("data-lang");
+        paintVenueMap();
+      });
+    });
+
     try {
       var saved = JSON.parse(localStorage.getItem("cmef2027-draft") || "null");
       if (saved) {
@@ -2207,7 +2276,8 @@ HQI light × 1</span></td>
           note.hidden = false;
           note.textContent = saved.introNote;
         }
-        if (saved.noticeBody) document.getElementById("noticeBody").textContent = saved.noticeBody;
+        venueMapEn = (saved.noticeMapEn || "").trim();
+        venueMapZh = (saved.noticeMapZh || "").trim();
         if (saved.noticeEntry) document.getElementById("noticeEntry").textContent = saved.noticeEntry;
         if (saved.applyLink) window.cmefApplyLink = saved.applyLink;
         if (saved.booths && saved.booths.length && typeof saved.booths[0] === "object") {
@@ -2236,6 +2306,7 @@ HQI light × 1</span></td>
         }
       }
     } catch (error) {}
+    paintVenueMap();
     var koreaSamples = [
       { hall: "5.2", booth: "5.2F37", company: "비나셀", category: "의료기기", product: "매일착용소프트콘택트렌즈", auth: "미취득", grade: "", x: 29.8, y: 47.5 },
       { hall: "5.2", booth: "5.2F38", company: "시노서울", category: "의료기기", product: "RF", auth: "미취득", grade: "", x: 21.8, y: 52.5 },
