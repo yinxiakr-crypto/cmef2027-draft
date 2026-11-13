@@ -1223,9 +1223,10 @@
           <div class="money-pick" role="group" aria-label="화폐">
             <button type="button" data-money="usd" class="on">USD</button>
             <button type="button" data-money="cny">CNY</button>
+            <button type="button" id="krwToggle" aria-pressed="false">KRW</button>
           </div>
         </div>
-        <p class="fx-line" id="fxLine">네이버 환율을 불러오는 중입니다.</p>
+        <p class="fx-line" id="fxLine" hidden>네이버 환율을 불러오는 중입니다.</p>
         <p id="introNoteView" hidden></p>
         <table class="booth-table">
           <thead>
@@ -1268,7 +1269,7 @@ HQI light × 1</span></td>
             <div><span>Catalogue fee · 필수</span><b id="totalCat"></b></div>
             <div><span>Online promotion fee</span><b id="totalPromo"></b></div>
             <div class="total-line"><span>합계</span><b id="totalSum"></b></div>
-            <div><span>원화</span><b id="totalKrw"></b></div>
+            <div id="krwRow" hidden><span>원화</span><b id="totalKrw"></b></div>
           </div>
           <div class="fee-actions"><button type="button" id="pickType">이 타입으로 신청</button></div>
         </div>
@@ -1916,6 +1917,7 @@ HQI light × 1</span></td>
     var siteCount = 1;
     var fx = { usd: null, cny: null };
     var fxState = "loading";
+    var krwOpen = false;
     var fxPage = {
       usd: "https://m.stock.naver.com/marketindex/exchange/FX_USDKRW",
       cny: "https://m.stock.naver.com/marketindex/exchange/FX_CNYKRW"
@@ -1936,6 +1938,18 @@ HQI light × 1</span></td>
     function rateText(rate) {
       var parts = rate.toFixed(2).split(".");
       return groupDigits(parts[0]) + "." + parts[1];
+    }
+    function paintKrw() {
+      var button = document.getElementById("krwToggle");
+      var line = document.getElementById("fxLine");
+      var row = document.getElementById("krwRow");
+      if (button) {
+        button.classList.toggle("on", krwOpen);
+        button.setAttribute("aria-pressed", krwOpen ? "true" : "false");
+      }
+      if (line) line.hidden = !krwOpen;
+      if (row) row.hidden = !krwOpen;
+      if (krwOpen) showFx();
     }
     function showFx() {
       var line = document.getElementById("fxLine");
@@ -2025,16 +2039,20 @@ HQI light × 1</span></td>
       var box = document.getElementById("boothTypes");
       box.classList.toggle("usd", boothMoneyNow === "usd");
       box.classList.toggle("cny", boothMoneyNow === "cny");
-      document.querySelectorAll(".money-pick button").forEach(function (node) {
+      document.querySelectorAll(".money-pick button[data-money]").forEach(function (node) {
         node.classList.toggle("on", node.dataset.money === boothMoneyNow);
       });
-      showFx();
+      if (krwOpen) showFx();
       if (pickedKind) showPicked(pickedKind);
     }
-    document.querySelectorAll(".money-pick button").forEach(function (button) {
+    document.querySelectorAll(".money-pick button[data-money]").forEach(function (button) {
       button.addEventListener("click", function () {
         chooseMoney(button.dataset.money);
       });
+    });
+    document.getElementById("krwToggle").addEventListener("click", function () {
+      krwOpen = !krwOpen;
+      paintKrw();
     });
     loadFx();
     document.querySelectorAll(".booth-table tr.pick").forEach(function (row) {
