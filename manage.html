@@ -442,7 +442,7 @@
         <a href="#map">전시 도면</a>
         <a href="#match">바이어 매칭</a>
         <a href="#notice">공지</a>
-        <a class="to-visitor" href="fair4.html">방문자로 보기</a>
+        <a class="to-visitor" href="fair5.html">방문자로 보기</a>
       </nav>
     </div>
   </div>
@@ -453,12 +453,12 @@
         <button type="button" id="visitorRefresh">다시 보기</button>
         <button type="button" id="visitorFold" aria-expanded="true">접기</button>
       </div>
-      <iframe id="visitorFrame" title="방문자 화면" src="show11.html?preview=1#intro"></iframe>
+      <iframe id="visitorFrame" title="방문자 화면" src="show12.html?preview=1#intro"></iframe>
     </section>
   </div>
   <main class="wrap">
     <article id="intro">
-      <p class="see">방문자 화면 · <a href="fair4.html#intro">전시 소개</a></p>
+      <p class="see">방문자 화면 · <a href="fair5.html#intro">전시 소개</a></p>
       <h2>전시 소개</h2>
       <p>기본 정보는 여기 있습니다. 브로셔 PDF는 아래 칸에 끌어다 놓습니다. 규모 숫자를 읽어서 방문자 화면의 Data에 넣습니다. 파일에 없는 숫자는 바꾸지 않습니다.</p>
       <label>주최<input id="hostName" placeholder="주최"></label>
@@ -488,7 +488,7 @@
     </article>
 
     <article id="apply">
-      <p class="see">방문자 화면 · <a href="fair4.html#apply">참가 신청</a></p>
+      <p class="see">방문자 화면 · <a href="fair5.html#apply">참가 신청</a></p>
       <h2>참가 신청</h2>
       <p>부스 종류와 금액은 여기 있습니다. 방문자 화면의 참가 신청에도 같은 칸이 있습니다. 기본 정보는 방문자 화면에서 받습니다. 전시회 신청을 누르면 아래 주소의 CMEF 신청서로 연결됩니다. 부스 번호는 여기서 나중에 넣습니다.</p>
       <h2 style="margin-top:22px">부스 <span class="tag">금액 · 종류</span></h2>
@@ -577,7 +577,7 @@
     </article>
 
     <article id="map">
-      <p class="see">방문자 화면 · <a href="fair4.html#map">전시 도면</a></p>
+      <p class="see">방문자 화면 · <a href="fair5.html#map">전시 도면</a></p>
       <h2>전시 도면 <span class="tag">CMEF</span></h2>
       <p>도면 위를 눌러 점을 차례로 찍습니다. 그리는 동안에는 점과 점만 이어지고, 처음과 끝을 잇는 선은 구획 확정 뒤에 닫힙니다. 잘못 찍은 빨간 점을 누르면 그 점만 빠집니다. 구획 확정만으로 그 관을 누르면 그 관의 기업 위치로 이동합니다. 아래 시안 반영은 다른 정보를 다 적은 뒤에 누릅니다.</p>
       <label>이 구획의 관<select id="zoneHall"></select></label>
@@ -664,13 +664,13 @@
     </article>
 
     <article id="match">
-      <p class="see">방문자 화면 · <a href="fair4.html#match">바이어 매칭</a></p>
+      <p class="see">방문자 화면 · <a href="fair5.html#match">바이어 매칭</a></p>
       <h2>바이어 매칭</h2>
       <p>인허가 여부에 따라 바이어 소개가 달라집니다. 소개 방식은 다음 설명에서 넣습니다.</p>
     </article>
 
     <article id="shows">
-      <p class="see">방문자 화면 · <a href="fair4.html">동기간 전시</a></p>
+      <p class="see">방문자 화면 · <a href="fair5.html">동기간 전시</a></p>
       <h2>동기간 전시</h2>
       <p>담당하는 섹터만 내용을 넣습니다. 나머지 카드는 로고와 이름만 둡니다.</p>
       <label>섹터
@@ -690,10 +690,11 @@
     </article>
 
     <article id="notice">
-      <p class="see">방문자 화면 · <a href="fair4.html#notice">공지</a></p>
+      <p class="see">방문자 화면 · <a href="fair5.html#notice">공지</a></p>
       <h2>공지</h2>
-      <label>제목<input id="noticeTitle" placeholder="공지 제목"></label>
-      <label>내용<textarea id="noticeBody" rows="3"></textarea></label>
+      <p>공지는 전시장 맵과 입장 방법 두 칸입니다. 전시 도면은 전시 도면 메뉴에 있습니다.</p>
+      <label>전시장 맵<textarea id="noticeBody" rows="4" placeholder="전시장 맵 안내"></textarea></label>
+      <label>입장 방법<textarea id="noticeEntry" rows="4" placeholder="입장 방법"></textarea></label>
     </article>
 
     <button class="save" type="button" id="save">이 브라우저 시안에 반영</button>
@@ -777,8 +778,9 @@
       apps: [],
       sector: "",
       sectorNote: "",
-      noticeTitle: "",
+      noticeTitle: "전시장 맵",
       noticeBody: "",
+      noticeEntry: "",
       foldOrder: ["visitor", "chain", "shows", "psr"],
       visitors: [],
       reasons: [],
@@ -1207,7 +1209,7 @@
               ? "넣었습니다. " + wrote.join(" · ") + (missed.length ? ". 브로셔에서 찾지 못해 그대로 둔 항목: " + missed.join(", ") : "") + extra.note
               : "이 PDF에서 규모 숫자를 찾지 못했습니다. 있는 숫자는 그대로 둡니다." + extra.note;
             var frame = document.getElementById("visitorFrame");
-            if (frame) stayHere(function () { frame.src = "show11.html?preview=1&t=" + Date.now(); });
+            if (frame) stayHere(function () { frame.src = "show12.html?preview=1&t=" + Date.now(); });
           }).catch(function () {
             note.textContent = "이 PDF에서 글자를 읽지 못했습니다.";
           });
@@ -1243,7 +1245,7 @@
         stayHere(function () {
           try { localStorage.setItem(key, JSON.stringify(data)); } catch (error) {}
           var frame = document.getElementById("visitorFrame");
-          if (frame) frame.src = "show11.html?preview=1&t=" + Date.now();
+          if (frame) frame.src = "show12.html?preview=1&t=" + Date.now();
         });
       }
       var orderList = document.getElementById("foldOrder");
@@ -1679,7 +1681,7 @@
         data.applyPeriod = from && to ? from + " – " + to : (from || to);
         try { localStorage.setItem(key, JSON.stringify(data)); } catch (error) {}
         var frame = document.getElementById("visitorFrame");
-        if (frame) stayHere(function () { frame.src = "show11.html?preview=1&t=" + Date.now(); });
+        if (frame) stayHere(function () { frame.src = "show12.html?preview=1&t=" + Date.now(); });
       }
       startInput.value = data.applyStart || "";
       endInput.value = data.applyEnd || "";
@@ -1753,8 +1755,8 @@
     fill("applyLink", "applyLink");
     fill("sector", "sector");
     fill("sectorNote", "sectorNote");
-    fill("noticeTitle", "noticeTitle");
     fill("noticeBody", "noticeBody");
+    fill("noticeEntry", "noticeEntry");
     if (!Array.isArray(data.hallNames)) data.hallNames = ["", "Imaging", "", "국제관", ""];
     var pinHall = document.getElementById("pinHall");
     var planBoard = document.getElementById("planBoard");
@@ -1931,7 +1933,7 @@
       }
       document.getElementById("status").textContent = zoneHall.value + " 구획을 확정했습니다. 업체 화면에서 그 구획을 누르면 이 관의 기업 위치로 이동합니다. 아래 시안 반영은 다른 정보를 다 적은 뒤에 누릅니다.";
       var frame = document.getElementById("visitorFrame");
-      if (frame) frame.src = "show11.html?preview=1#map";
+      if (frame) frame.src = "show12.html?preview=1#map";
     });
     document.getElementById("zoneCancel").addEventListener("click", function () {
       draftPoints.pop();
@@ -2565,9 +2567,9 @@
           link.classList.toggle("on", link.getAttribute("href") === "#" + id);
         });
         var visitorLink = document.querySelector(".to-visitor");
-        if (visitorLink) visitorLink.setAttribute("href", "fair4.html#" + id);
+        if (visitorLink) visitorLink.setAttribute("href", "fair5.html#" + id);
         var frame = document.getElementById("visitorFrame");
-        if (frame) frame.src = "show11.html?preview=1#" + id;
+        if (frame) frame.src = "show12.html?preview=1#" + id;
         if (location.hash !== "#" + id) history.replaceState(null, "", "#" + id);
         window.scrollTo(0, 0);
       }
@@ -2594,7 +2596,7 @@
           var frame = document.getElementById("visitorFrame");
           if (!frame) return;
           var id = (location.hash || "#intro").replace("#", "");
-          frame.src = "show11.html?preview=1#" + id;
+          frame.src = "show12.html?preview=1#" + id;
         });
       }
     })();

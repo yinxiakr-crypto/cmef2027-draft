@@ -2207,8 +2207,8 @@ HQI light × 1</span></td>
           note.hidden = false;
           note.textContent = saved.introNote;
         }
-        if (saved.noticeTitle) document.getElementById("noticeTitle").textContent = saved.noticeTitle;
         if (saved.noticeBody) document.getElementById("noticeBody").textContent = saved.noticeBody;
+        if (saved.noticeEntry) document.getElementById("noticeEntry").textContent = saved.noticeEntry;
         if (saved.applyLink) window.cmefApplyLink = saved.applyLink;
         if (saved.booths && saved.booths.length && typeof saved.booths[0] === "object") {
           var box = document.getElementById("booths");
