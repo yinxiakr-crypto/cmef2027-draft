@@ -136,7 +136,22 @@
     }
     label.tick { margin-top: 8px; }
     .picks input, label.tick input { width: auto; margin: 0; }
-    .map-put { display: flex; gap: 8px; align-items: center; margin-top: 6px; }
+    .entry-admin { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 14px; max-width: 360px; }
+    .entry-admin img { width: 100%; height: 220px; object-fit: contain; background: #eef3f8; border: 1px solid var(--line); }
+    .entry-admin-btns { display: flex; gap: 8px; margin-top: 8px; }
+    .entry-admin-btns button {
+      min-height: 36px;
+      padding: 0 14px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--deep);
+      color: #fff;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 680;
+      cursor: pointer;
+    }
+    .entry-admin-btns button.clear { background: #fff; color: var(--ink); border: 1px solid var(--line); }
     .map-put input { width: auto; flex: 1 1 auto; min-width: 0; margin-top: 0; }
     .map-put button {
       flex: 0 0 auto;
@@ -463,7 +478,7 @@
         <a href="#map">전시 도면</a>
         <a href="#match">바이어 매칭</a>
         <a href="#notice">공지</a>
-        <a class="to-visitor" href="fair9.html">방문자로 보기</a>
+        <a class="to-visitor" href="fair10.html">방문자로 보기</a>
       </nav>
     </div>
   </div>
@@ -474,12 +489,12 @@
         <button type="button" id="visitorRefresh">다시 보기</button>
         <button type="button" id="visitorFold" aria-expanded="true">접기</button>
       </div>
-      <iframe id="visitorFrame" title="방문자 화면" src="show16.html?preview=1#intro"></iframe>
+      <iframe id="visitorFrame" title="방문자 화면" src="show17.html?preview=1#intro"></iframe>
     </section>
   </div>
   <main class="wrap">
     <article id="intro">
-      <p class="see">방문자 화면 · <a href="fair9.html#intro">전시 소개</a></p>
+      <p class="see">방문자 화면 · <a href="fair10.html#intro">전시 소개</a></p>
       <h2>전시 소개</h2>
       <p>기본 정보는 여기 있습니다. 브로셔 PDF는 아래 칸에 끌어다 놓습니다. 규모 숫자를 읽어서 방문자 화면의 Data에 넣습니다. 파일에 없는 숫자는 바꾸지 않습니다.</p>
       <label>주최<input id="hostName" placeholder="주최"></label>
@@ -509,7 +524,7 @@
     </article>
 
     <article id="apply">
-      <p class="see">방문자 화면 · <a href="fair9.html#apply">참가 신청</a></p>
+      <p class="see">방문자 화면 · <a href="fair10.html#apply">참가 신청</a></p>
       <h2>참가 신청</h2>
       <p>부스 종류와 금액은 여기 있습니다. 방문자 화면의 참가 신청에도 같은 칸이 있습니다. 기본 정보는 방문자 화면에서 받습니다. 전시회 신청을 누르면 아래 주소의 CMEF 신청서로 연결됩니다. 부스 번호는 여기서 나중에 넣습니다.</p>
       <h2 style="margin-top:22px">부스 <span class="tag">금액 · 종류</span></h2>
@@ -598,7 +613,7 @@
     </article>
 
     <article id="map">
-      <p class="see">방문자 화면 · <a href="fair9.html#map">전시 도면</a></p>
+      <p class="see">방문자 화면 · <a href="fair10.html#map">전시 도면</a></p>
       <h2>전시 도면 <span class="tag">CMEF</span></h2>
       <p>도면 위를 눌러 점을 차례로 찍습니다. 그리는 동안에는 점과 점만 이어지고, 처음과 끝을 잇는 선은 구획 확정 뒤에 닫힙니다. 잘못 찍은 빨간 점을 누르면 그 점만 빠집니다. 구획 확정만으로 그 관을 누르면 그 관의 기업 위치로 이동합니다. 아래 시안 반영은 다른 정보를 다 적은 뒤에 누릅니다.</p>
       <label>이 구획의 관<select id="zoneHall"></select></label>
@@ -685,13 +700,13 @@
     </article>
 
     <article id="match">
-      <p class="see">방문자 화면 · <a href="fair9.html#match">바이어 매칭</a></p>
+      <p class="see">방문자 화면 · <a href="fair10.html#match">바이어 매칭</a></p>
       <h2>바이어 매칭</h2>
       <p>인허가 여부에 따라 바이어 소개가 달라집니다. 소개 방식은 다음 설명에서 넣습니다.</p>
     </article>
 
     <article id="shows">
-      <p class="see">방문자 화면 · <a href="fair9.html">동기간 전시</a></p>
+      <p class="see">방문자 화면 · <a href="fair10.html">동기간 전시</a></p>
       <h2>동기간 전시</h2>
       <p>담당하는 섹터만 내용을 넣습니다. 나머지 카드는 로고와 이름만 둡니다.</p>
       <label>섹터
@@ -711,9 +726,9 @@
     </article>
 
     <article id="notice">
-      <p class="see">방문자 화면 · <a href="fair9.html#notice">공지</a></p>
+      <p class="see">방문자 화면 · <a href="fair10.html#notice">공지</a></p>
       <h2>공지</h2>
-      <p>공지는 전시장 맵과 입장 방법 두 칸입니다. 전시 도면은 전시 도면 메뉴에 있습니다. 주소나 전시장 명칭을 적고 오른쪽 입력을 누르면 방문자 화면 지도에 들어갑니다. 영문과 중국어를 각각 넣을 수 있습니다. 입장 방법에는 입장권 수령 절차가 들어가 있습니다.</p>
+      <p>공지는 전시장 맵과 입장 방법 두 칸입니다. 전시 도면은 전시 도면 메뉴에 있습니다. 주소나 전시장 명칭을 적고 오른쪽 입력을 누르면 방문자 화면 지도에 들어갑니다. 영문과 중국어를 각각 넣을 수 있습니다. 입장 방법의 순서 글을 누르면 세로 그림이 나오고, 같은 글을 다시 누르면 숨습니다. 넓은 화면과 휴대폰이 같습니다. 바꾸기와 삭제는 그 그림만 바꿉니다.</p>
       <label>영문 주소·명칭
         <span class="map-put">
           <input id="noticeMapEn" placeholder="영문 주소 또는 전시장 명칭">
@@ -727,6 +742,18 @@
         </span>
       </label>
       <label>입장 방법<textarea id="noticeEntry" rows="4" placeholder="입장 방법"></textarea></label>
+      <div class="entry-admin">
+        <div>
+          <p>입장 절차 그림</p>
+          <img id="entryTallPreview" src="entry-pass-tall.jpg" alt="세로 입장 절차">
+          <p id="entryTallEmpty" hidden>그림 없음</p>
+          <div class="entry-admin-btns">
+            <button type="button" id="entryTallPick">바꾸기</button>
+            <button type="button" id="entryTallClear" class="clear">삭제</button>
+          </div>
+          <input id="entryTallFile" type="file" accept="image/*" hidden>
+        </div>
+      </div>
     </article>
 
     <button class="save" type="button" id="save">이 브라우저 시안에 반영</button>
@@ -815,6 +842,10 @@
       noticeMapEn: "",
       noticeMapZh: "",
       noticeEntry: "",
+      entryWide: "",
+      entryWideOff: false,
+      entryTall: "",
+      entryTallOff: false,
       foldOrder: ["visitor", "chain", "shows", "psr"],
       visitors: [],
       reasons: [],
@@ -1243,7 +1274,7 @@
               ? "넣었습니다. " + wrote.join(" · ") + (missed.length ? ". 브로셔에서 찾지 못해 그대로 둔 항목: " + missed.join(", ") : "") + extra.note
               : "이 PDF에서 규모 숫자를 찾지 못했습니다. 있는 숫자는 그대로 둡니다." + extra.note;
             var frame = document.getElementById("visitorFrame");
-            if (frame) stayHere(function () { frame.src = "show16.html?preview=1&t=" + Date.now(); });
+            if (frame) stayHere(function () { frame.src = "show17.html?preview=1&t=" + Date.now(); });
           }).catch(function () {
             note.textContent = "이 PDF에서 글자를 읽지 못했습니다.";
           });
@@ -1279,7 +1310,7 @@
         stayHere(function () {
           try { localStorage.setItem(key, JSON.stringify(data)); } catch (error) {}
           var frame = document.getElementById("visitorFrame");
-          if (frame) frame.src = "show16.html?preview=1&t=" + Date.now();
+          if (frame) frame.src = "show17.html?preview=1&t=" + Date.now();
         });
       }
       var orderList = document.getElementById("foldOrder");
@@ -1715,7 +1746,7 @@
         data.applyPeriod = from && to ? from + " – " + to : (from || to);
         try { localStorage.setItem(key, JSON.stringify(data)); } catch (error) {}
         var frame = document.getElementById("visitorFrame");
-        if (frame) stayHere(function () { frame.src = "show16.html?preview=1&t=" + Date.now(); });
+        if (frame) stayHere(function () { frame.src = "show17.html?preview=1&t=" + Date.now(); });
       }
       startInput.value = data.applyStart || "";
       endInput.value = data.applyEnd || "";
@@ -1792,6 +1823,67 @@
     fill("noticeMapEn", "noticeMapEn");
     fill("noticeMapZh", "noticeMapZh");
     fill("noticeEntry", "noticeEntry");
+    function saveEntryPics(message) {
+      try {
+        localStorage.setItem(key, JSON.stringify(data));
+      } catch (error) {
+        document.getElementById("status").textContent = "반영하지 못했습니다.";
+        return;
+      }
+      document.getElementById("status").textContent = message;
+      var frame = document.getElementById("visitorFrame");
+      if (frame) stayHere(function () { frame.src = "show17.html?preview=1&t=" + Date.now() + "#notice"; });
+    }
+    function showEntryPreview() {
+      var preview = document.getElementById("entryTallPreview");
+      var empty = document.getElementById("entryTallEmpty");
+      if (data.entryTallOff) {
+        preview.hidden = true;
+        empty.hidden = false;
+        return;
+      }
+      preview.hidden = false;
+      empty.hidden = true;
+      preview.src = data.entryTall || "entry-pass-tall.jpg";
+    }
+    function readEntryFile(file, done) {
+      var reader = new FileReader();
+      reader.onload = function () {
+        var image = new Image();
+        image.onload = function () {
+          var canvas = document.createElement("canvas");
+          var scale = Math.min(1, 1400 / image.width);
+          canvas.width = Math.max(1, Math.round(image.width * scale));
+          canvas.height = Math.max(1, Math.round(image.height * scale));
+          canvas.getContext("2d").drawImage(image, 0, 0, canvas.width, canvas.height);
+          done(canvas.toDataURL("image/jpeg", 0.85));
+        };
+        image.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    }
+    showEntryPreview();
+    document.getElementById("entryTallPick").addEventListener("click", function () {
+      document.getElementById("entryTallFile").click();
+    });
+    document.getElementById("entryTallFile").addEventListener("change", function () {
+      var input = document.getElementById("entryTallFile");
+      var file = input.files && input.files[0];
+      input.value = "";
+      if (!file) return;
+      readEntryFile(file, function (src) {
+        data.entryTall = src;
+        data.entryTallOff = false;
+        showEntryPreview();
+        saveEntryPics("입장 절차 그림을 바꿨습니다.");
+      });
+    });
+    document.getElementById("entryTallClear").addEventListener("click", function () {
+      data.entryTall = "";
+      data.entryTallOff = true;
+      showEntryPreview();
+      saveEntryPics("입장 절차 그림을 뺐습니다.");
+    });
     function putVenueMap(id, field) {
       var node = document.getElementById(id);
       data[field] = (node.value || "").trim();
@@ -1805,7 +1897,7 @@
       }
       document.getElementById("status").textContent = "전시장 맵을 이 브라우저 시안에 반영했습니다.";
       var frame = document.getElementById("visitorFrame");
-      if (frame) stayHere(function () { frame.src = "show16.html?preview=1&t=" + Date.now() + "#notice"; });
+      if (frame) stayHere(function () { frame.src = "show17.html?preview=1&t=" + Date.now() + "#notice"; });
     }
     [["noticeMapEn", "noticeMapEnPut"], ["noticeMapZh", "noticeMapZhPut"]].forEach(function (pair) {
       var node = document.getElementById(pair[0]);
@@ -1992,7 +2084,7 @@
       }
       document.getElementById("status").textContent = zoneHall.value + " 구획을 확정했습니다. 업체 화면에서 그 구획을 누르면 이 관의 기업 위치로 이동합니다. 아래 시안 반영은 다른 정보를 다 적은 뒤에 누릅니다.";
       var frame = document.getElementById("visitorFrame");
-      if (frame) frame.src = "show16.html?preview=1#map";
+      if (frame) frame.src = "show17.html?preview=1#map";
     });
     document.getElementById("zoneCancel").addEventListener("click", function () {
       draftPoints.pop();
@@ -2612,7 +2704,7 @@
       var frame = document.getElementById("visitorFrame");
       if (frame) {
         var id = (location.hash || "#intro").replace("#", "");
-        stayHere(function () { frame.src = "show16.html?preview=1&t=" + Date.now() + "#" + id; });
+        stayHere(function () { frame.src = "show17.html?preview=1&t=" + Date.now() + "#" + id; });
       }
     });
   </script>
@@ -2631,9 +2723,9 @@
           link.classList.toggle("on", link.getAttribute("href") === "#" + id);
         });
         var visitorLink = document.querySelector(".to-visitor");
-        if (visitorLink) visitorLink.setAttribute("href", "fair9.html#" + id);
+        if (visitorLink) visitorLink.setAttribute("href", "fair10.html#" + id);
         var frame = document.getElementById("visitorFrame");
-        if (frame) frame.src = "show16.html?preview=1#" + id;
+        if (frame) frame.src = "show17.html?preview=1#" + id;
         if (location.hash !== "#" + id) history.replaceState(null, "", "#" + id);
         window.scrollTo(0, 0);
       }
@@ -2660,7 +2752,7 @@
           var frame = document.getElementById("visitorFrame");
           if (!frame) return;
           var id = (location.hash || "#intro").replace("#", "");
-          frame.src = "show16.html?preview=1#" + id;
+          frame.src = "show17.html?preview=1#" + id;
         });
       }
     })();

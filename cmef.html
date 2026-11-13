@@ -448,10 +448,24 @@
     .entry-lead { margin: 14px 0 0; font-size: 16px; font-weight: 680; line-height: 1.5; }
     .entry-note { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
     .entry-steps { margin: 8px 0 0; padding: 0; list-style: none; }
-    .entry-steps li { margin-top: 12px; }
-    .entry-steps b { display: block; font-size: 15px; font-weight: 720; }
-    .entry-steps span { display: block; margin-top: 2px; color: var(--muted); font-size: 14px; line-height: 1.5; }
+    .entry-steps li { margin-top: 8px; }
+    .entry-step {
+      display: block;
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--ink);
+      text-align: left;
+      font: inherit;
+      cursor: pointer;
+    }
+    .entry-step b { display: block; font-size: 15px; font-weight: 720; }
+    .entry-step span { display: block; margin-top: 2px; color: var(--muted); font-size: 14px; line-height: 1.5; }
+    .entry-step[aria-expanded="true"] { border-color: var(--deep); background: #f4f1ea; }
     .entry-sheet { display: block; width: 100%; height: auto; margin: 0; border: 0; transform-origin: 0 0; user-select: none; }
+    .entry-missing { margin: 24px 12px; color: var(--muted); font-size: 14px; text-align: center; }
     .entry-zoom { margin-top: 16px; }
     .entry-zoom-bar { display: flex; flex-wrap: wrap; gap: 6px; }
     .entry-zoom-bar button {
@@ -1533,17 +1547,17 @@ HQI light × 1</span></td>
         <div id="entryPass">
           <p class="entry-lead">QR 스캔 → 모바일 등록 6단계 → 개인 입장권 QR 수령</p>
           <p class="entry-note">휴대폰 화면 안내에 따라 6단계 진행</p>
-          <ol class="entry-steps">
-            <li><b>QR코드 스캔</b><span>Wi-Fi가 연결된 상태에서 휴대폰 카메라로 QR코드를 스캔해 등록 페이지에 접속합니다.</span></li>
-            <li><b>1차 등록 버튼 누르기</b><span>첫 화면의 Registration을 선택합니다.</span></li>
-            <li><b>이메일 검증코드 입력</b><span>이메일로 받은 코드를 입력한 뒤 Sign In/Register를 누릅니다.</span></li>
-            <li><b>좌측 하단 뒤로 가기</b><span>화면 왼쪽 아래 &lt; 버튼을 누릅니다.</span></li>
-            <li><b>두 번째 전시회 선택</b><span>CMEF Autumn 2026 (10.21-10.24)을 선택합니다.</span></li>
-            <li><b>2026년 등록 버튼 누르기</b><span>2026 가을 전시회 Registration을 선택합니다.</span></li>
-            <li><b>설문 1–5번 문항 답하기</b><span>Questionnaire 5개를 응답한 뒤 Next를 누릅니다.</span></li>
-            <li><b>입장권 QR 캡처·저장</b><span>개인 휴대폰에 입장권 QR 저장이 완료됩니다.</span></li>
+          <ol class="entry-steps" id="entrySteps">
+            <li><button type="button" class="entry-step" aria-expanded="false"><b>QR코드 스캔</b><span>Wi-Fi가 연결된 상태에서 휴대폰 카메라로 QR코드를 스캔해 등록 페이지에 접속합니다.</span></button></li>
+            <li><button type="button" class="entry-step" aria-expanded="false"><b>1차 등록 버튼 누르기</b><span>첫 화면의 Registration을 선택합니다.</span></button></li>
+            <li><button type="button" class="entry-step" aria-expanded="false"><b>이메일 검증코드 입력</b><span>이메일로 받은 코드를 입력한 뒤 Sign In/Register를 누릅니다.</span></button></li>
+            <li><button type="button" class="entry-step" aria-expanded="false"><b>좌측 하단 뒤로 가기</b><span>화면 왼쪽 아래 &lt; 버튼을 누릅니다.</span></button></li>
+            <li><button type="button" class="entry-step" aria-expanded="false"><b>두 번째 전시회 선택</b><span>CMEF Autumn 2026 (10.21-10.24)을 선택합니다.</span></button></li>
+            <li><button type="button" class="entry-step" aria-expanded="false"><b>2026년 등록 버튼 누르기</b><span>2026 가을 전시회 Registration을 선택합니다.</span></button></li>
+            <li><button type="button" class="entry-step" aria-expanded="false"><b>설문 1–5번 문항 답하기</b><span>Questionnaire 5개를 응답한 뒤 Next를 누릅니다.</span></button></li>
+            <li><button type="button" class="entry-step" aria-expanded="false"><b>입장권 QR 캡처·저장</b><span>개인 휴대폰에 입장권 QR 저장이 완료됩니다.</span></button></li>
           </ol>
-          <div class="entry-zoom">
+          <div class="entry-zoom" id="entryZoom" hidden>
             <div class="entry-zoom-bar">
               <button type="button" id="entryZoomOut">작게</button>
               <button type="button" id="entryZoomIn">크게</button>
@@ -1551,7 +1565,8 @@ HQI light × 1</span></td>
             </div>
             <p class="entry-hint">마우스 휠로 키우고 줄입니다. 휴대폰에서는 두 손가락으로 조절합니다.</p>
             <div class="entry-stage" id="entryStage">
-              <img class="entry-sheet" id="entrySheet" src="entry-pass.png" alt="CMEF 전시장 입장권 신청 절차" draggable="false">
+              <img class="entry-sheet" id="entryTall" src="entry-pass-tall.jpg" alt="CMEF 전시장 입장권 신청 절차" draggable="false">
+              <p class="entry-missing" id="entryMissing" hidden>그림 없음</p>
             </div>
           </div>
         </div>
@@ -2340,6 +2355,11 @@ HQI light × 1</span></td>
         venueMapEn = (saved.noticeMapEn || "").trim();
         venueMapZh = (saved.noticeMapZh || "").trim();
         if (saved.noticeMapLang === "en" || saved.noticeMapLang === "zh") venueMapLang = saved.noticeMapLang;
+        var entryTall = document.getElementById("entryTall");
+        if (entryTall) {
+          if (saved.entryTallOff) entryTall.hidden = true;
+          else if (saved.entryTall) entryTall.src = saved.entryTall;
+        }
         if (saved.noticeEntry) {
           document.getElementById("entryPass").hidden = true;
           document.getElementById("noticeEntry").textContent = saved.noticeEntry;
@@ -2374,8 +2394,7 @@ HQI light × 1</span></td>
     paintVenueMap();
     (function () {
       var stage = document.getElementById("entryStage");
-      var sheet = document.getElementById("entrySheet");
-      if (!stage || !sheet) return;
+      if (!stage) return;
       var scale = 1;
       var ox = 0;
       var oy = 0;
@@ -2384,8 +2403,48 @@ HQI light × 1</span></td>
       var pinch = null;
       function clamp(n) { return Math.max(1, Math.min(5, n)); }
       function paint() {
-        sheet.style.transform = "translate(" + ox + "px," + oy + "px) scale(" + scale + ")";
+        var change = "translate(" + ox + "px," + oy + "px) scale(" + scale + ")";
+        document.querySelectorAll(".entry-sheet").forEach(function (node) { node.style.transform = change; });
       }
+      var zoom = document.getElementById("entryZoom");
+      var sheet = document.getElementById("entryTall");
+      var missing = document.getElementById("entryMissing");
+      var openStep = null;
+      function fitStage() {
+        if (!sheet || sheet.hidden || !sheet.naturalWidth) return;
+        stage.style.aspectRatio = sheet.naturalWidth + " / " + sheet.naturalHeight;
+      }
+      if (sheet) {
+        if (sheet.complete) fitStage();
+        sheet.addEventListener("load", fitStage);
+      }
+      document.querySelectorAll(".entry-step").forEach(function (button) {
+        button.addEventListener("click", function () {
+          if (openStep === button) {
+            openStep = null;
+            button.setAttribute("aria-expanded", "false");
+            zoom.hidden = true;
+            return;
+          }
+          if (openStep) openStep.setAttribute("aria-expanded", "false");
+          openStep = button;
+          button.setAttribute("aria-expanded", "true");
+          button.insertAdjacentElement("afterend", zoom);
+          zoom.hidden = false;
+          scale = 1;
+          ox = 0;
+          oy = 0;
+          paint();
+          if (sheet && sheet.hidden) {
+            if (missing) missing.hidden = false;
+            stage.style.aspectRatio = "3 / 4";
+          } else if (missing) {
+            missing.hidden = true;
+            fitStage();
+          }
+        });
+      });
+      window.addEventListener("resize", function () { scale = 1; ox = 0; oy = 0; paint(); fitStage(); });
       function zoomAt(px, py, next) {
         next = clamp(next);
         if (next === 1) { scale = 1; ox = 0; oy = 0; paint(); return; }
