@@ -2278,6 +2278,7 @@ HQI light × 1</span></td>
         }
         venueMapEn = (saved.noticeMapEn || "").trim();
         venueMapZh = (saved.noticeMapZh || "").trim();
+        if (saved.noticeMapLang === "en" || saved.noticeMapLang === "zh") venueMapLang = saved.noticeMapLang;
         if (saved.noticeEntry) document.getElementById("noticeEntry").textContent = saved.noticeEntry;
         if (saved.applyLink) window.cmefApplyLink = saved.applyLink;
         if (saved.booths && saved.booths.length && typeof saved.booths[0] === "object") {
