@@ -1,0 +1,3090 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>제95회 CMEF 시안</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <style>
+    :root {
+      --ink: #1c1a17;
+      --muted: #8a817a;
+      --line: #e4ddd2;
+      --paper: #faf7f2;
+      --red: #9b1b30;
+      --deep: #141210;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: Pretendard, "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+      letter-spacing: -0.02em;
+    }
+    .draft {
+      margin: 0;
+      padding: 10px 16px;
+      background: var(--deep);
+      color: #faf7f2;
+      text-align: center;
+      font-size: 13px;
+    }
+    .wrap { width: min(1080px, calc(100% - 48px)); margin: 0 auto; }
+    header { padding: 40px 0 8px; }
+    .kicker {
+      margin: 0 0 18px;
+      color: var(--red);
+      font-size: 13px;
+      font-weight: 650;
+      letter-spacing: 0.16em;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(36px, 5vw, 58px);
+      font-weight: 720;
+      line-height: 1.18;
+      letter-spacing: -0.045em;
+    }
+    .en-title { margin: 12px 0 0; font-size: 18px; font-weight: 500; color: #3c3c3c; }
+    .when { margin: 22px 0 0; font-size: 16px; color: var(--muted); }
+
+    .data-title {
+      margin: 28px 0 0;
+      color: var(--ink);
+      font-size: 22px;
+      font-weight: 720;
+      letter-spacing: -0.03em;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      margin-top: 28px;
+      border-top: 1px solid var(--ink);
+    }
+    header .stats {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin-top: 10px;
+    }
+    .stat { padding: 26px 8px 22px 0; }
+    header .stat {
+      padding: 18px 4px 16px;
+      text-align: center;
+      font: inherit;
+      color: inherit;
+      background: transparent;
+      border: 0;
+      width: 100%;
+      cursor: default;
+      pointer-events: none;
+    }
+    .stat b {
+      display: block;
+      font-size: clamp(34px, 3.4vw, 46px);
+      font-weight: 680;
+      letter-spacing: -0.05em;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    header .stat b { font-size: clamp(28px, 3vw, 42px); }
+    .stat .en { display: block; margin-top: 10px; font-size: 16px; font-weight: 680; }
+    header .stat .en { margin-top: 8px; font-size: 15px; }
+    .stat .ko { display: block; margin-top: 2px; color: var(--muted); font-size: 12px; }
+    header .stat .ko { font-size: 11px; }
+
+    .folds { display: grid; gap: 12px; padding: 28px 0 8px; }
+    .fold { border: 0; padding: 0; background: transparent; }
+    .fold-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      text-align: left;
+      color: #faf7f2;
+      background: var(--deep);
+      border: 0;
+      cursor: pointer;
+      padding: 18px 22px;
+      font: inherit;
+    }
+    .fold-btn .en { display: block; font-size: 26px; font-weight: 720; letter-spacing: -0.04em; line-height: 1.1; }
+    .fold-btn .ko { display: block; margin-top: 4px; font-size: 13px; font-weight: 450; opacity: 0.85; }
+    .fold-btn .chev { font-size: 28px; font-weight: 400; line-height: 1; }
+    .fold-btn[aria-expanded="true"] { background: var(--red); }
+    body.preview .fold-btn { cursor: grab; }
+    body.preview .fold.drag { opacity: 0.45; }
+    body.preview .fold.drop .fold-btn { box-shadow: inset 0 4px 0 #fff; }
+    .panel { display: none; padding: 22px 4px 8px; }
+    .panel.open { display: block; }
+
+    .psr { position: relative; }
+    .psr-menu {
+      position: absolute;
+      z-index: 4;
+      left: 0;
+      right: 0;
+      margin-top: 8px;
+      background: #fff;
+      border: 1px solid var(--line);
+      box-shadow: 0 12px 28px rgba(26, 26, 26, 0.12);
+      max-height: 280px;
+      overflow: auto;
+    }
+    .psr-menu[hidden] { display: none; }
+    .psr-menu .row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--line);
+      background: #fff;
+    }
+    .psr-menu button.pick {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      border: 0;
+      background: transparent;
+      font: inherit;
+      text-align: left;
+      padding: 12px 16px;
+      cursor: pointer;
+    }
+    .psr-menu .row:hover,
+    .psr-menu button.pick.on { background: #f6f4ef; }
+    .psr-menu .get,
+    .brief .get {
+      flex: none;
+      margin: 0 12px 0 0;
+      min-height: 36px;
+      padding: 0 14px;
+      border: 0;
+      border-radius: 8px;
+      background: #141414;
+      color: #fff;
+      font: inherit;
+      cursor: pointer;
+    }
+    .psr-menu .en { font-size: 16px; font-weight: 720; }
+    .psr-menu .ko { font-size: 12px; color: var(--muted); }
+    .brief {
+      margin-top: 14px;
+      padding: 22px 22px 18px;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+    .brief .en { margin: 0; font-size: 28px; font-weight: 720; letter-spacing: -0.04em; }
+    .brief .ko { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
+    .brief ul { margin: 16px 0 0; padding: 0; list-style: none; }
+    .brief li { padding: 8px 0; border-top: 1px solid var(--line); font-size: 16px; }
+    .brief li span { display: block; margin-top: 2px; color: var(--muted); font-size: 12px; }
+    .brief { cursor: pointer; }
+    .brief .head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .brief .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 4px 18px;
+      margin-top: 16px;
+    }
+    .brief .stat { padding: 16px 8px 12px 0; }
+    .brief .stat b { display: block; font-size: clamp(26px, 2.6vw, 34px); letter-spacing: -0.04em; }
+    .brief .stat span { display: block; margin-top: 4px; color: var(--muted); font-size: 13px; }
+
+    .split { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 56px; }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px 16px;
+      align-items: center;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .row .name { display: block; font-size: 18px; font-weight: 700; }
+    .row .ko { display: block; margin-top: 2px; color: var(--muted); font-weight: 450; font-size: 12px; }
+    .row strong { font-variant-numeric: tabular-nums; font-weight: 650; }
+    .track { grid-column: 1 / -1; height: 3px; background: #ece8e1; }
+    .track i { display: block; height: 100%; background: var(--red); }
+
+    .side-title { margin: 0 0 8px; font-size: 18px; font-weight: 700; }
+    .reasons { display: grid; gap: 0; }
+    .reason { padding: 18px 0; border-bottom: 1px solid var(--line); }
+    .reason b {
+      font-size: 42px;
+      font-weight: 680;
+      letter-spacing: -0.05em;
+      line-height: 1;
+    }
+    .reason .en { display: block; margin-top: 6px; font-size: 18px; font-weight: 700; }
+
+    .fields {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0 28px;
+      margin-top: 8px;
+    }
+    .fields div { padding: 14px 0; border-top: 1px solid var(--line); }
+    .fields strong { display: block; font-size: 18px; font-weight: 700; }
+    .fields em { display: block; margin-top: 2px; color: var(--muted); font-style: normal; font-size: 12px; }
+
+    .shows { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 8px; }
+    .show {
+      background: #fff;
+      min-height: 168px;
+      padding: 22px 16px 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      text-align: center;
+      border: 1px solid var(--line);
+    }
+    .show img { height: 42px; width: auto; max-width: 150px; object-fit: contain; }
+    .mark { width: 42px; height: 42px; }
+    .show .en { margin: 14px 0 0; font-size: 16px; font-weight: 700; line-height: 1.3; }
+    .show .ko { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+    .show .slot:empty { display: none; }
+    .show .slot { margin-top: 12px; width: 100%; font-size: 13px; line-height: 1.45; color: var(--ink); }
+    .basics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 28px; }
+    .basics div { background: #fff; border: 1px solid var(--line); padding: 16px 18px; }
+    .basics .ko { display: block; color: var(--muted); font-size: 12px; }
+    .basics b { display: block; margin-top: 6px; font-size: 16px; font-weight: 680; }
+    .booth-fold-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 18px;
+      min-height: 46px;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      cursor: pointer;
+    }
+    .booth-fold-btn b { font-size: 16px; font-weight: 720; }
+    .booth-fold-btn em { margin-left: 8px; color: var(--muted); font-style: normal; font-size: 13px; }
+    .booth-fold-btn .chev { font-size: 20px; line-height: 1; }
+    .booth-types { margin-top: 10px; }
+    .booth-types .note { margin: 0 0 10px; color: var(--muted); font-size: 13px; }
+    .type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
+    .booth-tools { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 10px; }
+    .site-count { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 680; }
+    .site-count button {
+      width: 28px;
+      height: 28px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 16px;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .site-count b { min-width: 18px; text-align: center; font-size: 15px; }
+    .site-count .site-area { color: var(--muted); font-weight: 450; }
+    .money-pick { display: flex; gap: 6px; margin: 0; }
+    .money-pick button {
+      min-height: 32px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 720;
+      cursor: pointer;
+    }
+    .money-pick button.on { background: var(--deep); color: #fff; border-color: var(--deep); }
+    .fx-line { margin: 0 0 10px; color: var(--muted); font-size: 13px; }
+    .fx-line a { color: inherit; }
+    #boothTypes.usd .rmb, #boothTypes.rmb .usd { display: none; }
+    .fee .total-line b { font-size: 20px; }
+    .booth-table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--line); }
+    .booth-table th, .booth-table td { padding: 12px 10px; text-align: center; vertical-align: middle; border-bottom: 1px solid var(--line); font-size: 14px; font-weight: 550; }
+    .booth-table th { color: var(--muted); font-size: 13px; font-weight: 650; }
+    .booth-table td.no { width: 36px; color: var(--muted); }
+    .booth-table img { width: 180px; height: 120px; object-fit: contain; }
+    .booth-table tr.pick { cursor: pointer; }
+    .booth-table tr.pick.on { background: #faf7f2; box-shadow: inset 3px 0 0 var(--deep); }
+    .booth-table .info { text-align: left; }
+    .fee-actions { margin-top: 12px; }
+    #pickType { min-height: 40px; padding: 0 16px; border: 0; background: var(--deep); color: #fff; font: inherit; font-weight: 680; cursor: pointer; }
+    .type-drop {
+      width: 100%;
+      margin-top: 10px;
+      min-height: 40px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 14px;
+    }
+    .type-detail {
+      display: grid;
+      grid-template-columns: 1fr 148px;
+      gap: 16px;
+      align-items: start;
+      margin-top: 10px;
+      padding-top: 4px;
+    }
+    .type-detail .side { text-align: right; }
+    .type-detail .side .rates { margin-top: 0; padding-top: 0; border-top: 0; }
+    .type-detail .side .rates span,
+    .type-detail .side .rates b { text-align: right; }
+    .type-detail .side button { width: 100%; margin-top: 10px; }
+    .type-grid article {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: #fff;
+      border: 1px solid var(--line);
+      padding: 18px;
+    }
+    .type-grid article.on { outline: 2px solid var(--deep); }
+    .type-grid .shot {
+      flex: 0 0 176px;
+      height: 176px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #faf7f2;
+      border: 1px solid var(--line);
+    }
+    .type-grid .shot img {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    }
+    .type-grid b { display: block; margin-top: 10px; font-size: 16px; font-weight: 720; }
+    .type-grid .kit { margin-top: 8px; color: var(--ink); font-size: 13px; line-height: 1.55; white-space: pre-line; }
+    .type-grid .rates { margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--line); }
+    .type-grid .rates span, .type-grid .rates b { margin-top: 2px; font-size: 13px; font-weight: 650; color: var(--ink); }
+    .type-grid .rates .sum { color: var(--muted); font-weight: 450; }
+    .type-grid .info-row { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+    .type-grid .info-row b { margin-top: 0; font-size: 16px; }
+    .type-grid .info-row.on { background: #faf7f2; }
+    .type-grid span { display: block; margin-top: 6px; color: var(--muted); font-size: 13px; }
+    .type-grid span[hidden], .type-grid strong:empty { display: none; }
+    .type-grid strong { display: block; margin-top: 10px; font-size: 28px; font-weight: 680; letter-spacing: -0.04em; }
+    .type-grid .unit { margin-top: 2px; }
+    .type-grid article > button { margin-top: auto; }
+    .type-grid button, .shell-picks button {
+      margin-top: 12px;
+      min-height: 44px;
+      border: 0;
+      background: var(--deep);
+      color: #fff;
+      font: inherit;
+      font-weight: 680;
+      cursor: pointer;
+    }
+    .shell-picks { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .shell-picks[hidden] { display: none; }
+    .shell-picks button { width: 100%; background: #fff; color: var(--ink); border: 1px solid var(--line); }
+    .shell-picks button.on { background: var(--deep); color: #fff; border-color: var(--deep); }
+    .fee-title { margin: 14px 0 0; font-size: 13px; font-weight: 680; }
+    .fee { display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; margin-top: 8px; }
+    .chosen-booth { margin: 18px 0 0; padding: 12px 14px; background: #fff; border: 1px solid var(--line); font-size: 14px; }
+    .chosen-booth[hidden] { display: none; }
+    .chosen-booth b { font-weight: 720; }
+    .fee div { display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+    .fee span { font-size: 14px; }
+    .fee b { font-size: 18px; font-weight: 680; }
+    .crumb { margin: 0; padding: 10px 0 0; color: var(--muted); font-size: 13px; }
+    .crumb a { color: inherit; text-decoration: none; }
+
+    .site-nav {
+      position: sticky;
+      top: 0;
+      z-index: 6;
+      background: #faf7f2;
+      border-bottom: 1px solid var(--line);
+    }
+    .nav-row { display: flex; align-items: center; justify-content: space-between; gap: 18px; min-height: 64px; }
+    .brand { color: var(--ink); font-size: 13px; font-weight: 720; letter-spacing: 0.12em; text-decoration: none; }
+    .nav-links { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-left: auto; }
+    .nav-links a { color: var(--ink); font-size: 14px; font-weight: 650; text-decoration: none; }
+    nav a.on { color: var(--red); }
+    .to-admin {
+      flex: 0 0 auto;
+      color: #fff;
+      background: var(--deep);
+      text-decoration: none;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 680;
+    }
+    body.preview .to-admin { display: none; }
+    body.preview #map {
+      width: 100%;
+      max-width: 100%;
+      margin-left: 0;
+      padding-left: 0;
+      padding-right: 0;
+    }
+    .block { padding: 36px 0 8px; }
+    .block h2 { margin: 0; font-size: clamp(28px, 4vw, 40px); font-weight: 720; letter-spacing: -0.04em; }
+    .block .lead { margin: 12px 0 0; max-width: 640px; font-size: 16px; line-height: 1.55; }
+    .lock-card, .plain-card { margin-top: 18px; background: #fff; border: 1px solid var(--line); padding: 22px 22px 20px; }
+    .lock-card b, .plain-card b { display: block; font-size: 22px; font-weight: 720; }
+    .plain-card strong { display: block; margin-top: 12px; font-size: 28px; font-weight: 680; }
+    .entry-lead { margin: 14px 0 0; font-size: 16px; font-weight: 680; line-height: 1.5; }
+    .entry-note { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+    .entry-steps { margin: 8px 0 0; padding: 0; list-style: none; }
+    .entry-steps li { margin-top: 12px; }
+    .entry-steps b { display: block; font-size: 15px; font-weight: 720; }
+    .entry-steps span { display: block; margin-top: 2px; color: var(--muted); font-size: 14px; line-height: 1.5; }
+    .entry-sheet { display: block; width: 100%; height: auto; margin: 0; border: 0; transform-origin: 0 0; user-select: none; }
+    .entry-zoom { margin-top: 16px; }
+    .entry-zoom-bar { display: flex; flex-wrap: wrap; gap: 6px; }
+    .entry-zoom-bar button {
+      min-height: 32px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 720;
+      cursor: pointer;
+    }
+    .entry-hint { margin: 8px 0 0; color: var(--muted); font-size: 13px; }
+    .entry-stage {
+      margin-top: 8px;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: #eef3f8;
+      touch-action: none;
+      cursor: grab;
+    }
+    .entry-stage:active { cursor: grabbing; }
+    .map-lang { display: flex; gap: 6px; margin-top: 14px; }
+    .map-lang button {
+      min-height: 32px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 720;
+      cursor: pointer;
+    }
+    .map-lang button.on { background: var(--deep); color: #fff; border-color: var(--deep); }
+    .map-lang button:disabled { opacity: 0.4; cursor: default; }
+    .map-addr, .map-empty { display: block; margin-top: 12px; font-size: 15px; line-height: 1.5; }
+    .map-empty { color: var(--muted); }
+    #venueMap { width: 100%; height: 360px; margin-top: 12px; border: 0; }
+    #mapOpen { display: inline-block; margin-top: 10px; color: var(--red); font-size: 14px; font-weight: 680; }
+    .match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 18px; }
+    .match-card { background: #fff; border: 1px solid var(--line); padding: 22px; }
+    .match-card h3 { margin: 0; font-size: 18px; font-weight: 720; }
+    .match-card p, .match-card li { font-size: 14px; line-height: 1.55; }
+    .match-card p { margin: 10px 0 0; }
+    .match-card ol { margin: 14px 0 0; padding-left: 18px; }
+    .match-card li { margin-top: 6px; }
+    .match-card label { display: block; margin-top: 12px; font-size: 13px; font-weight: 680; }
+    .match-card input[type="text"], .match-card input[type="password"], .match-card select, #matchLogin input {
+      width: 100%;
+      margin-top: 6px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      font: inherit;
+      background: #fff;
+    }
+    .match-checks { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 14px; }
+    .match-checks label { display: flex; align-items: center; gap: 6px; margin: 0; font-weight: 550; }
+    .match-checks input { width: auto; margin: 0; }
+    .match-who { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; margin-top: 16px; font-size: 14px; font-weight: 680; }
+    .match-who button {
+      min-height: 32px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 680;
+      cursor: pointer;
+    }
+    .match-who button.on { background: var(--deep); color: #fff; border-color: var(--deep); }
+    .match-products { margin: 0; padding: 0; list-style: none; }
+    .match-products button {
+      width: 100%;
+      margin-top: 8px;
+      min-height: 40px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 14px;
+      text-align: left;
+      cursor: pointer;
+    }
+    .match-products button.on { background: var(--deep); color: #fff; border-color: var(--deep); }
+    .match-who label, #matchLogin label { display: flex; align-items: center; gap: 6px; margin: 0; font-weight: 550; }
+    .match-who input { width: auto; margin: 0; }
+    #matchLogin { max-width: 420px; margin-top: 16px; background: #fff; border: 1px solid var(--line); padding: 22px; }
+    #matchLogin label { display: block; margin-top: 12px; font-size: 13px; font-weight: 680; }
+    #matchLogin p { margin: 0; font-size: 14px; line-height: 1.55; }
+    .match-add { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+    .match-add .slim { margin-top: 0; }
+    .match-num {
+      min-width: 36px;
+      height: 32px;
+      padding: 0 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      background: var(--deep);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 720;
+      text-decoration: none;
+    }
+    .exhibitor-title { margin: 28px 0 0; font-size: 22px; font-weight: 720; letter-spacing: -0.03em; }
+    .apply-form label { display: block; margin-top: 14px; font-size: 13px; font-weight: 680; }
+    .apply-form .co-name { margin-top: 12px; font-size: 16px; }
+    .apply-form .co-name input { font-size: 18px; padding: 14px; }
+    .apply-form input[type="text"], .apply-form input[type="email"], .apply-form select {
+      width: 100%;
+      margin-top: 6px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      font: inherit;
+      background: #fff;
+    }
+    .product-card { margin-top: 14px; padding: 14px; background: #fff; border: 1px solid var(--line); border-radius: 12px; }
+    .product-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--ink);
+      font: inherit;
+      font-size: 15px;
+      font-weight: 720;
+      text-align: left;
+      cursor: pointer;
+    }
+    .product-head .product-label { flex: 1; font-weight: 550; color: var(--muted); }
+    .product-total { margin: 12px 0 0; font-size: 14px; font-weight: 720; }
+    .cn-picked { margin: 8px 0 0; font-size: 14px; font-weight: 650; cursor: pointer; }
+    .product-card label { margin-top: 10px; }
+    .apply-form .nmpa { display: flex; gap: 14px; align-items: center; min-height: 46px; font-size: 13px; font-weight: 550; }
+    .apply-form .nmpa input { width: auto; margin: 0 4px 0 0; }
+    .consent { margin-top: 18px; padding: 16px; background: #fff; border: 1px solid var(--line); }
+    .consent h3 { margin: 0 0 8px; font-size: 15px; }
+    .consent p { margin: 6px 0 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .consent .need { color: var(--red); font-weight: 700; }
+    .consent .pick { color: var(--ink); font-weight: 700; }
+    .go-fair { margin-top: 16px; min-height: 48px; padding: 0 18px; border: 0; border-radius: 12px; background: var(--deep); color: #fff; font: inherit; font-weight: 680; cursor: pointer; }
+    .slim { margin-top: 8px; min-height: 32px; padding: 0 12px; border: 0; border-radius: 8px; background: var(--deep); color: #fff; font: inherit; font-size: 13px; cursor: pointer; }
+    .steps { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; }
+    .hall {
+      position: relative;
+      height: 560px;
+      margin-top: 18px;
+      background:
+        radial-gradient(circle at 50% 48%, #fff 0 46px, transparent 47px),
+        #f3efe8;
+      border-radius: 48% 48% 46% 46% / 42% 42% 48% 48%;
+    }
+    .entrance {
+      position: absolute;
+      left: 50%;
+      top: 46%;
+      z-index: 2;
+      display: grid;
+      place-items: center;
+      width: 108px;
+      height: 64px;
+      transform: translate(-50%, -50%);
+      border: 1px solid var(--line);
+      border-radius: 40px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 13px;
+      letter-spacing: 0.08em;
+    }
+    .zone {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: flex-start;
+      padding: 14px;
+      border: 1px solid var(--line);
+      background: #efece6;
+      color: var(--ink);
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+    .zone b { font-size: 18px; font-weight: 720; }
+    .zone .go {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      font-size: 18px;
+      opacity: 0;
+    }
+    .zone:hover, .zone:focus-visible {
+      background: #fff;
+      outline: 2px solid var(--deep);
+      outline-offset: -2px;
+    }
+    .zone:hover .go, .zone:focus-visible .go { opacity: 1; }
+    .zone.h82 { grid-column: 1; grid-row: 2; border-radius: 28px 6px 6px 18px; }
+    .zone.h72 { grid-column: 2; grid-row: 2; }
+    .zone.h62 { grid-column: 3; grid-row: 2; }
+    .zone.h52 { grid-column: 4; grid-row: 2 / span 2; border-radius: 8px 28px 22px 8px; }
+    .zone.h42 { grid-column: 2 / span 2; grid-row: 3; border-radius: 8px 22px 8px 8px; }
+    .zone.korea { background: var(--red); color: #fff; border: 0; }
+    .zone.korea:hover, .zone.korea:focus-visible { background: #7a1526; outline-color: #fff; }
+    .zone em { display: block; margin-top: 4px; font-style: normal; font-size: 12px; opacity: 0.85; }
+    #map {
+      width: 100%;
+      max-width: 100%;
+      margin: 0;
+      padding: 0 0 28px;
+      box-sizing: border-box;
+      position: relative;
+      overflow-x: visible;
+    }
+    .map-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
+    .map-head h2 { margin-top: 0; }
+    .place-pick { display: flex; gap: 6px; margin-bottom: 2px; }
+    .place-pick button {
+      width: 26px;
+      height: 26px;
+      padding: 0;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 0;
+      line-height: 0;
+      cursor: pointer;
+    }
+    .place-pick button.on { background: var(--deep); color: #fff; border-color: var(--deep); }
+    .place-pick .mark {
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 4px 0 4px 6px;
+      border-color: transparent transparent transparent currentColor;
+    }
+    .place-pick button[data-place="bottom"] .mark { transform: rotate(90deg); }
+    [hidden] { display: none !important; }
+    .pair { display: block; max-width: 100%; min-width: 0; }
+    .pair > :first-child { min-width: 0; max-width: 100%; }
+    .company-list,
+    .drawer {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      margin-top: 12px;
+      overflow: hidden;
+      position: static;
+      flex: none;
+    }
+    #map.list-closed .drawer,
+    #map.list-right .drawer,
+    #map.list-bottom .drawer,
+    #map.list-bottom.list-closed .drawer,
+    #map .company-list {
+      width: 100%;
+      max-width: 100%;
+      flex-basis: auto;
+      align-self: stretch;
+    }
+    #map:not(.list-closed) .drawer-tab { display: none; }
+    .drawer-tab {
+      flex: 0 0 22px;
+      width: 22px;
+      height: 22px;
+      min-height: 22px;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: #fff;
+      color: var(--ink);
+      box-shadow: 0 1px 2px rgba(28, 26, 23, 0.08);
+      cursor: pointer;
+    }
+    .drawer-tab .chev {
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 6px 0 6px 8px;
+      border-color: transparent transparent transparent currentColor;
+    }
+    .drawer-tab .tab-name { display: none; }
+    #map.list-closed .drawer { width: 100%; max-width: 100%; }
+    #map.list-closed .roster { visibility: visible; }
+    #map.list-bottom .pair { display: block; }
+    #map.list-bottom .drawer {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      margin-top: 12px;
+      overflow: hidden;
+    }
+    #map.list-bottom .drawer-tab {
+      width: 22px;
+      height: 22px;
+      min-height: 22px;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+    }
+    #map.list-bottom .drawer-tab .chev { transform: rotate(90deg); }
+    #map.list-bottom .roster { width: 100%; flex-basis: auto; max-height: none; }
+    #map.list-bottom.list-closed .drawer { width: 100%; max-width: 100%; align-self: stretch; }
+    #map .clover .venue, #map .plan img.sheet {
+      width: 100%;
+      height: auto;
+    }
+    .clover { position: relative; width: 100%; margin-top: 14px; }
+    .clover .venue { display: block; width: 100%; height: auto; }
+    .clover .venue[hidden] { display: none; }
+    .venue-frame { position: relative; }
+    .hall-hot {
+      position: absolute;
+      left: 54%;
+      top: 30%;
+      width: 15%;
+      height: 18%;
+      border: 0;
+      padding: 0;
+      background: transparent;
+      cursor: pointer;
+      z-index: 3;
+    }
+    .hall-hot:hover, .hall-hot:focus-visible { background: rgba(155, 27, 48, 0.2); outline: none; }
+    .zone-layer {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    .zone-layer polygon {
+      fill: rgba(155, 27, 48, 0.12);
+      stroke: #9b1b30;
+      stroke-width: 0.35;
+      cursor: pointer;
+      pointer-events: auto;
+    }
+    .zone-layer polygon:hover { fill: rgba(155, 27, 48, 0.32); }
+    .hall-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .hall-row .zone {
+      position: static;
+      width: auto;
+      height: auto;
+      padding: 6px 12px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 720;
+      cursor: pointer;
+    }
+    .hall-row .zone.korea { background: var(--red); color: #fff; border-color: var(--red); }
+    .hall-row .zone:hover, .hall-row .zone:focus-visible { outline: 2px solid var(--deep); }
+    .korea-fit {
+      position: absolute;
+      left: 62%;
+      top: 16%;
+      width: 16%;
+      height: 24%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .korea-fit img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .hall-hint { margin: 10px 0 0; color: var(--muted); font-size: 13px; }
+    .pair { margin-top: 12px; }
+    .pair .plan { margin-top: 0; min-height: 0; }
+    .pair .roster {
+      flex: none;
+      width: 100%;
+      min-width: 0;
+      margin-top: 0;
+      max-height: 70vh;
+      overflow: auto;
+      padding: 12px 12px 4px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+    .plan { position: relative; margin-top: 16px; background: #efece6; border: 1px solid var(--line); min-height: 180px; overflow: hidden; max-width: 100%; }
+    #booths { display: none; }
+    .plan img.sheet { display: block; width: 100%; max-width: 100%; min-width: 0; height: auto; background: #fff; }
+    .plan img.sheet[hidden] { display: none; }
+    .plan.plain { aspect-ratio: 16 / 9; min-height: 0; }
+    .plan-note { margin: 0; padding: 16px; color: var(--muted); font-size: 14px; }
+    .plan .booth-box {
+      position: absolute;
+      z-index: 1;
+      box-sizing: border-box;
+      border: 2px solid #1f8f72;
+      background: rgba(31, 143, 114, 0.12);
+      cursor: pointer;
+    }
+    .plan .booth-box.hit { background: rgba(31, 143, 114, 0.4); }
+    .pin {
+      position: absolute;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: auto;
+      height: auto;
+      padding: 3px 6px;
+      border: 0;
+      border-radius: 4px;
+      background: #3c4450;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 720;
+      line-height: 1.25;
+      text-align: center;
+      white-space: nowrap;
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+    }
+    .pin span { font-size: 10px; font-weight: 650; }
+    .roster tr.hit td { background: #fdecef; }
+    .roster tbody tr { cursor: pointer; }
+    .pin.hit { outline: 3px solid #1c1a17; box-shadow: 0 0 0 3px #fff; z-index: 4; }
+    .pin.idle, .plan .booth-box.idle { opacity: 0; pointer-events: none; }
+    .roster h3 button.release {
+      margin-left: 8px;
+      padding: 2px 8px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .booths {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-auto-rows: minmax(76px, auto);
+      gap: 12px;
+      margin-top: 16px;
+      padding: 12px;
+      background: #efece6;
+      border: 1px solid var(--line);
+    }
+    .booth {
+      grid-column: var(--c);
+      grid-row: var(--r);
+      min-height: 76px;
+      background: #fff;
+      border: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 8px;
+    }
+    .booth b { font-size: 14px; font-weight: 720; }
+    .booth span { color: var(--muted); font-size: 12px; }
+    .back {
+      margin-top: 18px;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: var(--red);
+      font: inherit;
+      font-size: 15px;
+      font-weight: 720;
+      cursor: pointer;
+    }
+    .roster { margin-top: 28px; }
+    .roster h3 { margin: 0; font-size: 14px; font-weight: 680; letter-spacing: -0.02em; text-align: center; }
+    .roster p { margin: 8px 0 0; color: var(--muted); font-size: 14px; }
+    .roster table { width: 100%; margin-top: 8px; border-collapse: collapse; background: #fff; }
+    .roster th, .roster td { padding: 12px 8px; border-bottom: 1px solid var(--line); text-align: center; font-size: 13px; white-space: normal; }
+    .roster tbody tr { cursor: pointer; }
+    .roster th { color: var(--muted); font-size: 12px; font-weight: 650; letter-spacing: 0.04em; }
+    footer { padding: 36px 0 56px; color: var(--muted); font-size: 12px; }
+
+    @media (max-width: 1100px) {
+      .shows { grid-template-columns: 1fr 1fr; }
+      .fields { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 860px) {
+      .steps { grid-template-columns: 1fr 1fr; }
+      .nav-row { align-items: stretch; flex-direction: column; padding: 10px 0 12px; gap: 8px; }
+      .nav-links {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+        width: 100%;
+        margin-left: 0;
+      }
+      .nav-links a,
+      .nav-links a.lock {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 36px;
+        background: #141210;
+        color: #fff;
+        border-radius: 10px;
+        padding: 8px 10px;
+        font-size: 14px;
+        font-weight: 700;
+        text-align: center;
+      }
+      .nav-links a:last-child { grid-column: 1 / -1; }
+      .to-admin { align-self: flex-start; min-height: 36px; display: inline-flex; align-items: center; }
+      .hall { height: 460px; }
+      .split { grid-template-columns: 1fr; gap: 28px; }
+      .type-grid, .match-grid { grid-template-columns: 1fr; }
+      .roster { overflow-x: auto; }
+      #map { padding-left: 0; padding-right: 0; }
+      #map .map-head, #map .hall-row, #map .back { padding-left: 16px; padding-right: 16px; }
+      #map .place-pick { display: none; }
+      #map.list-right .sheet-row,
+      #map.list-bottom .sheet-row { display: block; }
+      #map.list-right .company-list,
+      #map.list-bottom .company-list { width: 100%; max-width: 100%; margin-top: 12px; }
+      #map .drawer,
+      #map.list-closed .drawer,
+      #map.list-right .drawer,
+      #map.list-bottom .drawer,
+      #map.list-bottom.list-closed .drawer {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        flex-basis: auto;
+        gap: 0;
+      }
+      #map .drawer-tab {
+        width: 100%;
+        height: 46px;
+        min-height: 46px;
+        border-radius: 0;
+        border-left: 0;
+        border-right: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 14px;
+        font-weight: 680;
+      }
+      #map .drawer-tab .tab-name { display: inline; }
+      #map .drawer-tab .chev { transform: rotate(90deg); }
+      #map.list-closed .drawer-tab .chev,
+      #map.list-bottom.list-closed .drawer-tab .chev { transform: rotate(90deg); }
+      #map:not(.list-closed) .drawer-tab .chev { transform: rotate(-90deg); }
+      #map .roster, #map.list-bottom .roster { width: 100%; padding: 0 16px 12px; box-sizing: border-box; }
+      #map.list-closed .roster { display: none; }
+      #koreaMap .plan {
+        width: 100%;
+        max-width: 100%;
+        margin-left: 0;
+        margin-top: 8px;
+        overflow: hidden;
+        background: #fff;
+      }
+      #koreaMap .plan img.sheet {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+      }
+      .reason b { font-size: 32px; }
+      .fold-btn .en { font-size: 22px; }
+    }
+    @media (max-width: 640px) {
+      .pair { flex-direction: column; }
+      .booths { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .product-card { padding: 12px; }
+      .plain-card { padding: 16px; }
+      .entry-lead { font-size: 15px; }
+      #venueMap { height: 240px; }
+      .map-lang, .money-pick { flex-wrap: wrap; }
+    }
+    @media (max-width: 520px) {
+      .wrap { width: min(1080px, calc(100% - 28px)); }
+      .shows, .fields, .steps, .type-grid, .fee, .basics { grid-template-columns: 1fr; }
+      header { padding-top: 28px; }
+    }
+    @media (pointer: coarse) and (max-width: 1100px) {
+      .data-title { font-size: 22px; }
+      header .stats { grid-template-columns: 1fr; gap: 8px; border-top: 0; }
+      header .stat {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      header .stat .en {
+        order: 1;
+        margin: 0;
+        font-size: 20px;
+        font-weight: 720;
+        letter-spacing: -0.03em;
+        line-height: 1.15;
+      }
+      header .stat b { display: none; order: 2; font-size: 22px; margin-top: 8px; }
+      header .stat.on b { display: block; }
+      header .stat.on { background: #141210; color: #fff; }
+      header .stat { cursor: pointer; pointer-events: auto; }
+    }
+    @media (min-width: 861px) {
+      #map { overflow-x: visible; }
+      #map.list-right .sheet-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 16px;
+        align-items: start;
+      }
+      #map.list-right .sheet-row:has(.company-list.is-closed) {
+        grid-template-columns: minmax(0, 1fr) auto;
+      }
+      #map.list-bottom .sheet-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+      }
+      #map.list-right .company-list,
+      #map.list-bottom .company-list {
+        width: auto;
+        max-width: none;
+        min-width: 0;
+        margin-top: 0;
+      }
+      #map .plan img.sheet,
+      #map img.venue {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+      }
+    }
+    .list-hide {
+      display: block;
+      margin: 10px 0 6px auto;
+      min-height: 28px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 680;
+      cursor: pointer;
+    }
+    .company-list.is-closed .roster { display: none !important; }
+    .company-list.is-closed {
+      width: auto !important;
+      height: auto !important;
+      max-height: none !important;
+      overflow: visible !important;
+      align-self: start !important;
+      border: 0 !important;
+    }
+  </style>
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="wrap nav-row">
+      <a class="brand" href="index.html">SINOSEOUL</a>
+      <div class="nav-links">
+        <a href="#intro">전시 소개</a>
+        <a href="#apply">참가 신청</a>
+        <a href="#map">전시 도면</a>
+        <a href="#match">바이어 매칭</a>
+        <a href="#notice">공지</a>
+      </div>
+      <a class="to-admin" href="manage.html#intro">관리자</a>
+    </div>
+    <div class="wrap"><p class="crumb"><a href="index.html">1. 플랫폼</a> · <a href="marketing.html">2. 마케팅</a> · 3. 중국 · 4. CMEF</p></div>
+  </nav>
+  <header id="intro">
+    <div class="wrap">
+      <p class="kicker">CMEF SHANGHAI 2027</p>
+      <h1>제95회 중국 국제 의료기기 전시회</h1>
+      <p class="en-title">China International Medical Equipment Fair</p>
+      <p class="when">2027.4.7 – 10 · NECC Shanghai</p>
+
+      <p class="data-title">Data</p>
+      <div class="stats" aria-label="Data">
+        <button type="button" class="stat" data-stat="sqm"><b>320,000+</b><span class="en">sqm</span></button>
+        <button type="button" class="stat" data-stat="exhibitors"><b>4,700+</b><span class="en">Exhibitors</span></button>
+        <button type="button" class="stat" data-stat="countries"><b>150+</b><span class="en">Countries</span></button>
+        <button type="button" class="stat" data-stat="innovations"><b>1,000+</b><span class="en">Innovations</span></button>
+        <button type="button" class="stat" data-stat="visits"><b>300,000+</b><span class="en">Visits</span></button>
+        <button type="button" class="stat" data-stat="buyers"><b>13,000+</b><span class="en">Buyers</span></button>
+        <button type="button" class="stat" data-stat="conferences"><b>100+</b><span class="en">Conferences</span></button>
+      </div>
+
+      <div class="basics" id="basics">
+        <div><span class="ko">주최</span><b id="hostName">Reed Sinopharm Exhibitions</b></div>
+        <div><span class="ko">장소</span><b>NECC Shanghai</b></div>
+        <div><span class="ko">신청 기간</span><b id="applyPeriod">아직 없습니다</b></div>
+      </div>
+
+    </div>
+
+  <div class="wrap folds" id="folds">
+    <section class="fold" data-fold="visitor">
+      <button type="button" class="fold-btn" aria-expanded="false" aria-controls="visitorBody">
+        <span><span class="en">Visitor Profile</span><span class="ko">참관객</span></span>
+        <span class="chev" aria-hidden="true">+</span>
+      </button>
+      <div class="panel" id="visitorBody">
+      <div class="split">
+      <div id="visitorRows">
+        <div class="row"><div><span class="name">Distributors &amp; Agents</span><span class="ko">유통·대리점</span></div><strong>34%</strong><div class="track"><i style="width:34%"></i></div></div>
+        <div class="row"><div><span class="name">Manufacturers</span><span class="ko">제조사</span></div><strong>24%</strong><div class="track"><i style="width:24%"></i></div></div>
+        <div class="row"><div><span class="name">Medical Institutions</span><span class="ko">의료기관</span></div><strong>23%</strong><div class="track"><i style="width:23%"></i></div></div>
+        <div class="row"><div><span class="name">Others</span><span class="ko">기타</span></div><strong>6%</strong><div class="track"><i style="width:6%"></i></div></div>
+        <div class="row"><div><span class="name">Associations</span><span class="ko">협회·기관</span></div><strong>5%</strong><div class="track"><i style="width:5%"></i></div></div>
+        <div class="row"><div><span class="name">Trade &amp; Tender</span><span class="ko">무역·입찰</span></div><strong>4%</strong><div class="track"><i style="width:4%"></i></div></div>
+        <div class="row"><div><span class="name">R&amp;D</span><span class="ko">연구기관</span></div><strong>4%</strong><div class="track"><i style="width:4%"></i></div></div>
+      </div>
+      <div>
+        <p class="side-title">Why They Visit</p>
+        <div class="reasons" id="visitReasons">
+          <div class="reason"><b>63.3%</b><span class="en">Purchasing</span></div>
+          <div class="reason"><b>37.7%</b><span class="en">Partnership</span></div>
+          <div class="reason"><b>37.7%</b><span class="en">New Trends</span></div>
+        </div>
+      </div>
+      </div>
+      </div>
+    </section>
+
+    <section class="fold" data-fold="chain">
+      <button type="button" class="fold-btn" aria-expanded="false" aria-controls="chainBody">
+        <span><span class="en">Industry Chain</span><span class="ko">산업 분야</span></span>
+        <span class="chev" aria-hidden="true">+</span>
+      </button>
+      <div class="panel" id="chainBody">
+      <div class="fields" id="industryFields">
+        <div><strong>Medical Imaging</strong><em>의료영상</em></div>
+        <div><strong>IVD</strong><em>체외진단</em></div>
+        <div><strong>Operating Room</strong><em>수술실</em></div>
+        <div><strong>Medical Electronics</strong><em>의료전자</em></div>
+        <div><strong>Medical Optics</strong><em>의료광학</em></div>
+        <div><strong>Medical Robotics</strong><em>의료용 로봇</em></div>
+        <div><strong>Consumables</strong><em>의료용 소모품</em></div>
+        <div><strong>Orthopedics</strong><em>정형외과</em></div>
+        <div><strong>Hospital Build</strong><em>병원 건설·시설</em></div>
+        <div><strong>Simulation</strong><em>의료 시뮬레이션</em></div>
+        <div><strong>Infection Control</strong><em>소독·감염관리</em></div>
+        <div><strong>Aesthetics</strong><em>미용 의료</em></div>
+        <div><strong>Asset Management</strong><em>병원 자산 관리</em></div>
+      </div>
+      </div>
+    </section>
+
+    <section class="fold" data-fold="shows">
+      <button type="button" class="fold-btn" aria-expanded="false" aria-controls="showBody">
+        <span><span class="en">Concurrent Shows</span><span class="ko">동기간 전시</span></span>
+        <span class="chev" aria-hidden="true">+</span>
+      </button>
+      <div class="panel" id="showBody">
+      <div class="shows">
+        <article class="show" data-show="icmd"><img src="logos/icmd.png" alt="ICMD"><p class="en">Component &amp; Design</p><p class="ko">부품·설계</p><div class="slot"></div></article>
+        <article class="show" data-show="crs"><img src="logos/crs.png" alt="CRS"><p class="en">Rehabilitation</p><p class="ko">재활·개인 건강</p><div class="slot"></div></article>
+        <article class="show" data-show="cecn"><img src="logos/cecn.png" alt="CECN"><p class="en">Elderly Care</p><p class="ko">노인 요양</p><div class="slot"></div></article>
+        <article class="show" data-show="homecare"><img src="logos/homecare.png" alt="Home Care"><p class="en">Home Care</p><p class="ko">가정용 의료</p><div class="slot"></div></article>
+        <article class="show" data-show="intelligent"><img src="logos/intelligent.png" alt="Intelligent Health"><p class="en">Intelligent Health</p><p class="ko">지능형 건강</p><div class="slot"></div></article>
+        <article class="show" data-show="ahc"><img src="logos/ahc.png" alt="AHC"><p class="en">Animal Health</p><p class="ko">동물 건강</p><div class="slot"></div></article>
+        <article class="show" data-show="emergency"><img src="logos/emergency.png" alt="Emergency Rescue"><p class="en">Emergency Rescue</p><p class="ko">응급·구조</p><div class="slot"></div></article>
+        <article class="show" data-show="lifestyle"><svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="16" fill="none" stroke="#1a1a1a" stroke-width="1.6"/><path d="M16 26c2-6 4-8 8-8s6 2 8 8" fill="none" stroke="#1a1a1a" stroke-width="1.6" stroke-linecap="round"/></svg><p class="en">Healthy Lifestyle</p><p class="ko">건강 생활</p><div class="slot"></div></article>
+      </div>
+      </div>
+    </section>
+
+    <section class="fold psr" data-fold="psr">
+      <button type="button" class="fold-btn" id="psrBtn" aria-expanded="false" aria-controls="psrMenu">
+        <span><span class="en">PSR</span><span class="ko">Post Show Report</span></span>
+        <span class="chev" aria-hidden="true">+</span>
+      </button>
+      <div class="psr-menu" id="psrMenu" hidden></div>
+      <div class="brief" id="historyBrief" hidden></div>
+    </section>
+  </div>
+  </header>
+
+  <div class="wrap">
+    <section class="block" id="apply">
+      <p class="kicker">APPLICATION</p>
+      <h2>참가 신청</h2>
+
+      <button type="button" class="booth-fold-btn" id="boothFold" aria-expanded="false" aria-controls="boothTypes">
+        <span><b>Booth type</b><em>부스유형</em></span>
+        <span class="chev" aria-hidden="true">+</span>
+      </button>
+      <div class="booth-types usd" id="boothTypes" hidden>
+        <div class="booth-tools">
+          <div class="site-count">
+            <span>사이즈</span>
+            <button type="button" id="siteMinus" aria-label="사이즈 줄이기">−</button>
+            <b id="siteCount">1</b>
+            <button type="button" id="sitePlus" aria-label="사이즈 늘리기">+</button>
+            <span class="site-area" id="siteArea">9㎡</span>
+          </div>
+          <div class="money-pick" role="group" aria-label="화폐">
+            <button type="button" data-money="usd" class="on">USD</button>
+            <button type="button" data-money="cny">CNY</button>
+            <button type="button" id="krwToggle" aria-pressed="false">KRW</button>
+          </div>
+        </div>
+        <p class="fx-line" id="fxLine" hidden>네이버 환율을 불러오는 중입니다.</p>
+        <p id="introNoteView" hidden></p>
+        <table class="booth-table">
+          <thead>
+            <tr><th></th><th>Booth type</th><th>Image</th><th>Info</th><th>Area</th></tr>
+          </thead>
+          <tbody>
+            <tr class="pick" data-kind="raw">
+              <td class="no">1</td>
+              <td id="typeName0">Raw space</td>
+              <td><img id="typePic0" src="booths/raw.png" alt="Raw space"></td>
+              <td class="info"><span id="typeInfo0">면적만 제공</span><span id="typeKit0" hidden>비품 없음</span></td>
+              <td id="typeArea0">가로 3m × 세로 3m</td>
+            </tr>
+            <tr class="pick" data-kind="standard">
+              <td class="no">2</td>
+              <td id="typeName1">Basic Shell Scheme</td>
+              <td><img id="typePic1" src="booths/standard.png" alt="Basic Shell Scheme"></td>
+              <td class="info"><span id="typeInfo1">기본조립부스</span><span id="typeKit1" hidden>비품 없음</span></td>
+              <td id="typeArea1">가로 3m × 세로 3m × 높이 4m</td>
+            </tr>
+            <tr class="pick" data-kind="upgrade">
+              <td class="no">3</td>
+              <td id="typeName2">Upgraded Shell Scheme</td>
+              <td><img id="typePic2" src="booths/standard.png" alt="Upgraded Shell Scheme"></td>
+              <td class="info"><span id="typeInfo2">기본 조립부스 + 라이트박스(간판, 국가관 이미지) + HQI light(×1)</span><span id="typeKit2" hidden>비품
+Luminous International image
+Luminous fascia board
+HQI light × 1</span></td>
+              <td id="typeArea2">가로 3m × 세로 3m × 높이 4m</td>
+            </tr>
+          </tbody>
+        </table>
+        <strong id="typePrice0" hidden>470</strong>
+        <strong id="typePrice1" hidden>530</strong>
+        <strong id="typePrice2" hidden>562</strong>
+        <div id="feeTotal" hidden>
+          <p class="fee-title">최종 신청 비용</p>
+          <div class="fee">
+            <div><span id="totalBoothName">부스 9㎡</span><b id="totalBooth"></b></div>
+            <div><span>Catalogue fee · 필수</span><b id="totalCat"></b></div>
+            <div><span>Online promotion fee</span><b id="totalPromo"></b></div>
+            <div class="total-line"><span>합계</span><b id="totalSum"></b></div>
+            <div id="krwRow" hidden><span>원화</span><b id="totalKrw"></b></div>
+          </div>
+          <div class="fee-actions"><button type="button" id="pickType">이 타입으로 신청</button></div>
+        </div>
+      </div>
+      <p class="chosen-booth" id="chosenBooth" hidden><b id="chosenName"></b> <span id="chosenInfo"></span> <span id="chosenPrice"></span></p>
+      <form class="apply-form" id="basicForm">
+        <h3 class="exhibitor-title">Exhibitor's information</h3>
+        <label class="co-name">기업명<input id="coName" type="text" placeholder="기업명"></label>
+        <div id="productBlocks"></div>
+        <p class="product-total" id="productTotal">전시 품목 합계 1</p>
+        <button class="slim" type="button" id="addProduct">제품 추가</button>
+        <label>담당자<input id="coPerson" type="text" placeholder="담당자 성함"></label>
+        <label>연락처<input id="coPhone" type="text" placeholder="숫자만 입력해주세요"></label>
+        <label>E-mail<input id="coMail" type="email" placeholder="담당자 이메일"></label>
+        <div class="consent">
+          <h3>개인정보 수집·이용 및 광고성 이메일 수신 동의</h3>
+          <p><b>1. 전시회 참가신청 및 운영을 위한 개인정보 수집·이용 동의</b> <span class="need">필수</span></p>
+          <p>수집 항목: 업체명, 연락처, 담당자, 이메일 주소, 제품명 및 품목분류 등 정보</p>
+          <p>이용 목적: 전시회 참가신청 처리, 참가업체 현황관리 및 전시회 운영 관련 안내</p>
+          <p>보유·이용 기간: 동의 후 3년간 보유하며, 이후 지체 없이 파기합니다. 관계 법령에 따라 보존할 필요가 있으면 그 기간 동안 보관합니다.</p>
+          <label><input id="agreeNeed" type="checkbox"> 전시회 참가신청 및 운영을 위한 개인정보 수집·이용에 동의합니다.</label>
+          <p><b>2. 마케팅 목적 개인정보 이용 및 광고성 이메일 수신 동의</b> <span class="pick">선택</span></p>
+          <p>수집 항목: 업체명, 연락처, 담당자, 이메일 주소, 제품명 및 품목분류 등 정보</p>
+          <p>이용 목적: 의료기기 관련 전시회, 세미나, 정보 제공 및 안내</p>
+          <p>동의하지 않아도 전시회 참가신청과 관련 안내를 받을 수 있습니다.</p>
+          <label><input id="agreeAd" type="checkbox"> 의료기기 관련 회의, 세미나, 전시회 및 광고성 이메일 수신에 동의합니다.</label>
+        </div>
+        <button class="go-fair" type="submit" id="goFair">전시회 신청</button>
+        <p class="hall-hint" id="applyMsg"></p>
+      </form>
+    </section>
+
+    <section class="block list-right" id="map">
+      <div class="map-head">
+        <div>
+          <p class="kicker">FLOOR PLAN</p>
+          <h2>전시 도면</h2>
+        </div>
+        <div class="place-pick" role="group" aria-label="참가 기업 목록 위치">
+          <button type="button" data-place="right" class="on" aria-label="목록을 오른쪽에"><span class="mark" aria-hidden="true"></span></button>
+          <button type="button" data-place="bottom" aria-label="목록을 아래에"><span class="mark" aria-hidden="true"></span></button>
+        </div>
+      </div>
+      <div id="venuePair" class="sheet-row">
+        <div id="hallMap" class="clover">
+          <div class="venue-frame">
+            <img class="venue" id="venuePic" src="halls/venue.jpg?v=3" alt="상하이 전시장 모식도">
+            <button type="button" class="hall-hot" data-hall="5.2" aria-label="5.2 국제관"></button>
+            <svg class="zone-layer" id="zoneLayer" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+          </div>
+          <p id="venueEmpty" hidden></p>
+          <div class="hall-row">
+            <button type="button" class="zone" data-slot="0" data-hall="8.2" data-korea="0" data-name="" aria-label="8.2"><span class="hall-no">8.2</span></button>
+            <button type="button" class="zone" data-slot="1" data-hall="7.2" data-korea="0" data-name="" aria-label="7.2"><span class="hall-no">7.2</span></button>
+            <button type="button" class="zone" data-slot="2" data-hall="6.2" data-korea="0" data-name="" aria-label="6.2"><span class="hall-no">6.2</span></button>
+            <button type="button" class="zone korea" data-slot="3" data-hall="5.2" data-korea="1" data-name="국제관" aria-label="5.2 국제관"><span class="hall-no">5.2</span></button>
+            <button type="button" class="zone" data-slot="4" data-hall="4.2" data-korea="0" data-name="" aria-label="4.2"><span class="hall-no">4.2</span></button>
+          </div>
+          <p class="hall-hint" id="hallHint" hidden></p>
+        </div>
+        <div class="company-list">
+          <div class="roster" id="applyRoster">
+            <h3>참가 기업</h3>
+            <table>
+              <thead><tr><th>부스 번호</th><th>기업명</th><th>품목분류</th><th>전시 제품</th><th>등급</th></tr></thead>
+              <tbody id="applyRosterBody"></tbody>
+            </table>
+          </div>
+          <button type="button" class="list-hide">감추기</button>
+        </div>
+      </div>
+      <div id="sectionMap" hidden>
+        <button type="button" class="back" id="backSection">전체 도면</button>
+        <div class="plain-card">
+          <b id="sectionTitle">섹션</b>
+        </div>
+        <div class="pair sheet-row">
+        <div class="plan plain" id="sectionPlan"></div>
+        <div class="company-list">
+          <div class="roster">
+          <h3>참가 기업</h3>
+          <table>
+            <thead><tr><th>부스 번호</th><th>기업명</th><th>품목분류</th><th>전시 제품</th><th>인허가</th></tr></thead>
+            <tbody id="sectionRoster"></tbody>
+          </table>
+          </div>
+          <button type="button" class="list-hide">감추기</button>
+        </div>
+        </div>
+      </div>
+      <div id="koreaMap" hidden>
+        <button type="button" class="back" id="backHall">전체 도면</button>
+        <div class="sheet-row">
+        <div class="plan" id="koreaPlan">
+          <img class="sheet" id="koreaPlanImg" alt="한국관 도면" src="halls/korea-plan5.png">
+        <div class="booths" id="booths" aria-label="한국관 부스">
+          <div class="booth" data-c="1" data-r="1" style="--c:1;--r:1"><b>번호</b><span>3×3</span></div>
+          <div class="booth" data-c="3" data-r="1" style="--c:3;--r:1"><b>번호</b><span>3×3</span></div>
+          <div class="booth" data-c="2" data-r="2" style="--c:2;--r:2"><b>번호</b><span>3×3</span></div>
+          <div class="booth" data-c="4" data-r="2" style="--c:4;--r:2"><b>번호</b><span>3×3</span></div>
+          <div class="booth" data-c="1" data-r="4" style="--c:1;--r:4"><b>번호</b><span>3×3</span></div>
+          <div class="booth" data-c="4" data-r="4" style="--c:4;--r:4"><b>번호</b><span>3×3</span></div>
+          <div class="booth" data-c="2" data-r="5" style="--c:2;--r:5"><b>번호</b><span>3×3</span></div>
+          <div class="booth" data-c="3" data-r="6" style="--c:3;--r:6"><b>번호</b><span>3×3</span></div>
+        </div>
+        </div>
+        <div class="company-list">
+          <div class="roster">
+          <h3>참가 기업 <button class="release" type="button" id="clearSpot">표시 끄기</button></h3>
+          <p class="hall-hint" id="spotNote" hidden></p>
+          <table>
+            <thead>
+              <tr><th>부스 번호</th><th>기업명</th><th>품목분류</th><th>전시 제품</th><th>인허가</th></tr>
+            </thead>
+            <tbody id="rosterBody"></tbody>
+          </table>
+          </div>
+          <button type="button" class="list-hide">감추기</button>
+        </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="block" id="match">
+      <p class="kicker">BUYER MATCHING</p>
+      <h2>바이어 매칭</h2>
+      <div class="match-who">
+        <button type="button" class="on" id="matchNow">이번 신청</button>
+        <button type="button" id="matchOther">아님</button>
+      </div>
+      <div class="match-who" id="matchPast" hidden>
+        <span>전시참가경험</span>
+        <label><input type="radio" name="matchExp" value="yes"> 있음</label>
+        <label><input type="radio" name="matchExp" value="no"> 없음</label>
+      </div>
+      <div id="matchLogin" hidden>
+        <label>아이디<input id="matchId" type="text" placeholder="아이디"></label>
+        <label>비밀번호<input id="matchPw" type="password" placeholder="비밀번호"></label>
+        <button type="button" class="slim" id="matchEnter">로그인</button>
+      </div>
+      <div class="match-grid" id="matchWork">
+        <article class="match-card">
+          <h3>직접 검색</h3>
+          <ul class="match-products" id="matchProducts"></ul>
+          <div id="matchPick" hidden>
+            <label>의료기기 품목분류<select id="matchDevice"></select></label>
+            <label>체외진단제 품목분류<select id="matchIvd"></select></label>
+          </div>
+          <label>지역<select id="matchRegion">
+            <option value="">선택</option>
+            <option>감숙성(Gansu)</option>
+            <option>강소성(Jiangsu)</option>
+            <option>강서성(Jiangxi)</option>
+            <option>광동성(Guangdong)</option>
+            <option>광서장족자치구(Guangxi)</option>
+            <option>귀주성(Guizhou)</option>
+            <option>길림성(Jilin)</option>
+            <option>내몽골자치구(Neimenggu)</option>
+            <option>녕하회족자치구(Ningxia)</option>
+            <option>복건성(Fujian)</option>
+            <option value="5">북경시(Beijing)</option>
+            <option>사천성(Sichuan)</option>
+            <option>산동성(Shandong)</option>
+            <option>산서성(Shanxi)</option>
+            <option>상해시(Shanghai)</option>
+            <option>서장자치구(Xizang)</option>
+            <option>섬서성(Shaanxi)</option>
+            <option>신장위그르자치구(Xinjiang)</option>
+            <option>안휘성(Anhui)</option>
+          </select></label>
+          <label>기업명칭<select id="matchCompany"><option value="">선택</option></select></label>
+          <div class="match-add">
+            <button type="button" class="slim" id="matchAdd">목록에 담기</button>
+            <a class="match-num" id="matchCount" href="https://sinoseoul.co.kr/resource/client/market/158?category_idx=1&amp;type=market" target="_blank" rel="noopener">0</a>
+          </div>
+        </article>
+        <article class="match-card">
+          <h3>조사와 매칭</h3>
+          <div class="match-checks">
+            <label><input type="checkbox" value="신용도"> 신용도</label>
+            <label><input type="checkbox" value="규모"> 규모</label>
+            <label><input type="checkbox" value="조건"> 조건</label>
+          </div>
+          <button type="button" class="go-fair" id="matchAsk">조사·매칭 요청</button>
+          <p id="matchMsg"></p>
+        </article>
+      </div>
+    </section>
+
+    <section class="block" id="notice">
+      <p class="kicker">NOTICE</p>
+      <h2>공지</h2>
+      <div class="plain-card" id="noticeCard">
+        <b id="noticeTitle">전시장 맵</b>
+        <div class="map-lang" id="mapLang">
+          <button type="button" data-lang="en">영문</button>
+          <button type="button" data-lang="zh">중국어</button>
+        </div>
+        <span class="map-addr" id="mapAddr"></span>
+        <iframe id="venueMap" title="전시장 지도" hidden></iframe>
+        <a id="mapOpen" hidden target="_blank" rel="noopener">구글 지도에서 열기</a>
+        <span class="map-empty" id="mapEmpty">주소나 전시장 명칭을 넣으면 지도가 열립니다.</span>
+      </div>
+      <div class="plain-card">
+        <b>입장 방법</b>
+        <div id="entryPass">
+          <p class="entry-lead">QR 스캔 → 모바일 등록 6단계 → 개인 입장권 QR 수령</p>
+          <p class="entry-note">휴대폰 화면 안내에 따라 6단계 진행</p>
+          <ol class="entry-steps">
+            <li><b>QR코드 스캔</b><span>Wi-Fi가 연결된 상태에서 휴대폰 카메라로 QR코드를 스캔해 등록 페이지에 접속합니다.</span></li>
+            <li><b>1차 등록 버튼 누르기</b><span>첫 화면의 Registration을 선택합니다.</span></li>
+            <li><b>이메일 검증코드 입력</b><span>이메일로 받은 코드를 입력한 뒤 Sign In/Register를 누릅니다.</span></li>
+            <li><b>좌측 하단 뒤로 가기</b><span>화면 왼쪽 아래 &lt; 버튼을 누릅니다.</span></li>
+            <li><b>두 번째 전시회 선택</b><span>CMEF Autumn 2026 (10.21-10.24)을 선택합니다.</span></li>
+            <li><b>2026년 등록 버튼 누르기</b><span>2026 가을 전시회 Registration을 선택합니다.</span></li>
+            <li><b>설문 1–5번 문항 답하기</b><span>Questionnaire 5개를 응답한 뒤 Next를 누릅니다.</span></li>
+            <li><b>입장권 QR 캡처·저장</b><span>개인 휴대폰에 입장권 QR 저장이 완료됩니다.</span></li>
+          </ol>
+          <div class="entry-zoom">
+            <div class="entry-zoom-bar">
+              <button type="button" id="entryZoomOut">작게</button>
+              <button type="button" id="entryZoomIn">크게</button>
+              <button type="button" id="entryZoomReset">처음 크기</button>
+            </div>
+            <p class="entry-hint">마우스 휠로 키우고 줄입니다. 휴대폰에서는 두 손가락으로 조절합니다.</p>
+            <div class="entry-stage" id="entryStage">
+              <img class="entry-sheet" id="entrySheet" src="entry-pass.png" alt="CMEF 전시장 입장권 신청 절차" draggable="false">
+            </div>
+          </div>
+        </div>
+        <span id="noticeEntry"></span>
+      </div>
+    </section>
+  </div>
+  <script>
+    if (location.search.indexOf("preview=1") >= 0) document.body.classList.add("preview");
+    var fairs = [
+      { year: "2027", no: "95th", en: "Spring", ko: "봄", date: "2027.4.7–10", place: "NECC Shanghai", placeKo: "상하이 국가회의전람센터", note: "전시면적 320,000㎡ 이상 · 참가업체 4,700곳 이상" },
+      { year: "2026", no: "94th", en: "Autumn", ko: "가을", date: "2026.10.21–24", place: "CIECC Beijing", placeKo: "베이징" },
+      { year: "2026", no: "93rd", en: "Spring", ko: "봄", date: "2026.4.9–12", place: "Shanghai", placeKo: "상하이", report: true },
+      { year: "2025", no: "92nd", en: "Autumn", ko: "가을", date: "2025.9.26–29", place: "Guangzhou", placeKo: "광저우" },
+      { year: "2025", no: "91st", en: "Spring", ko: "봄", date: "2025.4.8–11", place: "Shanghai", placeKo: "상하이" },
+      { year: "2024", no: "90th", en: "Autumn", ko: "가을", date: "2024.10.12–15", place: "Shenzhen", placeKo: "선전" },
+      { year: "2024", no: "89th", en: "Spring", ko: "봄", date: "2024.4.11–14", place: "Shanghai", placeKo: "상하이" },
+      { year: "2023", no: "88th", en: "Autumn", ko: "가을", date: "2023.10.28–31", place: "Shenzhen", placeKo: "선전" },
+      { year: "2023", no: "87th", en: "Spring", ko: "봄", date: "2023.5.14–17", place: "Shanghai", placeKo: "상하이" },
+      { year: "2022", no: "86th", en: "Spring", ko: "봄", date: "2022.8.21–24", place: "Shanghai", placeKo: "상하이" },
+      { year: "2021", no: "85th", en: "Autumn", ko: "가을", date: "2021.10.13–16", place: "Shenzhen", placeKo: "선전" },
+      { year: "2021", no: "84th", en: "Spring", ko: "봄", date: "2021.5.13–16", place: "Shanghai", placeKo: "상하이" }
+    ];
+    var menu = document.getElementById("psrMenu");
+    var psrBtn = document.getElementById("psrBtn");
+    var briefBox = document.getElementById("historyBrief");
+    var byYear = {};
+    var yearOrder = [];
+    fairs.forEach(function (fair) {
+      if (!byYear[fair.year]) {
+        byYear[fair.year] = [];
+        yearOrder.push(fair.year);
+      }
+      byYear[fair.year].push(fair);
+    });
+    var reportDb;
+    function openReports() {
+      return new Promise(function (resolve, reject) {
+        if (reportDb) { resolve(reportDb); return; }
+        var req = indexedDB.open("cmef2027-reports", 1);
+        req.onupgradeneeded = function () {
+          if (!req.result.objectStoreNames.contains("files")) req.result.createObjectStore("files");
+        };
+        req.onsuccess = function () { reportDb = req.result; resolve(reportDb); };
+        req.onerror = function () { reject(req.error); };
+      });
+    }
+    function loadReport(fair) {
+      if (!fair || !fair.id) return Promise.resolve(null);
+      return openReports().then(function (db) {
+        return new Promise(function (resolve, reject) {
+          var req = db.transaction("files", "readonly").objectStore("files").get(fair.id);
+          req.onsuccess = function () { resolve(req.result || null); };
+          req.onerror = function () { reject(req.error); };
+        });
+      });
+    }
+    function downloadReport(fair, button) {
+      loadReport(fair).then(function (saved) {
+        if (!saved || !saved.blob) {
+          button.textContent = "download";
+          return;
+        }
+        var url = URL.createObjectURL(saved.blob);
+        var link = document.createElement("a");
+        link.href = url;
+        link.download = saved.name || fair.file || "report.pdf";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+      }).catch(function () {
+        button.textContent = "download";
+      });
+    }
+    function showBrief(fair, button) {
+      menu.querySelectorAll("button.pick").forEach(function (item) { item.classList.remove("on"); });
+      if (button) button.classList.add("on");
+      menu.hidden = true;
+      briefBox.hidden = false;
+      psrBtn.setAttribute("aria-expanded", "true");
+      psrBtn.querySelector(".chev").textContent = "–";
+      briefBox.innerHTML = "";
+      var head = document.createElement("div");
+      head.className = "head";
+      var title = document.createElement("p");
+      title.className = "en";
+      title.textContent = ((fair.no || "") + " " + (fair.en || "")).trim();
+      var down = document.createElement("button");
+      down.type = "button";
+      down.className = "get";
+      down.textContent = "download";
+      down.addEventListener("click", function (event) {
+        event.stopPropagation();
+        downloadReport(fair, down);
+      });
+      head.appendChild(title);
+      head.appendChild(down);
+      briefBox.appendChild(head);
+    }
+    function paintPsr(list) {
+      menu.innerHTML = "";
+      briefBox.hidden = true;
+      briefBox.innerHTML = "";
+      list.forEach(function (fair) {
+        if (!fair.year && !fair.no && !fair.file) return;
+        var row = document.createElement("div");
+        row.className = "row";
+        var button = document.createElement("button");
+        button.type = "button";
+        button.className = "pick";
+        button.innerHTML = '<span class="en">' + (fair.year ? fair.year + " " : "") + fair.no + "</span><span class=\"ko\">" + (fair.en || "") + "</span>";
+        button.addEventListener("click", function (event) {
+          event.stopPropagation();
+          showBrief(fair, button);
+        });
+        var down = document.createElement("button");
+        down.type = "button";
+        down.className = "get";
+        down.textContent = "download";
+        down.addEventListener("click", function (event) {
+          event.stopPropagation();
+          downloadReport(fair, down);
+        });
+        row.appendChild(button);
+        row.appendChild(down);
+        menu.appendChild(row);
+      });
+    }
+    paintPsr(fairs);
+    function markPsr(open) {
+      psrBtn.setAttribute("aria-expanded", open ? "true" : "false");
+      psrBtn.querySelector(".chev").textContent = open ? "–" : "+";
+    }
+    psrBtn.addEventListener("click", function (event) {
+      event.stopPropagation();
+      if (!menu.hidden) {
+        menu.hidden = true;
+        markPsr(!briefBox.hidden);
+        return;
+      }
+      if (!briefBox.hidden) {
+        briefBox.hidden = true;
+        menu.hidden = false;
+        markPsr(true);
+        return;
+      }
+      menu.hidden = false;
+      markPsr(true);
+    });
+    briefBox.addEventListener("click", function (event) {
+      event.stopPropagation();
+      if (briefBox.hidden) return;
+      briefBox.hidden = true;
+      menu.hidden = false;
+      markPsr(true);
+    });
+    document.addEventListener("click", function () {
+      if (menu.hidden) return;
+      menu.hidden = true;
+      markPsr(!briefBox.hidden);
+    });
+
+    var hallMap = document.getElementById("hallMap");
+    var koreaMap = document.getElementById("koreaMap");
+    var sectionMap = document.getElementById("sectionMap");
+    var hallHint = document.getElementById("hallHint");
+    var hallApps = [];
+    var lockedCo = null;
+    function paintLock() {
+      document.querySelectorAll(".roster tr.hit, .plan .pin.hit, .plan .booth-box.hit").forEach(function (node) { node.classList.remove("hit"); });
+      document.querySelectorAll(".plan .pin, .plan .booth-box").forEach(function (node) {
+        var on = lockedCo != null && node.dataset.index === String(lockedCo);
+        node.hidden = false;
+        node.classList.toggle("idle", !on);
+        node.classList.toggle("hit", on);
+      });
+      var note = document.getElementById("spotNote");
+      if (lockedCo == null || !hallApps[lockedCo]) {
+        if (note) { note.hidden = true; note.textContent = ""; }
+        return;
+      }
+      var row = document.getElementById("co-" + lockedCo);
+      if (row) {
+        row.classList.add("hit");
+        row.scrollIntoView({ block: "nearest" });
+      }
+      var marks = document.querySelectorAll('.plan [data-index="' + lockedCo + '"]');
+      if (!note) return;
+      if (marks.length || note) {
+        note.hidden = true;
+        note.textContent = "";
+      }
+    }
+    function lockCompany(index) {
+      lockedCo = index;
+      paintLock();
+    }
+    function clearCompanyLock() {
+      lockedCo = null;
+      paintLock();
+    }
+    function toggleCompany(index) {
+      if (lockedCo === index) clearCompanyLock();
+      else lockCompany(index);
+    }
+    var currentHall = "";
+    function goToCompany(index) {
+      var item = hallApps[index];
+      if (!item) return;
+      var target = item.hall || window.cmefHall || "5.2";
+      if (target !== currentHall) {
+        var zone = null;
+        document.querySelectorAll("#hallMap .zone").forEach(function (node) {
+          if (node.getAttribute("data-hall") === target) zone = node;
+        });
+        if (zone) openZone(zone);
+      }
+      if (currentHall === target && lockedCo === index) clearCompanyLock();
+      else lockCompany(index);
+    }
+    ["koreaPlan", "sectionPlan"].forEach(function (id) {
+      var board = document.getElementById(id);
+      if (!board) return;
+      board.addEventListener("click", function (event) {
+        if (event.target.closest(".pin") || event.target.closest(".booth-box")) return;
+        var rect = board.getBoundingClientRect();
+        if (!rect.width || !rect.height) {
+          clearCompanyLock();
+          return;
+        }
+        var x = (event.clientX - rect.left) / rect.width * 100;
+        var y = (event.clientY - rect.top) / rect.height * 100;
+        var best = -1;
+        var bestDistance = 6;
+        hallApps.forEach(function (item, index) {
+          if (item.x == null || item.y == null) return;
+          var dx = item.x - x;
+          var dy = item.y - y;
+          var distance = Math.sqrt(dx * dx + dy * dy);
+          if (distance < bestDistance) {
+            bestDistance = distance;
+            best = index;
+          }
+        });
+        if (best >= 0) toggleCompany(best);
+        else clearCompanyLock();
+      });
+    });
+    var clearSpot = document.getElementById("clearSpot");
+    if (clearSpot) clearSpot.addEventListener("click", clearCompanyLock);
+    function inHall(item, hall, korea) {
+      if (item.hall) return item.hall === hall;
+      return korea;
+    }
+    function boothReady(item) {
+      var booth = (item.booth || "").trim();
+      return booth !== "" && booth !== "미정";
+    }
+    function paintCompanies(tbody, hall, korea) {
+      tbody.innerHTML = "";
+      var any = false;
+      hallApps.forEach(function (item, index) {
+        if (!boothReady(item) || !inHall(item, hall, korea)) return;
+        any = true;
+        var row = document.createElement("tr");
+        row.id = "co-" + index;
+        [item.booth || "미정", item.company, item.category, item.product, item.auth].forEach(function (value) {
+          var cell = document.createElement("td");
+          cell.textContent = value || "";
+          row.appendChild(cell);
+        });
+        row.addEventListener("click", function () { goToCompany(index); });
+        tbody.appendChild(row);
+      });
+      if (!any) {
+        var row = document.createElement("tr");
+        var cell = document.createElement("td");
+        cell.colSpan = 5;
+        cell.textContent = "";
+        row.appendChild(cell);
+        tbody.appendChild(row);
+      }
+      paintLock();
+    }
+    function paintApplicantList() {
+      var tbody = document.getElementById("applyRosterBody");
+      if (!tbody) return;
+      var hall = window.cmefHall || "5.2";
+      tbody.innerHTML = "";
+      var any = false;
+      hallApps.forEach(function (item, index) {
+        if (!boothReady(item)) return;
+        any = true;
+        var row = document.createElement("tr");
+        row.addEventListener("click", function () { goToCompany(index); });
+        [item.booth || ((item.hall || "") + " 미정"), item.company, item.category, item.product, item.grade].forEach(function (value) {
+          var cell = document.createElement("td");
+          cell.textContent = value || "";
+          row.appendChild(cell);
+        });
+        tbody.appendChild(row);
+      });
+      if (!any) {
+        var row = document.createElement("tr");
+        var cell = document.createElement("td");
+        cell.colSpan = 5;
+        cell.textContent = "";
+        row.appendChild(cell);
+        tbody.appendChild(row);
+      }
+      var koreaBody = document.getElementById("rosterBody");
+      if (koreaBody) paintCompanies(koreaBody, hall, true);
+    }
+    function markColor(hex, alpha) {
+      var n = (hex || "#3c4450").replace("#", "");
+      if (n.length === 3) n = n[0] + n[0] + n[1] + n[1] + n[2] + n[2];
+      var r = parseInt(n.slice(0, 2), 16);
+      var g = parseInt(n.slice(2, 4), 16);
+      var b = parseInt(n.slice(4, 6), 16);
+      if (isNaN(r) || isNaN(g) || isNaN(b)) return "rgba(60,68,80," + alpha + ")";
+      return "rgba(" + r + "," + g + "," + b + "," + alpha + ")";
+    }
+    function paintPins(board, hall, korea) {
+      board.querySelectorAll(".pin, .booth-box").forEach(function (node) { node.remove(); });
+      hallApps.forEach(function (item, index) {
+        if (!boothReady(item) || !inHall(item, hall, korea)) return;
+        if (item.x == null || item.y == null) return;
+        var box = null;
+        if (item.w && item.h) {
+          box = document.createElement("div");
+          box.className = "booth-box";
+          box.dataset.index = String(index);
+          box.style.left = (item.x - item.w / 2) + "%";
+          box.style.top = (item.y - item.h / 2) + "%";
+          box.style.width = item.w + "%";
+          box.style.height = item.h + "%";
+          box.style.borderColor = item.color || "#1f8f72";
+          box.style.background = markColor(item.color || "#1f8f72", 0.2);
+          box.addEventListener("click", function (event) {
+            event.stopPropagation();
+            toggleCompany(index);
+          });
+          board.appendChild(box);
+        }
+        var pin = document.createElement("button");
+        pin.type = "button";
+        pin.className = "pin";
+        pin.dataset.index = String(index);
+        pin.style.left = item.x + "%";
+        pin.style.top = item.y + "%";
+        pin.style.background = item.color || "#3c4450";
+        var pinNo = document.createElement("b");
+        pinNo.textContent = item.booth || "번호";
+        var pinName = document.createElement("span");
+        pinName.textContent = item.company || "";
+        pin.appendChild(pinNo);
+        pin.appendChild(pinName);
+        pin.setAttribute("aria-label", (item.booth || "") + " " + (item.company || ""));
+        pin.addEventListener("click", function (event) {
+          event.stopPropagation();
+          toggleCompany(index);
+        });
+        board.appendChild(pin);
+      });
+      paintLock();
+    }
+    function showKoreaImage(src) {
+      if (!src) return;
+      var img = document.getElementById("koreaPlanImg");
+      img.src = src;
+      img.hidden = false;
+      document.getElementById("booths").hidden = true;
+    }
+    function openZone(zone) {
+      var hall = zone.getAttribute("data-hall");
+      var korea = zone.getAttribute("data-korea") === "1";
+      var name = zone.getAttribute("data-name") || "";
+      hallMap.hidden = true;
+      document.getElementById("venuePair").hidden = true;
+      currentHall = hall;
+      if (korea) {
+        sectionMap.hidden = true;
+        koreaMap.hidden = false;
+        paintCompanies(document.getElementById("rosterBody"), hall, true);
+        paintPins(document.getElementById("koreaPlan"), hall, true);
+      } else {
+        koreaMap.hidden = true;
+        sectionMap.hidden = false;
+        document.getElementById("sectionTitle").textContent = name ? hall + " · " + name : hall;
+        paintCompanies(document.getElementById("sectionRoster"), hall, false);
+        paintPins(document.getElementById("sectionPlan"), hall, false);
+      }
+    }
+    function showHall() {
+      hallMap.hidden = false;
+      document.getElementById("venuePair").hidden = false;
+      currentHall = "";
+      koreaMap.hidden = true;
+      sectionMap.hidden = true;
+      if (hallHint) hallHint.textContent = "";
+    }
+    document.querySelectorAll(".hall-hot").forEach(function (button) {
+      button.addEventListener("click", function (event) {
+        event.stopPropagation();
+        var hall = button.getAttribute("data-hall");
+        var match = null;
+        document.querySelectorAll("#hallMap .zone").forEach(function (node) {
+          if ((node.getAttribute("data-hall") || "") === hall) match = node;
+        });
+        if (match) openZone(match);
+      });
+    });
+    document.querySelectorAll("#hallMap .zone").forEach(function (zone) {
+      zone.addEventListener("mouseenter", function () {
+        var name = zone.getAttribute("data-name");
+        if (hallHint) hallHint.textContent = "";
+      });
+      zone.addEventListener("focus", function () {
+        var name = zone.getAttribute("data-name");
+        if (hallHint) hallHint.textContent = "";
+      });
+      zone.addEventListener("click", function () { openZone(zone); });
+      zone.addEventListener("keydown", function (event) {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        openZone(zone);
+      });
+    });
+    var boothMoney = "USD";
+    function chooseType() {
+      var field = document.getElementById("coName");
+      if (!field) return;
+      var label = field.closest("label") || field;
+      var nav = document.querySelector(".site-nav");
+      var navHeight = nav ? nav.offsetHeight : 0;
+      var top = label.getBoundingClientRect().top + window.pageYOffset - navHeight - 16;
+      window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+      field.focus({ preventScroll: true });
+    }
+    document.getElementById("boothFold").addEventListener("click", function () {
+      var box = document.getElementById("boothTypes");
+      var open = box.hidden;
+      box.hidden = !open;
+      this.setAttribute("aria-expanded", open ? "true" : "false");
+      this.querySelector(".chev").textContent = open ? "–" : "+";
+    });
+    var boothMoneyNow = "usd";
+    var pickedKind = "";
+    var siteCount = 1;
+    var fx = { usd: null, cny: null };
+    var fxState = "loading";
+    var krwOpen = false;
+    var fxPage = {
+      usd: "https://m.stock.naver.com/marketindex/exchange/FX_USDKRW",
+      cny: "https://m.stock.naver.com/marketindex/exchange/FX_CNYKRW"
+    };
+    var boothQuote = {
+      raw: { name: "Raw space", usd: 4230, cny: 26100, ids: ["typeName0", "typeInfo0", "typeArea0", "typePrice0"] },
+      standard: { name: "Basic Shell Scheme", usd: 4770, cny: 28800, ids: ["typeName1", "typeInfo1", "typeArea1", "typePrice1"] },
+      upgrade: { name: "Upgraded Shell Scheme", usd: 5058, cny: 30798, ids: ["typeName2", "typeInfo2", "typeArea2", "typePrice2"] }
+    };
+    var feeQuote = { usd: { cat: 61, promo: 600 }, cny: { cat: 371, promo: 4000 } };
+    function groupDigits(text) {
+      return text.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+    function moneyText(amount) {
+      var unit = boothMoneyNow === "cny" ? "CNY " : "USD ";
+      return unit + groupDigits(String(amount));
+    }
+    function rateText(rate) {
+      var parts = rate.toFixed(2).split(".");
+      return groupDigits(parts[0]) + "." + parts[1];
+    }
+    function paintKrw() {
+      var button = document.getElementById("krwToggle");
+      var line = document.getElementById("fxLine");
+      var row = document.getElementById("krwRow");
+      if (button) {
+        button.classList.toggle("on", krwOpen);
+        button.setAttribute("aria-pressed", krwOpen ? "true" : "false");
+      }
+      if (line) line.hidden = !krwOpen;
+      if (row) row.hidden = !krwOpen;
+      if (krwOpen) showFx();
+    }
+    function showFx() {
+      var line = document.getElementById("fxLine");
+      if (!line) return;
+      var item = fx[boothMoneyNow];
+      line.textContent = "";
+      if (fxState === "loading" || !item) {
+        line.textContent = fxState === "loading" ? "네이버 환율을 불러오는 중입니다." : "네이버 환율을 가져오지 못했습니다.";
+        return;
+      }
+      var name = boothMoneyNow === "cny" ? "CNY" : "USD";
+      line.append("1 " + name + " = " + rateText(item.rate) + " KRW · ");
+      var link = document.createElement("a");
+      link.href = fxPage[boothMoneyNow];
+      link.target = "_blank";
+      link.rel = "noopener";
+      link.textContent = "네이버";
+      line.appendChild(link);
+      line.append(" · " + item.date);
+    }
+    function krwText(amount) {
+      var item = fx[boothMoneyNow];
+      if (!item) return "환율 없음";
+      return "KRW " + groupDigits(String(Math.round(amount * item.rate)));
+    }
+    function readFxNode(node) {
+      var rate = Number(node && node.rate);
+      var date = node && String(node.date || "");
+      if (!isFinite(rate) || rate <= 0 || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
+      return { rate: rate, date: date };
+    }
+    function loadFx() {
+      fetch("rate.json", { cache: "no-store" }).then(function (res) {
+        if (!res.ok) throw new Error("rate");
+        return res.json();
+      }).then(function (data) {
+        var usd = readFxNode(data && data.usd);
+        var cny = readFxNode(data && data.cny);
+        if (!usd || !cny) throw new Error("rate");
+        fx.usd = usd;
+        fx.cny = cny;
+        fxState = "ready";
+        showFx();
+        if (pickedKind) showPicked(pickedKind);
+      }).catch(function () {
+        fxState = "error";
+        showFx();
+        if (pickedKind) showPicked(pickedKind);
+      });
+    }
+    function showPicked(kind) {
+      pickedKind = kind || "";
+      document.querySelectorAll(".booth-table tr.pick").forEach(function (row) {
+        var chosen = row.dataset.kind === kind;
+        row.classList.toggle("on", chosen);
+        row.hidden = !!kind && !chosen;
+      });
+      var total = document.getElementById("feeTotal");
+      var item = boothQuote[kind];
+      if (!item) {
+        total.hidden = true;
+        return;
+      }
+      var extra = feeQuote[boothMoneyNow];
+      var booth = item[boothMoneyNow] * siteCount;
+      total.hidden = false;
+      document.getElementById("siteCount").textContent = String(siteCount);
+      document.getElementById("siteArea").textContent = (9 * siteCount) + "㎡";
+      document.getElementById("totalBoothName").textContent = document.getElementById(item.ids[0]).textContent + " · 9㎡ × " + siteCount;
+      document.getElementById("totalBooth").textContent = moneyText(booth);
+      document.getElementById("totalCat").textContent = moneyText(extra.cat);
+      document.getElementById("totalPromo").textContent = moneyText(extra.promo);
+      var sum = booth + extra.cat + extra.promo;
+      document.getElementById("totalSum").textContent = moneyText(sum);
+      document.getElementById("totalKrw").textContent = krwText(sum);
+    }
+    function changeSites(step) {
+      siteCount = Math.min(20, Math.max(1, siteCount + step));
+      document.getElementById("siteCount").textContent = String(siteCount);
+      document.getElementById("siteArea").textContent = (9 * siteCount) + "㎡";
+      if (pickedKind) showPicked(pickedKind);
+    }
+    document.getElementById("siteMinus").addEventListener("click", function () { changeSites(-1); });
+    document.getElementById("sitePlus").addEventListener("click", function () { changeSites(1); });
+    function chooseMoney(code) {
+      boothMoneyNow = code === "cny" ? "cny" : "usd";
+      var box = document.getElementById("boothTypes");
+      box.classList.toggle("usd", boothMoneyNow === "usd");
+      box.classList.toggle("cny", boothMoneyNow === "cny");
+      document.querySelectorAll(".money-pick button[data-money]").forEach(function (node) {
+        node.classList.toggle("on", node.dataset.money === boothMoneyNow);
+      });
+      if (krwOpen) showFx();
+      if (pickedKind) showPicked(pickedKind);
+    }
+    document.querySelectorAll(".money-pick button[data-money]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        chooseMoney(button.dataset.money);
+      });
+    });
+    document.getElementById("krwToggle").addEventListener("click", function () {
+      krwOpen = !krwOpen;
+      paintKrw();
+    });
+    loadFx();
+    document.querySelectorAll(".booth-table tr.pick").forEach(function (row) {
+      row.addEventListener("click", function () {
+        showPicked(row.dataset.kind === pickedKind ? "" : row.dataset.kind);
+      });
+    });
+    document.getElementById("pickType").addEventListener("click", function () {
+      var item = boothQuote[pickedKind];
+      if (!item) return;
+      chooseType(item.ids[0], item.ids[1], item.ids[2], item.ids[3]);
+    });
+    document.getElementById("backHall").addEventListener("click", showHall);
+    document.getElementById("backSection").addEventListener("click", showHall);
+
+    var venueMapLang = "en";
+    var venueMapEn = "";
+    var venueMapZh = "";
+    function paintVenueMap() {
+      var enBtn = document.querySelector("#mapLang [data-lang='en']");
+      var zhBtn = document.querySelector("#mapLang [data-lang='zh']");
+      var frame = document.getElementById("venueMap");
+      var open = document.getElementById("mapOpen");
+      var addr = document.getElementById("mapAddr");
+      var empty = document.getElementById("mapEmpty");
+      enBtn.disabled = !venueMapEn;
+      zhBtn.disabled = !venueMapZh;
+      if (!venueMapEn && !venueMapZh) {
+        frame.hidden = true;
+        frame.removeAttribute("src");
+        open.hidden = true;
+        addr.textContent = "";
+        empty.hidden = false;
+        enBtn.classList.remove("on");
+        zhBtn.classList.remove("on");
+        return;
+      }
+      if (venueMapLang === "en" && !venueMapEn) venueMapLang = "zh";
+      if (venueMapLang === "zh" && !venueMapZh) venueMapLang = "en";
+      enBtn.classList.toggle("on", venueMapLang === "en");
+      zhBtn.classList.toggle("on", venueMapLang === "zh");
+      var query = venueMapLang === "zh" ? venueMapZh : venueMapEn;
+      var hl = venueMapLang === "zh" ? "zh-CN" : "en";
+      frame.hidden = false;
+      frame.src = "https://maps.google.com/maps?q=" + encodeURIComponent(query) + "&hl=" + hl + "&z=15&output=embed";
+      open.hidden = false;
+      open.href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(query) + "&hl=" + hl;
+      addr.textContent = query;
+      empty.hidden = true;
+    }
+    document.querySelectorAll("#mapLang button").forEach(function (button) {
+      button.addEventListener("click", function () {
+        if (button.disabled) return;
+        venueMapLang = button.getAttribute("data-lang");
+        paintVenueMap();
+      });
+    });
+
+    try {
+      var saved = JSON.parse(localStorage.getItem("cmef2027-draft") || "null");
+      if (saved) {
+        if (saved.halls && saved.halls.length) {
+          document.querySelectorAll("#hallMap .zone").forEach(function (zone) {
+            var slot = Number(zone.getAttribute("data-slot"));
+            if (!saved.halls[slot]) return;
+            zone.setAttribute("data-hall", saved.halls[slot]);
+            var number = zone.querySelector(".hall-no");
+            if (number) number.textContent = saved.halls[slot];
+            var open = saved.koreaHall ? saved.halls[slot] === saved.koreaHall : zone.getAttribute("data-korea") === "1";
+            zone.classList.toggle("korea", open);
+            zone.setAttribute("data-korea", open ? "1" : "0");
+            var name = (saved.hallNames && saved.hallNames[slot]) || zone.getAttribute("data-name") || "";
+            if (open && !name) name = "국제관";
+            zone.setAttribute("data-name", name);
+            var label = zone.querySelector(".hall-name");
+            if (label) label.textContent = name;
+            zone.setAttribute("aria-label", name ? saved.halls[slot] + " " + name : saved.halls[slot]);
+          });
+        }
+        if (saved.apps) hallApps = saved.apps;
+        window.cmefHall = saved.koreaHall || "5.2";
+        if (saved.applyLink) window.cmefApplyLink = saved.applyLink;
+        if (saved.planOff) {
+          document.getElementById("koreaPlanImg").hidden = true;
+        } else if (saved.koreaPlan && saved.koreaPlan.indexOf("korea-plan") < 0) {
+          showKoreaImage(saved.koreaPlan);
+        }
+        if (saved.venueOff) {
+          document.getElementById("venuePic").hidden = true;
+          document.getElementById("venueEmpty").hidden = false;
+        } else if (saved.venuePic) {
+          var venue = document.getElementById("venuePic");
+          venue.src = saved.venuePic;
+          venue.hidden = false;
+          document.getElementById("venueEmpty").hidden = true;
+        }
+        var zones = saved.zones || [];
+        if (!zones.length && saved.koreaZone && saved.koreaZone.w) {
+          var box = saved.koreaZone;
+          zones = [{
+            hall: saved.koreaHall || "5.2",
+            points: [[box.x, box.y], [box.x + box.w, box.y], [box.x + box.w, box.y + box.h], [box.x, box.y + box.h]]
+          }];
+        }
+        var layer = document.getElementById("zoneLayer");
+        window.cmefZones = zones;
+        zones.forEach(function (zone) {
+          if (!zone.points || zone.points.length < 3) return;
+          var poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+          poly.setAttribute("points", zone.points.map(function (p) { return p[0] + "," + p[1]; }).join(" "));
+          poly.setAttribute("aria-label", zone.hall);
+          poly.addEventListener("click", function () {
+            var match = null;
+            document.querySelectorAll("#hallMap .zone").forEach(function (node) {
+              if (node.getAttribute("data-hall") === zone.hall) match = node;
+            });
+            if (match) openZone(match);
+          });
+          layer.appendChild(poly);
+        });
+        if (saved.currency) {
+          boothMoney = saved.currency === "CNY" ? "CNY" : "USD";
+          document.querySelectorAll(".unit").forEach(function (node) {
+            node.textContent = boothMoney + " · 9㎡";
+          });
+          if (saved.currency === "CNY") chooseMoney("cny");
+        }
+        if (saved.dataStats) {
+          Object.keys(saved.dataStats).forEach(function (name) {
+            var button = document.querySelector('.stat[data-stat="' + name + '"]');
+            if (button && saved.dataStats[name]) button.querySelector("b").textContent = saved.dataStats[name];
+          });
+        }
+        var foldBox = document.getElementById("folds");
+        var foldOrder = saved.foldOrder && saved.foldOrder.length ? saved.foldOrder : ["visitor", "chain", "shows", "psr"];
+        foldOrder.forEach(function (name) {
+          var node = foldBox.querySelector('[data-fold="' + name + '"]');
+          if (node) foldBox.appendChild(node);
+        });
+        if (saved.visitors && saved.visitors.length) {
+          var rows = document.getElementById("visitorRows");
+          rows.innerHTML = "";
+          saved.visitors.forEach(function (item) {
+            var row = document.createElement("div");
+            row.className = "row";
+            row.innerHTML = '<div><span class="name"></span><span class="ko"></span></div><strong></strong><div class="track"><i></i></div>';
+            row.querySelector(".name").textContent = item.en || "";
+            row.querySelector(".ko").textContent = item.ko || "";
+            row.querySelector("strong").textContent = item.pct || "";
+            row.querySelector("i").style.width = item.pct || "0";
+            rows.appendChild(row);
+          });
+        }
+        if (saved.reasons && saved.reasons.length) {
+          var reasons = document.getElementById("visitReasons");
+          reasons.innerHTML = "";
+          saved.reasons.forEach(function (item) {
+            var node = document.createElement("div");
+            node.className = "reason";
+            node.innerHTML = "<b></b><span class=\"en\"></span>";
+            node.querySelector("b").textContent = item.pct || "";
+            node.querySelector(".en").textContent = item.en || "";
+            reasons.appendChild(node);
+          });
+        }
+        if (saved.industries && saved.industries.length) {
+          var fields = document.getElementById("industryFields");
+          fields.innerHTML = "";
+          saved.industries.forEach(function (item) {
+            var node = document.createElement("div");
+            node.innerHTML = "<strong></strong><em></em>";
+            node.querySelector("strong").textContent = item.en || "";
+            node.querySelector("em").textContent = item.ko || "";
+            fields.appendChild(node);
+          });
+        }
+        if (saved.showIds && saved.showIds.length) {
+          document.querySelectorAll("#showBody .show").forEach(function (card) {
+            card.hidden = saved.showIds.indexOf(card.getAttribute("data-show")) < 0;
+          });
+        }
+        if (Array.isArray(saved.psrList)) paintPsr(saved.psrList);
+        if (saved.hostName) document.getElementById("hostName").textContent = saved.hostName;
+        if (saved.applyPeriod) document.getElementById("applyPeriod").textContent = saved.applyPeriod;
+        ["0", "1", "2"].forEach(function (n) {
+          if (saved["typeName" + n]) document.getElementById("typeName" + n).textContent = saved["typeName" + n];
+          if (saved["typeInfo" + n]) document.getElementById("typeInfo" + n).textContent = saved["typeInfo" + n];
+          if (saved["typeArea" + n]) document.getElementById("typeArea" + n).textContent = saved["typeArea" + n];
+          if (saved["typeKit" + n]) document.getElementById("typeKit" + n).textContent = saved["typeKit" + n].replace(/ · /g, "\n");
+          if (n !== "2" && saved["typePic" + n]) document.getElementById("typePic" + n).src = saved["typePic" + n];
+          if (saved.typePic1) document.getElementById("typePic2").src = document.getElementById("typePic1").src;
+        });
+        if (saved.introNote) {
+          var note = document.getElementById("introNoteView");
+          note.hidden = false;
+          note.textContent = saved.introNote;
+        }
+        venueMapEn = (saved.noticeMapEn || "").trim();
+        venueMapZh = (saved.noticeMapZh || "").trim();
+        if (saved.noticeMapLang === "en" || saved.noticeMapLang === "zh") venueMapLang = saved.noticeMapLang;
+        if (saved.noticeEntry) {
+          document.getElementById("entryPass").hidden = true;
+          document.getElementById("noticeEntry").textContent = saved.noticeEntry;
+        }
+        if (saved.applyLink) window.cmefApplyLink = saved.applyLink;
+        if (saved.booths && saved.booths.length && typeof saved.booths[0] === "object") {
+          var box = document.getElementById("booths");
+          box.innerHTML = "";
+          saved.booths.forEach(function (item, index) {
+            var col = item.c || (Math.round((item.x || 0) / 25) + 1);
+            var row = item.r || (Math.floor(index / 4) + 1);
+            var node = document.createElement("div");
+            node.className = "booth";
+            node.setAttribute("data-c", String(Math.min(4, Math.max(1, col))));
+            node.setAttribute("data-r", String(row));
+            var name = document.createElement("b");
+            name.textContent = item.n || "번호";
+            var size = document.createElement("span");
+            size.textContent = "3×3";
+            node.appendChild(name);
+            node.appendChild(size);
+            box.appendChild(node);
+          });
+        }
+        var shows = ["icmd", "crs", "cecn", "homecare", "intelligent", "ahc", "emergency", "lifestyle"];
+        if (shows.indexOf(saved.sector) >= 0 && saved.sectorNote) {
+          var card = document.querySelector('.show[data-show="' + saved.sector + '"] .slot');
+          if (card) card.textContent = saved.sectorNote;
+        }
+      }
+    } catch (error) {}
+    paintVenueMap();
+    (function () {
+      var stage = document.getElementById("entryStage");
+      var sheet = document.getElementById("entrySheet");
+      if (!stage || !sheet) return;
+      var scale = 1;
+      var ox = 0;
+      var oy = 0;
+      var pointers = {};
+      var drag = null;
+      var pinch = null;
+      function clamp(n) { return Math.max(1, Math.min(5, n)); }
+      function paint() {
+        sheet.style.transform = "translate(" + ox + "px," + oy + "px) scale(" + scale + ")";
+      }
+      function zoomAt(px, py, next) {
+        next = clamp(next);
+        if (next === 1) { scale = 1; ox = 0; oy = 0; paint(); return; }
+        var ratio = next / scale;
+        ox = px - (px - ox) * ratio;
+        oy = py - (py - oy) * ratio;
+        scale = next;
+        paint();
+      }
+      function apart(a, b) {
+        var dx = a.x - b.x;
+        var dy = a.y - b.y;
+        return Math.sqrt(dx * dx + dy * dy) || 1;
+      }
+      stage.addEventListener("wheel", function (event) {
+        event.preventDefault();
+        var rect = stage.getBoundingClientRect();
+        zoomAt(event.clientX - rect.left, event.clientY - rect.top, scale * (event.deltaY < 0 ? 1.12 : 0.89));
+      }, { passive: false });
+      stage.addEventListener("pointerdown", function (event) {
+        pointers[event.pointerId] = { x: event.clientX, y: event.clientY };
+        stage.setPointerCapture(event.pointerId);
+        var ids = Object.keys(pointers);
+        if (ids.length >= 2) {
+          var a = pointers[ids[0]];
+          var b = pointers[ids[1]];
+          var rect = stage.getBoundingClientRect();
+          drag = null;
+          pinch = {
+            dist: apart(a, b),
+            scale: scale,
+            ox: ox,
+            oy: oy,
+            px: (a.x + b.x) / 2 - rect.left,
+            py: (a.y + b.y) / 2 - rect.top
+          };
+          return;
+        }
+        drag = { x: event.clientX, y: event.clientY, ox: ox, oy: oy };
+        pinch = null;
+      });
+      stage.addEventListener("pointermove", function (event) {
+        if (!pointers[event.pointerId]) return;
+        pointers[event.pointerId] = { x: event.clientX, y: event.clientY };
+        var ids = Object.keys(pointers);
+        if (ids.length >= 2 && pinch) {
+          var a = pointers[ids[0]];
+          var b = pointers[ids[1]];
+          var next = clamp(pinch.scale * (apart(a, b) / pinch.dist));
+          var ratio = next / pinch.scale;
+          ox = pinch.px - (pinch.px - pinch.ox) * ratio;
+          oy = pinch.py - (pinch.py - pinch.oy) * ratio;
+          if (next === 1) { ox = 0; oy = 0; }
+          scale = next;
+          paint();
+          return;
+        }
+        if (!drag || scale === 1) return;
+        ox = drag.ox + event.clientX - drag.x;
+        oy = drag.oy + event.clientY - drag.y;
+        paint();
+      });
+      function endPointer(event) {
+        delete pointers[event.pointerId];
+        drag = null;
+        pinch = null;
+      }
+      stage.addEventListener("pointerup", endPointer);
+      stage.addEventListener("pointercancel", endPointer);
+      function zoomCenter(next) {
+        var rect = stage.getBoundingClientRect();
+        zoomAt(rect.width / 2, rect.height / 2, next);
+      }
+      document.getElementById("entryZoomIn").addEventListener("click", function () { zoomCenter(scale * 1.25); });
+      document.getElementById("entryZoomOut").addEventListener("click", function () { zoomCenter(scale / 1.25); });
+      document.getElementById("entryZoomReset").addEventListener("click", function () { zoomAt(0, 0, 1); });
+    })();
+    var koreaSamples = [
+      { hall: "5.2", booth: "5.2F37", company: "비나셀", category: "의료기기", product: "매일착용소프트콘택트렌즈", auth: "미취득", grade: "", x: 29.8, y: 47.5 },
+      { hall: "5.2", booth: "5.2F38", company: "시노서울", category: "의료기기", product: "RF", auth: "미취득", grade: "", x: 21.8, y: 52.5 },
+      { hall: "5.2", booth: "5.2F39", company: "가나다", category: "의료기기", product: "test", auth: "미취득", grade: "", x: 39.9, y: 67.2 }
+    ];
+    koreaSamples.forEach(function (sample) {
+      var found = null;
+      hallApps.forEach(function (item) {
+        if (item.booth === sample.booth && item.company === sample.company) found = item;
+      });
+      if (!found) hallApps.push(sample);
+      else if (found.x == null || found.y == null) {
+        found.x = sample.x;
+        found.y = sample.y;
+      }
+    });
+    var koreaSheet = document.getElementById("koreaPlanImg");
+    if (koreaSheet && !koreaSheet.hidden && (!koreaSheet.getAttribute("src") || koreaSheet.getAttribute("src").indexOf("korea-plan") >= 0)) {
+      showKoreaImage("halls/korea-plan5.png");
+    }
+    paintApplicantList();
+    (function () {
+      var fallback = [{ hall: "5.2", points: [[51, 31], [67, 30], [68, 47], [50, 48]] }];
+      function inside(point, poly) {
+        var x = point[0], y = point[1], hit = false;
+        for (var i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+          var xi = poly[i][0], yi = poly[i][1], xj = poly[j][0], yj = poly[j][1];
+          var den = (yj - yi) || 0.0001;
+          if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / den + xi)) hit = !hit;
+        }
+        return hit;
+      }
+      function openHall(hall) {
+        var match = null;
+        var name = String(hall || "");
+        document.querySelectorAll("#hallMap .zone").forEach(function (node) {
+          var id = node.getAttribute("data-hall") || "";
+          if (id === name || name.indexOf(id) === 0 || id.indexOf(name) === 0) match = node;
+        });
+        if (!match) return false;
+        openZone(match);
+        return true;
+      }
+      var frame = document.querySelector("#hallMap .venue-frame");
+      if (!frame) return;
+      frame.addEventListener("click", function (event) {
+        var rect = frame.getBoundingClientRect();
+        if (!rect.width || !rect.height) return;
+        var point = [(event.clientX - rect.left) / rect.width * 100, (event.clientY - rect.top) / rect.height * 100];
+        var lists = [window.cmefZones || [], fallback];
+        for (var n = 0; n < lists.length; n++) {
+          var list = lists[n];
+          for (var i = list.length - 1; i >= 0; i--) {
+            if (list[i].points && inside(point, list[i].points) && openHall(list[i].hall)) return;
+          }
+        }
+      });
+    })();
+
+    var foldDragged = false;
+    document.querySelectorAll(".fold-btn").forEach(function (button) {
+      button.addEventListener("click", function (event) {
+        if (!foldDragged) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        foldDragged = false;
+      }, true);
+      if (button.id === "psrBtn") return;
+      button.addEventListener("click", function () {
+        var panel = document.getElementById(button.getAttribute("aria-controls"));
+        var open = button.getAttribute("aria-expanded") === "true";
+        button.setAttribute("aria-expanded", open ? "false" : "true");
+        panel.classList.toggle("open", !open);
+        button.querySelector(".chev").textContent = open ? "+" : "–";
+      });
+    });
+    if (location.search.indexOf("preview=1") >= 0) {
+      var foldBoxDrag = document.getElementById("folds");
+      var dragFold = "";
+      foldBoxDrag.querySelectorAll(".fold").forEach(function (section) {
+        var button = section.querySelector(".fold-btn");
+        button.draggable = true;
+        button.addEventListener("dragstart", function (event) {
+          dragFold = section.getAttribute("data-fold");
+          foldDragged = true;
+          section.classList.add("drag");
+          event.dataTransfer.effectAllowed = "move";
+          try { event.dataTransfer.setData("text/plain", dragFold); } catch (error) {}
+        });
+        button.addEventListener("dragend", function () {
+          section.classList.remove("drag");
+          foldBoxDrag.querySelectorAll(".fold").forEach(function (item) { item.classList.remove("drop"); });
+          setTimeout(function () { foldDragged = false; }, 0);
+        });
+        section.addEventListener("dragover", function (event) {
+          if (!dragFold || section.getAttribute("data-fold") === dragFold) return;
+          event.preventDefault();
+          section.classList.add("drop");
+        });
+        section.addEventListener("dragleave", function () { section.classList.remove("drop"); });
+        section.addEventListener("drop", function (event) {
+          event.preventDefault();
+          section.classList.remove("drop");
+          var target = section.getAttribute("data-fold");
+          if (!dragFold || dragFold === target) return;
+          var names = [].map.call(foldBoxDrag.querySelectorAll(".fold"), function (item) {
+            return item.getAttribute("data-fold");
+          });
+          var from = names.indexOf(dragFold);
+          var to = names.indexOf(target);
+          names.splice(from, 1);
+          names.splice(to, 0, dragFold);
+          names.forEach(function (name) {
+            var node = foldBoxDrag.querySelector('[data-fold="' + name + '"]');
+            if (node) foldBoxDrag.appendChild(node);
+          });
+          try {
+            var saved = JSON.parse(localStorage.getItem("cmef2027-draft") || "{}") || {};
+            saved.foldOrder = names;
+            localStorage.setItem("cmef2027-draft", JSON.stringify(saved));
+          } catch (error) {}
+        });
+      });
+    }
+    function fitBooths() {
+      var narrow = window.innerWidth < 640;
+      document.querySelectorAll("#booths .booth").forEach(function (node) {
+        var col = Number(node.getAttribute("data-c"));
+        var row = Number(node.getAttribute("data-r"));
+        if (narrow) {
+          node.style.setProperty("--c", String(((col - 1) % 2) + 1));
+          node.style.setProperty("--r", String((row - 1) * 2 + Math.floor((col - 1) / 2) + 1));
+        } else {
+          node.style.setProperty("--c", String(col));
+          node.style.setProperty("--r", String(row));
+        }
+      });
+    }
+    fitBooths();
+    window.addEventListener("resize", fitBooths);
+
+    var pageIds = ["intro", "apply", "map", "match", "notice"];
+    function showPage(id) {
+      id = String(id || "").replace("#", "");
+      if (pageIds.indexOf(id) < 0) id = "intro";
+      pageIds.forEach(function (page) {
+        var node = document.getElementById(page);
+        if (node) node.hidden = page !== id;
+      });
+      document.querySelectorAll(".nav-links a").forEach(function (link) {
+        var on = link.getAttribute("href") === "#" + id;
+        link.classList.toggle("on", on);
+        link.style.fontWeight = on ? "800" : "550";
+      });
+      var adminLink = document.querySelector(".to-admin");
+      if (adminLink) adminLink.setAttribute("href", "manage.html#" + id);
+      if (location.hash !== "#" + id) history.replaceState(null, "", "#" + id);
+      window.scrollTo(0, 0);
+    }
+    document.querySelectorAll(".nav-links a").forEach(function (link) {
+      link.addEventListener("click", function (event) {
+        var id = (event.currentTarget.getAttribute("href") || "").replace("#", "");
+        if (pageIds.indexOf(id) < 0) return;
+        event.preventDefault();
+        showPage(id);
+      });
+    });
+    showPage((location.hash || "#intro").replace("#", ""));
+    if (location.search.indexOf("preview=1") >= 0) document.body.classList.add("preview");
+    document.querySelectorAll("header .stat").forEach(function (button) {
+      button.addEventListener("click", function () {
+        var open = button.classList.contains("on");
+        document.querySelectorAll("header .stat.on").forEach(function (other) { other.classList.remove("on"); });
+        if (!open) button.classList.add("on");
+      });
+    });
+    var mapNode = document.getElementById("map");
+    var openPlace = "right";
+    function applyList() {
+      if (!mapNode) return;
+      mapNode.classList.toggle("list-right", openPlace === "right");
+      mapNode.classList.toggle("list-bottom", openPlace !== "right");
+      document.querySelectorAll(".place-pick button").forEach(function (button) {
+        button.classList.toggle("on", button.dataset.place === openPlace);
+      });
+      try { localStorage.setItem("cmef2027-list-spot", openPlace); } catch (error) {}
+    }
+    document.querySelectorAll(".place-pick button").forEach(function (button) {
+      button.addEventListener("click", function () {
+        openPlace = button.dataset.place === "bottom" ? "bottom" : "right";
+        applyList();
+      });
+    });
+    try {
+      var savedSpot = localStorage.getItem("cmef2027-list-spot");
+      if (savedSpot === "bottom" || savedSpot === "right") openPlace = savedSpot;
+    } catch (error) {}
+    if (window.matchMedia("(max-width: 860px)").matches) openPlace = "bottom";
+    applyList();
+    document.querySelectorAll("#map .list-hide").forEach(function (button) {
+      button.addEventListener("click", function () {
+        var box = button.closest(".company-list");
+        var closed = box.classList.toggle("is-closed");
+        button.textContent = closed ? "보이기" : "감추기";
+        document.querySelectorAll("#map p, #map div, #map span, #map td").forEach(function (el) {
+          if (el.children.length) return;
+          if ((el.textContent || "").indexOf("아직 놓은") >= 0) el.remove();
+        });
+      });
+    });
+
+    var productCount = 0;
+    function levelSelect(title) {
+      var label = document.createElement("label");
+      label.appendChild(document.createTextNode(title));
+      var select = document.createElement("select");
+      select.dataset.level = title;
+      var blank = document.createElement("option");
+      blank.value = "";
+      blank.textContent = "선택";
+      select.appendChild(blank);
+      label.appendChild(select);
+      return label;
+    }
+    function gradeSelect(title, grades) {
+      var label = document.createElement("label");
+      label.appendChild(document.createTextNode(title));
+      var select = document.createElement("select");
+      select.dataset.grade = title;
+      var blank = document.createElement("option");
+      blank.value = "";
+      blank.textContent = "선택";
+      select.appendChild(blank);
+      grades.forEach(function (grade) {
+        var option = document.createElement("option");
+        option.value = grade;
+        option.textContent = grade;
+        select.appendChild(option);
+      });
+      label.appendChild(select);
+      return label;
+    }
+    var cnDeviceNames = [
+      "01 유원수술기기", "02 무원수술기기", "03 신경 및 심혈관용 수술기기", "04 정형외과(골과) 수술기기",
+      "05 방사선 치료기기", "06 의료용 영상기기", "07 의료용 진찰 및 감시기기", "08 호흡, 마취 및 응급기기",
+      "09 물리치료기기", "10 수혈, 투석, 체외순환기기", "11 의료기기 소독멸균기기", "12 유원삽입기기",
+      "13 무원삽입기기", "14 관류, 처치 및 보호기기", "15 환자 지지 기기", "16 안과기기",
+      "17 구강과 기기", "18 산부인과, 보조생식 및 피임기구", "19 의료용 재활기기", "20 중의(中医)기기",
+      "21 의료용 소프트웨어", "22 임상분석장비"
+    ];
+    var cnIvdNames = [
+      "6840 Ⅲ-01 질환성 병원체 항원, 항체 및 핵산 등 검측과 관련된 시약",
+      "6840 Ⅲ-02 혈액형, 조직 적합성 검측시약",
+      "6840 Ⅲ-03 인간 유전자 검측시약",
+      "6840 Ⅲ-04 유전성 질환 검측시약",
+      "6840 Ⅲ-05 마취 의약품, 향정신성 의약품, 의료용 독성 약품 검측 관련 시약",
+      "6840 Ⅲ-06 치료 의약품 타겟 수치 측정 관련 시약, 동반 검측시약",
+      "6840 Ⅲ-07 종양선별, 보조진단, 종양 병기 관련 검측 시약",
+      "6840 Ⅱ-08 단백질 검측시약",
+      "6840 Ⅱ-09 당류 검측 시약",
+      "6840 Ⅱ-10 호르몬 검측",
+      "6840 Ⅱ-11 효소 검측 시약",
+      "6840 Ⅱ-12 지질 검측",
+      "6840 Ⅱ-13 비타민 검측",
+      "6840 Ⅱ-14 무기 이온 검측 시약",
+      "6840 Ⅱ-15 약물 및 약품 대사물질 검측 시약",
+      "6840 Ⅱ-16 자가 항체 검측시약",
+      "6840 Ⅱ-17 미생물 감별 혹은 약제 감수성 검측 시약, 세포 선택, 유도, 분화에 사용하는 세포배지",
+      "6840 Ⅱ-18 과민반응 검측시약",
+      "6840 Ⅱ-19 기타 생리, 생화학 혹은 면역 기능 지표 검측시약",
+      "6840 Ⅰ-20 미생물 배지 및 세포 증식 배지",
+      "6840 Ⅰ-21 표본 처리용 제품",
+      "6840 Ⅰ-22 반응 시스템용 범용 시약",
+      "6840 Ⅰ-23 유세포 분석장비용 항체 시약 및 동형 대조항체",
+      "6840 Ⅰ-24 면역조직화학용 단일 항체 시약",
+      "6840 Ⅰ-25 제자리부합법 단일 탐침시약"
+    ];
+    function fillSelect(select, values) {
+      select.innerHTML = "";
+      var blank = document.createElement("option");
+      blank.value = "";
+      blank.textContent = "선택";
+      select.appendChild(blank);
+      values.forEach(function (value) {
+        var option = document.createElement("option");
+        option.value = value;
+        option.textContent = value;
+        select.appendChild(option);
+      });
+    }
+    fillSelect(document.getElementById("matchDevice"), cnDeviceNames);
+    fillSelect(document.getElementById("matchIvd"), cnIvdNames);
+    var matchPicks = [];
+    var linkedIndex = 0;
+    function applicationLines() {
+      var saved = {};
+      try { saved = JSON.parse(localStorage.getItem("cmef2027-draft") || "{}") || {}; } catch (error) { saved = {}; }
+      var lines = [];
+      (saved.apps || []).forEach(function (item) {
+        var names = (item.product || "").split(", ");
+        var classes = (item.category || "").split(", ");
+        names.forEach(function (name, index) {
+          name = name.trim();
+          if (!name) return;
+          var raw = (classes[index] || "").trim();
+          var china = "";
+          raw.split(" · ").forEach(function (part) {
+            if (part.indexOf("중국 ") === 0) china = part.slice(3);
+          });
+          lines.push({ name: name, klass: china || raw });
+        });
+      });
+      return lines;
+    }
+    function paintLinked() {
+      var lines = applicationLines();
+      var list = document.getElementById("matchProducts");
+      list.innerHTML = "";
+      if (linkedIndex >= lines.length) linkedIndex = 0;
+      lines.forEach(function (line, index) {
+        var button = document.createElement("button");
+        button.type = "button";
+        button.className = index === linkedIndex ? "on" : "";
+        button.textContent = line.klass ? line.name + " · " + line.klass : line.name;
+        button.addEventListener("click", function () {
+          linkedIndex = index;
+          paintLinked();
+        });
+        var item = document.createElement("li");
+        item.appendChild(button);
+        list.appendChild(item);
+      });
+    }
+    function showApplicant(now) {
+      document.getElementById("matchNow").classList.toggle("on", now);
+      document.getElementById("matchOther").classList.toggle("on", !now);
+      document.getElementById("matchPast").hidden = now;
+      document.getElementById("matchLogin").hidden = true;
+      document.getElementById("matchWork").hidden = !now;
+      document.getElementById("matchProducts").hidden = !now;
+      document.getElementById("matchPick").hidden = now;
+      document.getElementById("matchPw").value = "";
+      if (now) paintLinked();
+    }
+    document.getElementById("matchNow").addEventListener("click", function () { showApplicant(true); });
+    document.getElementById("matchOther").addEventListener("click", function () { showApplicant(false); });
+    document.querySelectorAll("input[name=matchExp]").forEach(function (radio) {
+      radio.addEventListener("change", function () {
+        document.getElementById("matchPw").value = "";
+        document.getElementById("matchLogin").hidden = false;
+        document.getElementById("matchWork").hidden = true;
+      });
+    });
+    document.getElementById("matchEnter").addEventListener("click", function () {
+      var id = document.getElementById("matchId").value.trim();
+      var pw = document.getElementById("matchPw").value;
+      if (!id || !pw) return;
+      document.getElementById("matchPw").value = "";
+      document.getElementById("matchLogin").hidden = true;
+      document.getElementById("matchWork").hidden = false;
+      document.getElementById("matchProducts").hidden = true;
+      document.getElementById("matchPick").hidden = false;
+    });
+    paintLinked();
+    var salesAll = "https://sinoseoul.co.kr/resource/client/market/158?category_idx=1&type=market";
+    var salesBeijing = "https://sinoseoul.co.kr/resource/client/market/158?type=market&category_idx=1&group_idx=&mc_idx=&ic_idx=&code_idx=5&sfl=title&stx=";
+    function paintMatch() {
+      var count = document.getElementById("matchCount");
+      count.textContent = String(matchPicks.length);
+      count.href = document.getElementById("matchRegion").value === "5" ? salesBeijing : salesAll;
+    }
+    document.getElementById("matchRegion").addEventListener("change", paintMatch);
+    document.getElementById("matchAdd").addEventListener("click", function () {
+      var regionBox = document.getElementById("matchRegion");
+      var region = regionBox.value ? regionBox.options[regionBox.selectedIndex].text : "";
+      var company = document.getElementById("matchCompany").value;
+      var lines = applicationLines();
+      var linked = document.getElementById("matchNow").classList.contains("on");
+      var klass = linked ? (lines[linkedIndex] ? lines[linkedIndex].klass : "") : (document.getElementById("matchDevice").value || document.getElementById("matchIvd").value);
+      if (!region && !company && !klass) return;
+      matchPicks.push({ region: region, name: company, klass: klass });
+      paintMatch();
+    });
+    document.getElementById("matchAsk").addEventListener("click", function () {
+      var msg = document.getElementById("matchMsg");
+      if (!matchPicks.length) {
+        msg.textContent = "먼저 기업을 목록에 담으세요.";
+        return;
+      }
+      var checks = [];
+      document.querySelectorAll(".match-checks input:checked").forEach(function (box) {
+        checks.push(box.value);
+      });
+      if (!checks.length) {
+        msg.textContent = "신용도, 규모, 조건 중 조사할 항목을 고르세요.";
+        return;
+      }
+      msg.textContent = checks.join(", ") + " 조사와 매칭은 별도 계약 후 진행합니다.";
+    });
+    function showKrLevels(card) {
+      var kind = card.querySelector("[data-level='구분']").value;
+      var major = card.querySelector("[data-level='대분류']");
+      var mid = card.querySelector("[data-level='중분류']");
+      var sub = card.querySelector("[data-level='소분류']");
+      major.parentElement.hidden = !kind;
+      if (!kind) major.value = "";
+      mid.parentElement.hidden = !major.value;
+      if (!major.value) mid.value = "";
+      sub.parentElement.hidden = !mid.value;
+      if (!mid.value) sub.value = "";
+    }
+    function showCnList(card) {
+      var group = card.querySelector("[data-level='중국구분']").value;
+      var list = card.querySelector("[data-level='중국분류']");
+      card.dataset.cn = "";
+      card.querySelector(".cn-picked").hidden = true;
+      if (group === "의료기기") fillSelect(list, cnDeviceNames);
+      if (group === "6840") fillSelect(list, cnIvdNames);
+      list.parentElement.hidden = group !== "의료기기" && group !== "6840";
+    }
+    function foldCard(card, folded) {
+      card.classList.toggle("folded", folded);
+      var body = card.querySelector(".product-body");
+      if (body) body.hidden = folded;
+      var chev = card.querySelector(".chev");
+      if (chev) chev.textContent = folded ? "+" : "–";
+    }
+    function paintProductTotal() {
+      var count = document.querySelectorAll("#productBlocks .product-card").length;
+      var line = document.getElementById("productTotal");
+      if (line) line.textContent = "전시 품목 합계 " + count;
+    }
+    function addProductBlock() {
+      document.querySelectorAll("#productBlocks .product-card").forEach(function (card) {
+        foldCard(card, true);
+      });
+      productCount += 1;
+      var card = document.createElement("article");
+      card.className = "product-card";
+      var title = document.createElement("button");
+      title.type = "button";
+      title.className = "product-head";
+      title.innerHTML = "<span>전시 제품 " + productCount + "</span><span class=\"product-label\"></span><span class=\"chev\" aria-hidden=\"true\">–</span>";
+      var nameLabel = document.createElement("label");
+      nameLabel.appendChild(document.createTextNode("전시 제품"));
+      var name = document.createElement("input");
+      name.type = "text";
+      name.placeholder = "전시 제품";
+      name.addEventListener("input", function () {
+        title.querySelector(".product-label").textContent = name.value.trim();
+      });
+      nameLabel.appendChild(name);
+      var kind = document.createElement("label");
+      kind.appendChild(document.createTextNode("한국 품목분류"));
+      var kindSelect = document.createElement("select");
+      kindSelect.dataset.level = "구분";
+      [["", "선택"], ["의료기기", "의료기기"], ["체외진단 의료기기", "체외진단 의료기기"], ["디지털제품", "디지털제품"]].forEach(function (item) {
+        var option = document.createElement("option");
+        option.value = item[0];
+        option.textContent = item[1];
+        kindSelect.appendChild(option);
+      });
+      kind.appendChild(kindSelect);
+      var major = levelSelect("대분류");
+      var mid = levelSelect("중분류");
+      var sub = levelSelect("소분류");
+      major.hidden = true;
+      mid.hidden = true;
+      sub.hidden = true;
+      var permit = document.createElement("div");
+      permit.className = "nmpa";
+      permit.innerHTML = "NMPA <label><input type=\"radio\" name=\"nmpa" + productCount + "\" value=\"있음\"> 있음</label><label><input type=\"radio\" name=\"nmpa" + productCount + "\" value=\"없음\" checked> 없음</label>";
+      var china = document.createElement("div");
+      china.className = "cn-class";
+      china.hidden = true;
+      var chinaKind = document.createElement("label");
+      chinaKind.appendChild(document.createTextNode("중국 품목분류"));
+      var chinaKindSelect = document.createElement("select");
+      chinaKindSelect.dataset.level = "중국구분";
+      [["", "선택"], ["의료기기", "의료기기 22개"], ["6840", "체외진단제 (시약) 6840"], ["기타", "기타"]].forEach(function (item) {
+        var option = document.createElement("option");
+        option.value = item[0];
+        option.textContent = item[1];
+        chinaKindSelect.appendChild(option);
+      });
+      chinaKind.appendChild(chinaKindSelect);
+      var chinaList = levelSelect("중국분류");
+      chinaList.hidden = true;
+      var confirmCn = document.createElement("button");
+      confirmCn.type = "button";
+      confirmCn.className = "slim";
+      confirmCn.textContent = "확인";
+      var picked = document.createElement("p");
+      picked.className = "cn-picked";
+      picked.hidden = true;
+      china.appendChild(chinaKind);
+      china.appendChild(chinaList);
+      china.appendChild(confirmCn);
+      china.appendChild(picked);
+      var body = document.createElement("div");
+      body.className = "product-body";
+      card.appendChild(title);
+      body.appendChild(nameLabel);
+      body.appendChild(kind);
+      body.appendChild(major);
+      body.appendChild(mid);
+      body.appendChild(sub);
+      body.appendChild(permit);
+      body.appendChild(china);
+      card.appendChild(body);
+      title.addEventListener("click", function () {
+        foldCard(card, !card.classList.contains("folded"));
+      });
+      kindSelect.addEventListener("change", function () { showKrLevels(card); });
+      major.querySelector("select").addEventListener("change", function () { showKrLevels(card); });
+      mid.querySelector("select").addEventListener("change", function () { showKrLevels(card); });
+      permit.addEventListener("change", function () {
+        var on = permit.querySelector("input:checked").value === "있음";
+        china.hidden = !on;
+        if (!on) {
+          chinaKindSelect.value = "";
+          card.dataset.cn = "";
+          picked.hidden = true;
+          chinaList.hidden = true;
+          confirmCn.hidden = false;
+          chinaKind.hidden = false;
+        }
+      });
+      chinaKindSelect.addEventListener("change", function () { showCnList(card); });
+      confirmCn.addEventListener("click", function () {
+        var group = chinaKindSelect.value;
+        var item = chinaList.querySelector("select").value;
+        if (!group) return;
+        if (group !== "기타" && !item) return;
+        card.dataset.cn = group === "기타" ? "기타" : item;
+        picked.textContent = card.dataset.cn;
+        picked.hidden = false;
+        chinaKind.hidden = true;
+        chinaList.hidden = true;
+        confirmCn.hidden = true;
+      });
+      picked.addEventListener("click", function () {
+        picked.hidden = true;
+        card.dataset.cn = "";
+        chinaKind.hidden = false;
+        confirmCn.hidden = false;
+        showCnList(card);
+      });
+      document.getElementById("productBlocks").appendChild(card);
+      paintProductTotal();
+    }
+    addProductBlock();
+    document.getElementById("addProduct").addEventListener("click", addProductBlock);
+    document.getElementById("basicForm").addEventListener("submit", function (event) {
+      event.preventDefault();
+      var msg = document.getElementById("applyMsg");
+      var company = document.getElementById("coName").value.trim();
+      if (!company) {
+        msg.textContent = "기업명을 적으세요.";
+        return;
+      }
+      if (!document.getElementById("agreeNeed").checked) {
+        msg.textContent = "필수 동의는 전시회 신청 전에 골라야 합니다.";
+        return;
+      }
+      var names = [];
+      var classes = [];
+      var permits = [];
+      var missingCn = false;
+      Array.prototype.forEach.call(document.querySelectorAll("#productBlocks .product-card"), function (row) {
+        var productName = row.querySelector("input[type=text]").value.trim();
+        if (!productName) return;
+        var picked = [];
+        Array.prototype.forEach.call(row.querySelectorAll("select"), function (select) {
+          if (!select.dataset.level || !select.value) return;
+          if (select.dataset.level === "중국구분" || select.dataset.level === "중국분류") return;
+          picked.push(select.dataset.level + " " + select.value);
+        });
+        var permit = row.querySelector("input[type=radio]:checked");
+        var permitValue = permit ? permit.value : "없음";
+        if (permitValue === "있음" && !row.dataset.cn) missingCn = true;
+        if (row.dataset.cn) picked.push("중국 " + row.dataset.cn);
+        names.push(productName);
+        classes.push(picked.join(" · "));
+        permits.push(permitValue);
+      });
+      if (!names.length) {
+        msg.textContent = "기업명 다음에 전시 제품을 적으세요.";
+        return;
+      }
+      if (missingCn) {
+        msg.textContent = "NMPA가 있으면 중국 품목분류를 고르고 확인하세요.";
+        return;
+      }
+      var item = {
+        hall: window.cmefHall || "5.2",
+        booth: "",
+        company: company,
+        person: document.getElementById("coPerson").value.trim(),
+        phone: document.getElementById("coPhone").value.trim(),
+        email: document.getElementById("coMail").value.trim(),
+        category: classes.join(", "),
+        product: names.join(", "),
+        auth: permits.map(function (value) { return "NMPA " + value; }).join(", "),
+        grade: "",
+        adMail: document.getElementById("agreeAd").checked ? "광고성 이메일 동의" : "",
+        x: null,
+        y: null
+      };
+      var saved = {};
+      try { saved = JSON.parse(localStorage.getItem("cmef2027-draft") || "{}") || {}; } catch (error) { saved = {}; }
+      if (!saved.apps) saved.apps = [];
+      saved.apps.push(item);
+      hallApps = saved.apps;
+      try { localStorage.setItem("cmef2027-draft", JSON.stringify(saved)); } catch (error) {}
+      paintApplicantList();
+      msg.textContent = company + " 신청을 받았습니다. 부스 번호가 확정되기 전에는 도면의 참가 기업에 나오지 않습니다.";
+    });
+  </script>
+
+  <footer>
+    <div class="wrap"></div>
+  </footer>
+</body>
+</html>
