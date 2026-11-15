@@ -467,7 +467,16 @@
     .entry-sheet { display: block; width: 100%; height: auto; margin: 0; border: 0; transform-origin: 0 0; user-select: none; }
     .entry-missing { margin: 24px 12px; color: var(--muted); font-size: 14px; text-align: center; }
     .entry-zoom { margin-top: 16px; }
-    .entry-zoom-bar { display: flex; flex-wrap: wrap; gap: 6px; }
+    .entry-zoom-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      position: sticky;
+      top: 64px;
+      z-index: 5;
+      background: #faf7f2;
+      padding: 8px 0;
+    }
     .entry-zoom-bar button {
       min-height: 32px;
       padding: 0 12px;
@@ -488,7 +497,7 @@
       overflow: hidden;
       border: 1px solid var(--line);
       background: #eef3f8;
-      touch-action: none;
+      touch-action: pan-y;
       cursor: grab;
     }
     .entry-stage:active { cursor: grabbing; }
@@ -1560,6 +1569,7 @@ HQI light × 1</span></td>
           </ol>
           <div class="entry-zoom" id="entryZoom" hidden>
             <div class="entry-zoom-bar">
+              <button type="button" id="entryClose">닫기</button>
               <button type="button" id="entryZoomOut">작게</button>
               <button type="button" id="entryZoomIn">크게</button>
               <button type="button" id="entryZoomReset">처음 크기</button>
@@ -2406,6 +2416,7 @@ HQI light × 1</span></td>
       function paint() {
         var change = "translate(" + ox + "px," + oy + "px) scale(" + scale + ")";
         document.querySelectorAll(".entry-sheet").forEach(function (node) { node.style.transform = change; });
+        stage.style.touchAction = scale > 1 ? "none" : "pan-y";
       }
       var zoom = document.getElementById("entryZoom");
       var sheet = document.getElementById("entryTall");
@@ -2420,12 +2431,27 @@ HQI light × 1</span></td>
         if (sheet.complete) fitStage();
         sheet.addEventListener("load", fitStage);
       }
+      function pinBar() {
+        var nav = document.querySelector(".site-nav");
+        var bar = zoom.querySelector(".entry-zoom-bar");
+        if (!nav || !bar) return;
+        bar.style.top = Math.ceil(nav.getBoundingClientRect().height) + "px";
+      }
+      function closeStep() {
+        if (openStep) openStep.setAttribute("aria-expanded", "false");
+        var back = openStep;
+        openStep = null;
+        zoom.hidden = true;
+        scale = 1;
+        ox = 0;
+        oy = 0;
+        paint();
+        if (back) back.scrollIntoView({ block: "center" });
+      }
       document.querySelectorAll(".entry-step").forEach(function (button) {
         button.addEventListener("click", function () {
           if (openStep === button) {
-            openStep = null;
-            button.setAttribute("aria-expanded", "false");
-            zoom.hidden = true;
+            closeStep();
             return;
           }
           if (openStep) openStep.setAttribute("aria-expanded", "false");
@@ -2437,6 +2463,7 @@ HQI light × 1</span></td>
           ox = 0;
           oy = 0;
           paint();
+          pinBar();
           if (sheet && sheet.hidden) {
             if (missing) missing.hidden = false;
             stage.style.aspectRatio = "3 / 4";
@@ -2446,7 +2473,8 @@ HQI light × 1</span></td>
           }
         });
       });
-      window.addEventListener("resize", function () { scale = 1; ox = 0; oy = 0; paint(); fitStage(); });
+      document.getElementById("entryClose").addEventListener("click", closeStep);
+      window.addEventListener("resize", function () { scale = 1; ox = 0; oy = 0; paint(); fitStage(); pinBar(); });
       function zoomAt(px, py, next) {
         next = clamp(next);
         if (next === 1) { scale = 1; ox = 0; oy = 0; paint(); return; }
@@ -2468,9 +2496,9 @@ HQI light × 1</span></td>
       }, { passive: false });
       stage.addEventListener("pointerdown", function (event) {
         pointers[event.pointerId] = { x: event.clientX, y: event.clientY };
-        stage.setPointerCapture(event.pointerId);
         var ids = Object.keys(pointers);
         if (ids.length >= 2) {
+          stage.setPointerCapture(event.pointerId);
           var a = pointers[ids[0]];
           var b = pointers[ids[1]];
           var rect = stage.getBoundingClientRect();
@@ -2485,6 +2513,12 @@ HQI light × 1</span></td>
           };
           return;
         }
+        if (scale === 1) {
+          drag = null;
+          pinch = null;
+          return;
+        }
+        stage.setPointerCapture(event.pointerId);
         drag = { x: event.clientX, y: event.clientY, ox: ox, oy: oy };
         pinch = null;
       });
