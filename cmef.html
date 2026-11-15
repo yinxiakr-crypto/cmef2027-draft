@@ -482,7 +482,8 @@
     }
     .entry-hint { margin: 8px 0 0; color: var(--muted); font-size: 13px; }
     .entry-stage {
-      margin-top: 8px;
+      width: 100%;
+      margin: 8px auto 0;
       aspect-ratio: 16 / 9;
       overflow: hidden;
       border: 1px solid var(--line);
@@ -2413,6 +2414,7 @@ HQI light × 1</span></td>
       function fitStage() {
         if (!sheet || sheet.hidden || !sheet.naturalWidth) return;
         stage.style.aspectRatio = sheet.naturalWidth + " / " + sheet.naturalHeight;
+        stage.style.maxWidth = sheet.naturalWidth + "px";
       }
       if (sheet) {
         if (sheet.complete) fitStage();
