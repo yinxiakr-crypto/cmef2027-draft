@@ -447,7 +447,15 @@
     .plain-card strong { display: block; margin-top: 12px; font-size: 28px; font-weight: 680; }
     .entry-lead { margin: 14px 0 0; font-size: 16px; font-weight: 680; line-height: 1.5; }
     .entry-note { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+    .entry-board { display: block; width: 100%; height: auto; margin-top: 14px; border: 1px solid var(--line); background: #eef3f8; cursor: zoom-in; }
+    .entry-board-note { margin: 8px 0 0; color: var(--muted); font-size: 13px; }
     .entry-steps { margin: 8px 0 0; padding: 0; list-style: none; }
+    @media (max-width: 860px) {
+      .entry-board, .entry-board-note { display: none !important; }
+    }
+    @media (min-width: 861px) {
+      #entrySteps { display: none; }
+    }
     .entry-steps li { margin-top: 8px; }
     .entry-step {
       display: block;
@@ -1582,6 +1590,9 @@ HQI light × 1</span></td>
         <div id="entryPass">
           <p class="entry-lead">QR 스캔 → 모바일 등록 7단계 → 개인 입장권 QR 수령</p>
           <p class="entry-note">휴대폰 화면 안내에 따라 7단계 진행</p>
+          <img class="entry-board" id="entryBoard" src="entry-pass-wide2.jpg" alt="입장 절차">
+          <p class="entry-board-note" id="entryBoardMissing" hidden>그림 없음</p>
+          <p class="entry-board-note">그림을 누르면 크게 볼 수 있습니다.</p>
           <ol class="entry-steps" id="entrySteps">
             <li><button type="button" class="entry-step" aria-expanded="false"><b>QR코드 스캔</b><span>카메라로 QR코드를 스캔합니다.</span></button></li>
             <li><button type="button" class="entry-step" aria-expanded="false"><b>등록 버튼 누르기</b><span>첫 화면의 Registration을 누릅니다.</span></button></li>
@@ -2442,7 +2453,15 @@ HQI light × 1</span></td>
       var sheet = document.getElementById("entrySheet");
       var missing = document.getElementById("entryMissing");
       var openStep = null;
+      var board = document.getElementById("entryBoard");
+      var wideOpen = false;
       function phoneView() { return window.matchMedia("(max-width: 860px)").matches; }
+      function syncBoard() {
+        if (!board) return;
+        board.hidden = !!window.entryWideOff;
+        var gone = document.getElementById("entryBoardMissing");
+        if (gone) gone.hidden = !window.entryWideOff;
+      }
       function stepFile(index) {
         return (phoneView() ? "entry-m2-" : "entry-w2-") + index + ".jpg";
       }
@@ -2523,6 +2542,29 @@ HQI light × 1</span></td>
           fitStage();
         }
       }
+      function showWideImage() {
+        if (window.entryWideOff) {
+          sheet.hidden = true;
+          if (missing) missing.hidden = false;
+          return;
+        }
+        sheet.hidden = false;
+        if (missing) missing.hidden = true;
+        var file = "entry-pass-wide2.jpg";
+        sheet.alt = "입장 절차";
+        if (sheet.getAttribute("data-file") !== file) {
+          sheet.onload = function () {
+            if (zoom.classList.contains("is-full")) layoutFull();
+            else fitStage();
+          };
+          sheet.setAttribute("data-file", file);
+          sheet.src = file;
+        } else if (zoom.classList.contains("is-full")) {
+          layoutFull();
+        } else {
+          fitStage();
+        }
+      }
       if (sheet.complete && sheet.getAttribute("src")) fitStage();
       function pinBar() {
         var nav = document.querySelector(".site-nav");
@@ -2535,6 +2577,7 @@ HQI light × 1</span></td>
         if (openStep) openStep.setAttribute("aria-expanded", "false");
         var back = openStep;
         openStep = null;
+        wideOpen = false;
         zoom.hidden = true;
         scale = 1;
         ox = 0;
@@ -2542,6 +2585,20 @@ HQI light × 1</span></td>
         paint();
         if (back) back.scrollIntoView({ block: "center" });
       }
+      if (board) board.addEventListener("click", function () {
+        if (phoneView() || window.entryWideOff) return;
+        if (openStep) openStep.setAttribute("aria-expanded", "false");
+        openStep = null;
+        wideOpen = true;
+        document.getElementById("entryPass").appendChild(zoom);
+        zoom.hidden = false;
+        scale = 1;
+        ox = 0;
+        oy = 0;
+        paint();
+        showWideImage();
+        openFull();
+      });
       sheet.addEventListener("click", function () {
         if (zoom.hidden || sheet.hidden || !sheet.getAttribute("src")) return;
         openFull();
@@ -2566,8 +2623,19 @@ HQI light × 1</span></td>
         });
       });
       document.getElementById("entryClose").addEventListener("click", closeStep);
+      syncBoard();
+      var wasPhone = phoneView();
       window.addEventListener("resize", function () {
+        var phone = phoneView();
+        if (phone !== wasPhone) {
+          wasPhone = phone;
+          closeStep();
+          syncBoard();
+          return;
+        }
+        syncBoard();
         if (zoom.classList.contains("is-full")) {
+          if (wideOpen) showWideImage();
           layoutFull();
           return;
         }
