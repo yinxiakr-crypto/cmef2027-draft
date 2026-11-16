@@ -464,7 +464,32 @@
     .entry-step b { display: block; font-size: 15px; font-weight: 720; }
     .entry-step span { display: block; margin-top: 2px; color: var(--muted); font-size: 14px; line-height: 1.5; }
     .entry-step[aria-expanded="true"] { border-color: var(--deep); background: #f4f1ea; }
-    .entry-sheet { display: block; width: 100%; height: auto; margin: 0; border: 0; transform-origin: 0 0; user-select: none; }
+    .entry-sheet { display: block; width: 100%; height: auto; margin: 0; border: 0; transform-origin: 0 0; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; cursor: zoom-in; }
+    .entry-zoom.is-full {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      margin: 0;
+      padding: 0 12px calc(12px + env(safe-area-inset-bottom));
+      background: #faf7f2;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      touch-action: none;
+    }
+    .entry-zoom.is-full .entry-zoom-bar { position: relative; top: 0; flex: 0 0 auto; }
+    .entry-zoom.is-full .entry-hint { flex: 0 0 auto; }
+    .entry-zoom.is-full .entry-stage {
+      flex: 1 1 auto;
+      width: 100%;
+      max-width: none;
+      height: auto;
+      min-height: 0;
+      aspect-ratio: auto;
+      margin: 0;
+      touch-action: none;
+    }
+    .entry-zoom.is-full .entry-sheet { max-width: none; cursor: grab; }
     .entry-missing { margin: 24px 12px; color: var(--muted); font-size: 14px; text-align: center; }
     .entry-zoom { margin-top: 16px; }
     .entry-zoom-bar {
@@ -1575,7 +1600,7 @@ HQI light × 1</span></td>
               <button type="button" id="entryZoomIn">크게</button>
               <button type="button" id="entryZoomReset">처음 크기</button>
             </div>
-            <p class="entry-hint">마우스 휠로 키우고 줄입니다. 휴대폰에서는 두 손가락으로 조절합니다.</p>
+            <p class="entry-hint">그림을 누르면 화면 가득 열립니다. 두 손가락으로 키우고 줄입니다.</p>
             <div class="entry-stage" id="entryStage">
               <img class="entry-sheet" id="entrySheet" alt="" draggable="false">
               <p class="entry-missing" id="entryMissing" hidden>그림 없음</p>
@@ -2410,11 +2435,11 @@ HQI light × 1</span></td>
       var pointers = {};
       var drag = null;
       var pinch = null;
-      function clamp(n) { return Math.max(1, Math.min(5, n)); }
+      function clamp(n) { return Math.max(1, Math.min(8, n)); }
       function paint() {
         var change = "translate(" + ox + "px," + oy + "px) scale(" + scale + ")";
         document.querySelectorAll(".entry-sheet").forEach(function (node) { node.style.transform = change; });
-        stage.style.touchAction = scale > 1 ? "none" : "pan-y";
+        stage.style.touchAction = (zoom.classList.contains("is-full") || scale > 1) ? "none" : "pan-y";
       }
       var zoom = document.getElementById("entryZoom");
       var sheet = document.getElementById("entrySheet");
@@ -2430,8 +2455,50 @@ HQI light × 1</span></td>
       function fitStage() {
         var img = activeSheet();
         if (!img || !img.naturalWidth) return;
+        if (zoom.classList.contains("is-full")) return;
         stage.style.aspectRatio = img.naturalWidth + " / " + img.naturalHeight;
         stage.style.maxWidth = "100%";
+      }
+      function clearSheetSize() {
+        sheet.style.width = "";
+        sheet.style.height = "";
+        sheet.style.maxWidth = "";
+        sheet.style.maxHeight = "";
+      }
+      function layoutFull() {
+        if (!sheet || !sheet.naturalWidth) return;
+        var rect = stage.getBoundingClientRect();
+        if (rect.width < 20 || rect.height < 20) return;
+        var fit = Math.min(rect.width / sheet.naturalWidth, rect.height / sheet.naturalHeight);
+        var w = sheet.naturalWidth * fit;
+        var h = sheet.naturalHeight * fit;
+        sheet.style.width = w + "px";
+        sheet.style.height = h + "px";
+        sheet.style.maxWidth = "none";
+        sheet.style.maxHeight = "none";
+        scale = 1;
+        ox = (rect.width - w) / 2;
+        oy = (rect.height - h) / 2;
+        paint();
+      }
+      function openFull() {
+        if (zoom.classList.contains("is-full") || sheet.hidden || !sheet.getAttribute("src")) return;
+        zoom.classList.add("is-full");
+        document.body.style.overflow = "hidden";
+        var bar = zoom.querySelector(".entry-zoom-bar");
+        if (bar) bar.style.top = "0px";
+        requestAnimationFrame(function () { layoutFull(); });
+      }
+      function leaveFull() {
+        if (!zoom.classList.contains("is-full")) return;
+        zoom.classList.remove("is-full");
+        document.body.style.overflow = "";
+        clearSheetSize();
+        scale = 1;
+        ox = 0;
+        oy = 0;
+        paint();
+        fitStage();
       }
       function showStepImage(index) {
         var off = phoneView() ? window.entryTallOff : window.entryWideOff;
@@ -2447,9 +2514,14 @@ HQI light × 1</span></td>
         var title = openStep && openStep.querySelector("b");
         sheet.alt = title ? title.textContent : "";
         if (sheet.getAttribute("data-file") !== file) {
-          sheet.onload = fitStage;
+          sheet.onload = function () {
+            if (zoom.classList.contains("is-full")) layoutFull();
+            else fitStage();
+          };
           sheet.setAttribute("data-file", file);
           sheet.src = file;
+        } else if (zoom.classList.contains("is-full")) {
+          layoutFull();
         } else {
           fitStage();
         }
@@ -2462,6 +2534,7 @@ HQI light × 1</span></td>
         bar.style.top = Math.ceil(nav.getBoundingClientRect().height) + "px";
       }
       function closeStep() {
+        leaveFull();
         if (openStep) openStep.setAttribute("aria-expanded", "false");
         var back = openStep;
         openStep = null;
@@ -2472,6 +2545,10 @@ HQI light × 1</span></td>
         paint();
         if (back) back.scrollIntoView({ block: "center" });
       }
+      sheet.addEventListener("click", function () {
+        if (zoom.hidden || sheet.hidden || !sheet.getAttribute("src")) return;
+        openFull();
+      });
       document.querySelectorAll(".entry-step").forEach(function (button, index) {
         button.addEventListener("click", function () {
           if (openStep === button) {
@@ -2493,6 +2570,10 @@ HQI light × 1</span></td>
       });
       document.getElementById("entryClose").addEventListener("click", closeStep);
       window.addEventListener("resize", function () {
+        if (zoom.classList.contains("is-full")) {
+          layoutFull();
+          return;
+        }
         scale = 1;
         ox = 0;
         oy = 0;
@@ -2506,7 +2587,14 @@ HQI light × 1</span></td>
       });
       function zoomAt(px, py, next) {
         next = clamp(next);
-        if (next === 1) { scale = 1; ox = 0; oy = 0; paint(); return; }
+        if (next === 1) {
+          if (zoom.classList.contains("is-full")) { layoutFull(); return; }
+          scale = 1;
+          ox = 0;
+          oy = 0;
+          paint();
+          return;
+        }
         var ratio = next / scale;
         ox = px - (px - ox) * ratio;
         oy = py - (py - oy) * ratio;
@@ -2524,6 +2612,7 @@ HQI light × 1</span></td>
         zoomAt(event.clientX - rect.left, event.clientY - rect.top, scale * (event.deltaY < 0 ? 1.12 : 0.89));
       }, { passive: false });
       stage.addEventListener("pointerdown", function (event) {
+        if (event.pointerType === "touch") return;
         pointers[event.pointerId] = { x: event.clientX, y: event.clientY };
         var ids = Object.keys(pointers);
         if (ids.length >= 2) {
@@ -2552,6 +2641,7 @@ HQI light × 1</span></td>
         pinch = null;
       });
       stage.addEventListener("pointermove", function (event) {
+        if (event.pointerType === "touch") return;
         if (!pointers[event.pointerId]) return;
         pointers[event.pointerId] = { x: event.clientX, y: event.clientY };
         var ids = Object.keys(pointers);
@@ -2579,11 +2669,99 @@ HQI light × 1</span></td>
       }
       stage.addEventListener("pointerup", endPointer);
       stage.addEventListener("pointercancel", endPointer);
+      var touchPts = {};
+      var touchPinch = null;
+      var touchDrag = null;
+      var gestureMoved = false;
+      var lastTap = 0;
+      function touchIds() { return Object.keys(touchPts); }
+      stage.addEventListener("touchstart", function (event) {
+        if (!zoom.classList.contains("is-full")) return;
+        var before = touchIds().length;
+        for (var i = 0; i < event.changedTouches.length; i++) {
+          var t = event.changedTouches[i];
+          touchPts[t.identifier] = { x: t.clientX, y: t.clientY };
+        }
+        if (before === 0) gestureMoved = false;
+        var ids = touchIds();
+        if (ids.length >= 2) {
+          event.preventDefault();
+          var a = touchPts[ids[0]];
+          var b = touchPts[ids[1]];
+          var rect = stage.getBoundingClientRect();
+          touchDrag = null;
+          touchPinch = {
+            dist: apart(a, b),
+            scale: scale,
+            ox: ox,
+            oy: oy,
+            px: (a.x + b.x) / 2 - rect.left,
+            py: (a.y + b.y) / 2 - rect.top
+          };
+          return;
+        }
+        var one = touchPts[ids[0]];
+        touchDrag = { x: one.x, y: one.y, ox: ox, oy: oy };
+      }, { passive: false, capture: true });
+      stage.addEventListener("touchmove", function (event) {
+        if (!zoom.classList.contains("is-full")) return;
+        for (var i = 0; i < event.changedTouches.length; i++) {
+          var t = event.changedTouches[i];
+          if (touchPts[t.identifier]) touchPts[t.identifier] = { x: t.clientX, y: t.clientY };
+        }
+        var ids = touchIds();
+        if (ids.length >= 2 && touchPinch) {
+          event.preventDefault();
+          var a = touchPts[ids[0]];
+          var b = touchPts[ids[1]];
+          var next = clamp(touchPinch.scale * (apart(a, b) / touchPinch.dist));
+          var ratio = next / touchPinch.scale;
+          ox = touchPinch.px - (touchPinch.px - touchPinch.ox) * ratio;
+          oy = touchPinch.py - (touchPinch.py - touchPinch.oy) * ratio;
+          scale = next;
+          gestureMoved = true;
+          if (scale === 1) layoutFull();
+          else paint();
+          return;
+        }
+        if (touchDrag && scale > 1 && ids.length === 1) {
+          event.preventDefault();
+          var p = touchPts[ids[0]];
+          if (Math.abs(p.x - touchDrag.x) + Math.abs(p.y - touchDrag.y) > 4) gestureMoved = true;
+          ox = touchDrag.ox + p.x - touchDrag.x;
+          oy = touchDrag.oy + p.y - touchDrag.y;
+          paint();
+        }
+      }, { passive: false, capture: true });
+      function endTouch(event) {
+        var wasPinch = touchIds().length >= 2;
+        for (var i = 0; i < event.changedTouches.length; i++) delete touchPts[event.changedTouches[i].identifier];
+        if (touchIds().length < 2) touchPinch = null;
+        if (touchIds().length === 0) {
+          if (!wasPinch && !gestureMoved && zoom.classList.contains("is-full") && event.changedTouches.length === 1) {
+            var now = Date.now();
+            var t = event.changedTouches[0];
+            if (now - lastTap < 300) {
+              var rect = stage.getBoundingClientRect();
+              zoomAt(t.clientX - rect.left, t.clientY - rect.top, scale > 1.05 ? 1 : 2.5);
+              lastTap = 0;
+            } else lastTap = now;
+          }
+          touchDrag = null;
+        }
+      }
+      stage.addEventListener("touchend", endTouch);
+      stage.addEventListener("touchcancel", endTouch);
+      stage.addEventListener("gesturestart", function (event) { if (zoom.classList.contains("is-full")) event.preventDefault(); }, { passive: false });
+      stage.addEventListener("gesturechange", function (event) { if (zoom.classList.contains("is-full")) event.preventDefault(); }, { passive: false });
       function zoomCenter(next) {
         var rect = stage.getBoundingClientRect();
         zoomAt(rect.width / 2, rect.height / 2, next);
       }
-      document.getElementById("entryZoomIn").addEventListener("click", function () { zoomCenter(scale * 1.25); });
+      document.getElementById("entryZoomIn").addEventListener("click", function () {
+        if (!zoom.classList.contains("is-full")) { openFull(); return; }
+        zoomCenter(scale * 1.25);
+      });
       document.getElementById("entryZoomOut").addEventListener("click", function () { zoomCenter(scale / 1.25); });
       document.getElementById("entryZoomReset").addEventListener("click", function () { zoomAt(0, 0, 1); });
     })();
