@@ -445,13 +445,30 @@
     .lock-card, .plain-card { margin-top: 18px; background: #fff; border: 1px solid var(--line); padding: 22px 22px 20px; }
     .lock-card b, .plain-card b { display: block; font-size: 22px; font-weight: 720; }
     .plain-card strong { display: block; margin-top: 12px; font-size: 28px; font-weight: 680; }
-    .entry-lead { margin: 14px 0 0; font-size: 16px; font-weight: 680; line-height: 1.5; }
+    .entry-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 14px; }
+    .entry-lead { margin: 0; font-size: 16px; font-weight: 680; line-height: 1.5; }
+    .entry-procs { display: flex; flex-wrap: wrap; gap: 6px; }
+    .entry-procs button {
+      min-height: 32px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 720;
+      cursor: pointer;
+    }
+    .entry-procs button[aria-expanded="true"] { background: var(--deep); color: #fff; border-color: var(--deep); }
+    .entry-proc-view { margin-top: 12px; }
+    .entry-proc-view img { display: block; width: min(420px, 100%); height: auto; border: 1px solid var(--line); background: #eef3f8; }
     .entry-note { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
     .entry-board { display: block; width: 100%; height: auto; margin-top: 14px; border: 1px solid var(--line); background: #eef3f8; cursor: zoom-in; }
     .entry-board-note { margin: 8px 0 0; color: var(--muted); font-size: 13px; }
     .entry-steps { margin: 8px 0 0; padding: 0; list-style: none; }
     @media (max-width: 860px) {
-      .entry-board, .entry-board-note { display: none !important; }
+      .entry-board, .entry-board-note, .entry-procs, .entry-proc-view { display: none !important; }
     }
     @media (min-width: 861px) {
       #entrySteps { display: none; }
@@ -1588,7 +1605,21 @@ HQI light × 1</span></td>
       <div class="plain-card">
         <b>입장 방법</b>
         <div id="entryPass">
-          <p class="entry-lead">QR 스캔 → 모바일 등록 7단계 → 개인 입장권 QR 수령</p>
+          <div class="entry-head">
+            <p class="entry-lead">QR 스캔 → 모바일 등록 7단계 → 개인 입장권 QR 수령</p>
+            <div class="entry-procs" id="entryProcs">
+              <button type="button" data-step="1" aria-expanded="false">1 등록</button>
+              <button type="button" data-step="2" aria-expanded="false">2 이메일</button>
+              <button type="button" data-step="3" aria-expanded="false">3 뒤로</button>
+              <button type="button" data-step="4" aria-expanded="false">4 전시회</button>
+              <button type="button" data-step="5" aria-expanded="false">5 등록</button>
+              <button type="button" data-step="6" aria-expanded="false">6 설문</button>
+              <button type="button" data-step="7" aria-expanded="false">7 사진</button>
+            </div>
+          </div>
+          <div class="entry-proc-view" id="entryProcView" hidden>
+            <img id="entryProcImg" alt="">
+          </div>
           <p class="entry-note">휴대폰 화면 안내에 따라 7단계 진행</p>
           <img class="entry-board" id="entryBoard" src="entry-pass-wide2.jpg" alt="입장 절차">
           <p class="entry-board-note" id="entryBoardMissing" hidden>그림 없음</p>
@@ -2624,6 +2655,25 @@ HQI light × 1</span></td>
       });
       document.getElementById("entryClose").addEventListener("click", closeStep);
       syncBoard();
+      var procView = document.getElementById("entryProcView");
+      var procImg = document.getElementById("entryProcImg");
+      var openProc = null;
+      document.querySelectorAll("#entryProcs button").forEach(function (button) {
+        button.addEventListener("click", function () {
+          if (openProc === button) {
+            openProc = null;
+            button.setAttribute("aria-expanded", "false");
+            procView.hidden = true;
+            return;
+          }
+          if (openProc) openProc.setAttribute("aria-expanded", "false");
+          openProc = button;
+          button.setAttribute("aria-expanded", "true");
+          procImg.alt = button.textContent;
+          procImg.src = "entry-w2-" + button.getAttribute("data-step") + ".jpg";
+          procView.hidden = false;
+        });
+      });
       var wasPhone = phoneView();
       window.addEventListener("resize", function () {
         var phone = phoneView();
