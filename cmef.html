@@ -465,6 +465,7 @@
     .entry-step span { display: block; margin-top: 2px; color: var(--muted); font-size: 14px; line-height: 1.5; }
     .entry-step[aria-expanded="true"] { border-color: var(--deep); background: #f4f1ea; }
     .entry-sheet { display: block; width: 100%; height: auto; margin: 0; border: 0; transform-origin: 0 0; user-select: none; }
+    .entry-tall { display: none; }
     .entry-missing { margin: 24px 12px; color: var(--muted); font-size: 14px; text-align: center; }
     .entry-zoom { margin-top: 16px; }
     .entry-zoom-bar {
@@ -501,6 +502,10 @@
       cursor: grab;
     }
     .entry-stage:active { cursor: grabbing; }
+    @media (max-width: 860px) {
+      .entry-wide { display: none; }
+      .entry-tall { display: block; }
+    }
     .map-lang { display: flex; gap: 6px; margin-top: 14px; }
     .map-lang button {
       min-height: 32px;
@@ -1555,17 +1560,18 @@ HQI light × 1</span></td>
       <div class="plain-card">
         <b>입장 방법</b>
         <div id="entryPass">
-          <p class="entry-lead">QR 스캔 → 모바일 등록 6단계 → 개인 입장권 QR 수령</p>
-          <p class="entry-note">휴대폰 화면 안내에 따라 6단계 진행</p>
+          <p class="entry-lead">QR 스캔 → 모바일 등록 7단계 → 개인 입장권 QR 수령</p>
+          <p class="entry-note">휴대폰 화면 안내에 따라 7단계 진행</p>
           <ol class="entry-steps" id="entrySteps">
-            <li><button type="button" class="entry-step" aria-expanded="false"><b>QR코드 스캔</b><span>Wi-Fi가 연결된 상태에서 휴대폰 카메라로 QR코드를 스캔해 등록 페이지에 접속합니다.</span></button></li>
-            <li><button type="button" class="entry-step" aria-expanded="false"><b>1차 등록 버튼 누르기</b><span>첫 화면의 Registration을 선택합니다.</span></button></li>
-            <li><button type="button" class="entry-step" aria-expanded="false"><b>이메일 검증코드 입력</b><span>이메일로 받은 코드를 입력한 뒤 Sign In/Register를 누릅니다.</span></button></li>
-            <li><button type="button" class="entry-step" aria-expanded="false"><b>좌측 하단 뒤로 가기</b><span>화면 왼쪽 아래 &lt; 버튼을 누릅니다.</span></button></li>
-            <li><button type="button" class="entry-step" aria-expanded="false"><b>두 번째 전시회 선택</b><span>CMEF Autumn 2026 (10.21-10.24)을 선택합니다.</span></button></li>
-            <li><button type="button" class="entry-step" aria-expanded="false"><b>2026년 등록 버튼 누르기</b><span>2026 가을 전시회 Registration을 선택합니다.</span></button></li>
-            <li><button type="button" class="entry-step" aria-expanded="false"><b>설문 1–5번 문항 답하기</b><span>Questionnaire 5개를 응답한 뒤 Next를 누릅니다.</span></button></li>
-            <li><button type="button" class="entry-step" aria-expanded="false"><b>입장권 QR 캡처·저장</b><span>개인 휴대폰에 입장권 QR 저장이 완료됩니다.</span></button></li>
+            <li><button type="button" class="entry-step" aria-expanded="false"><b>QR코드 스캔</b><span>카메라로 QR코드를 스캔합니다.</span></button></li>
+            <li><button type="button" class="entry-step" aria-expanded="false"><b>등록 버튼 누르기</b><span>첫 화면의 Registration을 누릅니다.</span></button></li>
+            <li><button type="button" class="entry-step" aria-expanded="false"><b>이메일 검증코드 입력</b><span>코드를 입력한 뒤 Sign In을 누릅니다.</span></button></li>
+            <li><button type="button" class="entry-step" aria-expanded="false"><b>좌측 하단 뒤로 가기</b><span>왼쪽 아래 &lt; 버튼을 누릅니다.</span></button></li>
+            <li><button type="button" class="entry-step" aria-expanded="false"><b>전시회(CMEF) 선택</b><span>CMEF Spring 2027을 선택합니다.</span></button></li>
+            <li><button type="button" class="entry-step" aria-expanded="false"><b>등록 버튼 누르기</b><span>Registration을 누릅니다.</span></button></li>
+            <li><button type="button" class="entry-step" aria-expanded="false"><b>설문 1–4번 답하기</b><span>4문항을 답한 뒤 Next를 누릅니다.</span></button></li>
+            <li><button type="button" class="entry-step" aria-expanded="false"><b>방문자 사진 찍기</b><span>Take a photo를 누릅니다.</span></button></li>
+            <li><button type="button" class="entry-step" aria-expanded="false"><b>입장권 QR 캡처·저장</b><span>QR 화면을 캡처해 저장합니다.</span></button></li>
           </ol>
           <div class="entry-zoom" id="entryZoom" hidden>
             <div class="entry-zoom-bar">
@@ -1576,7 +1582,8 @@ HQI light × 1</span></td>
             </div>
             <p class="entry-hint">마우스 휠로 키우고 줄입니다. 휴대폰에서는 두 손가락으로 조절합니다.</p>
             <div class="entry-stage" id="entryStage">
-              <img class="entry-sheet" id="entryTall" src="entry-pass-tall.jpg" alt="CMEF 전시장 입장권 신청 절차" draggable="false">
+              <img class="entry-sheet entry-wide" id="entryWide" src="entry-pass-wide.jpg" alt="CMEF 전시장 입장권 신청 절차" draggable="false">
+              <img class="entry-sheet entry-tall" id="entryTall" src="entry-pass-tall.jpg" alt="CMEF 전시장 입장권 신청 절차" draggable="false">
               <p class="entry-missing" id="entryMissing" hidden>그림 없음</p>
             </div>
           </div>
@@ -2366,7 +2373,12 @@ HQI light × 1</span></td>
         venueMapEn = (saved.noticeMapEn || "").trim();
         venueMapZh = (saved.noticeMapZh || "").trim();
         if (saved.noticeMapLang === "en" || saved.noticeMapLang === "zh") venueMapLang = saved.noticeMapLang;
+        var entryWide = document.getElementById("entryWide");
         var entryTall = document.getElementById("entryTall");
+        if (entryWide) {
+          if (saved.entryWideOff) entryWide.hidden = true;
+          else if (saved.entryWide) entryWide.src = saved.entryWide;
+        }
         if (entryTall) {
           if (saved.entryTallOff) entryTall.hidden = true;
           else if (saved.entryTall) entryTall.src = saved.entryTall;
@@ -2422,15 +2434,23 @@ HQI light × 1</span></td>
       var sheet = document.getElementById("entryTall");
       var missing = document.getElementById("entryMissing");
       var openStep = null;
+      function activeSheet() {
+        var phone = window.matchMedia("(max-width: 860px)").matches;
+        var img = document.getElementById(phone ? "entryTall" : "entryWide");
+        return img && !img.hidden ? img : null;
+      }
       function fitStage() {
-        if (!sheet || sheet.hidden || !sheet.naturalWidth) return;
-        stage.style.aspectRatio = sheet.naturalWidth + " / " + sheet.naturalHeight;
-        stage.style.maxWidth = sheet.naturalWidth + "px";
+        var img = activeSheet();
+        if (!img || !img.naturalWidth) return;
+        stage.style.aspectRatio = img.naturalWidth + " / " + img.naturalHeight;
+        stage.style.maxWidth = "100%";
       }
-      if (sheet) {
-        if (sheet.complete) fitStage();
-        sheet.addEventListener("load", fitStage);
-      }
+      ["entryWide", "entryTall"].forEach(function (id) {
+        var img = document.getElementById(id);
+        if (!img) return;
+        if (img.complete) fitStage();
+        img.addEventListener("load", fitStage);
+      });
       function pinBar() {
         var nav = document.querySelector(".site-nav");
         var bar = zoom.querySelector(".entry-zoom-bar");
@@ -2464,7 +2484,8 @@ HQI light × 1</span></td>
           oy = 0;
           paint();
           pinBar();
-          if (sheet && sheet.hidden) {
+          var shown = activeSheet();
+          if (!shown) {
             if (missing) missing.hidden = false;
             stage.style.aspectRatio = "3 / 4";
           } else if (missing) {
