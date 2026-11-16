@@ -1596,9 +1596,6 @@ HQI light × 1</span></td>
           <div class="entry-zoom" id="entryZoom" hidden>
             <div class="entry-zoom-bar">
               <button type="button" id="entryClose">닫기</button>
-              <button type="button" id="entryZoomOut">작게</button>
-              <button type="button" id="entryZoomIn">크게</button>
-              <button type="button" id="entryZoomReset">처음 크기</button>
             </div>
             <p class="entry-hint">그림을 누르면 화면 가득 열립니다. 두 손가락으로 키우고 줄입니다.</p>
             <div class="entry-stage" id="entryStage">
@@ -2754,16 +2751,6 @@ HQI light × 1</span></td>
       stage.addEventListener("touchcancel", endTouch);
       stage.addEventListener("gesturestart", function (event) { if (zoom.classList.contains("is-full")) event.preventDefault(); }, { passive: false });
       stage.addEventListener("gesturechange", function (event) { if (zoom.classList.contains("is-full")) event.preventDefault(); }, { passive: false });
-      function zoomCenter(next) {
-        var rect = stage.getBoundingClientRect();
-        zoomAt(rect.width / 2, rect.height / 2, next);
-      }
-      document.getElementById("entryZoomIn").addEventListener("click", function () {
-        if (!zoom.classList.contains("is-full")) { openFull(); return; }
-        zoomCenter(scale * 1.25);
-      });
-      document.getElementById("entryZoomOut").addEventListener("click", function () { zoomCenter(scale / 1.25); });
-      document.getElementById("entryZoomReset").addEventListener("click", function () { zoomAt(0, 0, 1); });
     })();
     var koreaSamples = [
       { hall: "5.2", booth: "5.2F37", company: "비나셀", category: "의료기기", product: "매일착용소프트콘택트렌즈", auth: "미취득", grade: "", x: 29.8, y: 47.5 },
